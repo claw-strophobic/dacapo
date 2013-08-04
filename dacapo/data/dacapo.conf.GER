@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- 	
-	Diese Datei dient der Konfiguration des gPlayers.
+	Diese Datei dient der Konfiguration des dacapos.
      	Die einzelnen Parameter sind lokal Dokumentiert.
      	Einige von ihnen lassen sich durch Befehlsparameter
 	bei Programmaufruf überschreiben.
@@ -8,8 +8,8 @@
 	 - Parameter vom Typ "color" werden als RGB-Farben (z.B. 250,250,250 für Weiß) angegeben.
 -->
 
-<gPlayer_preferences>
-	<version>0.1.3</version>
+<dacapo_preferences>
+	<version>0.1.4</version>
 	<gui>
 		<!-- 	Diese Kapitel dient der Konfiguration der Oberfläche.
 		     	Es ist in vier Unterkapitel aufgeteilt:
@@ -58,7 +58,7 @@
 			<diaShowTime typ="int">10</diaShowTime> 	 <!-- Anzahl Sekunden, die ein Bild im Diashow-Modus angezeigt werden soll -->
 			<picNoCover typ="text">leerCD.png</picNoCover> 	 <!-- Bild, das angezeigt werden soll, wenn kein Cover verfügbar ist -->
 			<fullscreen typ="boolean">True</fullscreen> 	 <!-- standardmäßig im Fullscreenmodus ausführen? -->
-			<caption typ="text">gPlayer</caption> 	 <!-- Fenster-Beschreibung -->
+			<caption typ="text">dacapo</caption> 	 <!-- Fenster-Beschreibung -->
 			<icon typ="text">treble_clef.png</icon> 	 <!-- Fenster-Icon -->
 			<iconsize typ="int">50</iconsize>   <!-- Fenster-Icon-Größe in Pixel -->
 			<showComments typ="boolean">True</showComments> 	 <!-- Kommentare (*comment* in Frames) anzeigen? -->
@@ -178,7 +178,7 @@
 			ERROR 		Due to a more serious problem, the software has not been able to perform some function.
 			CRITICAL 	A serious error, indicating that the program itself may be unable to continue running.
 		-->
-		<logFile typ="text">/tmp/GPlayer.log</logFile>	 <!-- Debug-Ausgabe in Datei -->
+		<logFile typ="text">/tmp/dacapo.log</logFile>	 <!-- Debug-Ausgabe in Datei -->
 		<logLevel typ="text">WARNING</logLevel>	 <!-- DEBUG,INFO,WARNING,ERROR oder CRITICAL  -->
 		<debugGUI typ="boolean">False</debugGUI>	 <!-- Debug-Ausgabe für GUI-Module -->
 		<debugPL typ="boolean">False</debugPL>	 <!-- Debug-Ausgabe für Playlisten-Module -->
@@ -186,4 +186,4 @@
 		<debugM typ="boolean">False</debugM>	 <!-- Debug-Ausgabe für Metadaten-Module -->
 	</debug>
 
-</gPlayer_preferences>
+</dacapo_preferences>

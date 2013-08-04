@@ -28,7 +28,7 @@ except ImportError, err:
 	sys.exit(2)
 
 # ----------- Globale Variablen/Objekte ----------------------- #
-VERSION = [0, 1, 3]
+VERSION = [0, 1, 4]
 oConfig = readconfig.getConfigObject()
 
 levels = {'CRITICAL' : logging.CRITICAL,
