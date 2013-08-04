@@ -1,0 +1,19 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# argparse muss vor dem GStreamer-Import ausgeführt werden
+# (welcher in clawplayer stattfindet)
+# da sonst der Hilfetext von GStreamer überschrieben wird.
+from clawplayer import clawPlayerHelp
+clawPlayerHelp.parser.parse_args()
+import sys
+
+if __name__ == "__main__":
+
+	if len(sys.argv) < 2:
+		clawPlayerHelp.parser.print_help()
+		sys.exit(1)
+
+	from clawplayer import clawPlayer
+	clawPlayer.play()
+

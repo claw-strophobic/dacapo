@@ -1,0 +1,19 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# argparse muss vor dem GStreamer-Import ausgeführt werden
+# (welcher in gplayer stattfindet)
+# da sonst der Hilfetext von GStreamer überschrieben wird.
+from gplayer import gPlayerHelp
+gPlayerHelp.parser.parse_args()
+import sys
+
+if __name__ == "__main__":
+
+	if len(sys.argv) < 2:
+		gPlayerHelp.parser.print_help()
+		sys.exit(1)
+
+	from gplayer import gPlayer
+	gPlayer.play()
+

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-4.6.dtd">
+<!-- eric4 project file for project dacapo -->
+<!-- Saved: 2013-08-04, 16:58:50 -->
+<!-- Copyright (C) 2013 Thomas Korell, claw.strophob@gmx.de -->
+<Project version="4.6">
+  <Language>en</Language>
+  <ProgLanguage mixed="0">Python</ProgLanguage>
+  <ProjectType>Other</ProjectType>
+  <Description>Lightweight music player, which shows fullscreen coverarts, pictures, metadata and even song-lyrics (unsynced and synced) stored in the audio-files . Runs on linux and windows. Uses Gtk+ and GStreamer</Description>
+  <Version>0.1.4</Version>
+  <Author>Thomas Korell</Author>
+  <Email>claw.strophob@gmx.de</Email>
+  <Sources>
+    <Source>__init__.py</Source>
+    <Source>setup.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/ui/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/ui/player.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/playlist/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/playlist/generate.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/errorhandling/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/config/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/config/createconfig.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/config/readconfig.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/config/packconfigdir.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/clawPlayerui.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/data/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/clawPlayerHelp.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/metadaten/__init__.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/metadaten/audiofile.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/clawPlayerGST.py</Source>
+    <Source>build/lib.linux-i686-2.7/clawplayer/clawPlayer.py</Source>
+    <Source>dacapo/ui/__init__.py</Source>
+    <Source>dacapo/ui/player.py</Source>
+    <Source>dacapo/playlist/__init__.py</Source>
+    <Source>dacapo/playlist/generate.py</Source>
+    <Source>dacapo/errorhandling/__init__.py</Source>
+    <Source>dacapo/config/__init__.py</Source>
+    <Source>dacapo/config/createconfig.py</Source>
+    <Source>dacapo/config/readconfig.py</Source>
+    <Source>dacapo/config/packconfigdir.py</Source>
+    <Source>dacapo/__init__.py</Source>
+    <Source>dacapo/clawPlayerui.py</Source>
+    <Source>dacapo/data/__init__.py</Source>
+    <Source>dacapo/clawPlayerHelp.py</Source>
+    <Source>dacapo/metadaten/__init__.py</Source>
+    <Source>dacapo/metadaten/audiofile.py</Source>
+    <Source>dacapo/clawPlayerGST.py</Source>
+    <Source>dacapo/clawPlayer.py</Source>
+  </Sources>
+  <Forms>
+  </Forms>
+  <Translations>
+  </Translations>
+  <Resources>
+  </Resources>
+  <Interfaces>
+  </Interfaces>
+  <Others>
+  </Others>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.pyw" type="SOURCES" />
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES" />
+    <FiletypeAssociation pattern="*.py" type="SOURCES" />
+    <FiletypeAssociation pattern="*.ptl" type="SOURCES" />
+  </FiletypeAssociations>
+</Project>

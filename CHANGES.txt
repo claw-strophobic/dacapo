@@ -1,0 +1,12 @@
+V0.1.2c, 2013-07-13 -- 	Remove TK from errorhandling, replace it by Gtk+
+						Check, if the path to the logfile is existing
+						Create this CHANGES.txt
+						Some documentation in the modules.
+V0.1.3, 2013-07-26 -- 	actual title in gapless-mode necessary for synced-lyrics
+						starting FAQ
+						Remove TK from createconfig, replace it by Gtk+
+V0.1.3a, 2013-08-01 -- 	Last line of synced lyrics was flickering. Fixed.
+						Two new points in FAQ
+V0.1.4, 2013-08-04 -- 	Changing the name of the project to "dacapo" due to name conflicts.
+						A new point in FAQ
+

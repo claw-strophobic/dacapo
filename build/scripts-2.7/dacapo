@@ -1,0 +1,19 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# argparse muss vor dem GStreamer-Import ausgeführt werden
+# (welcher in dacapo stattfindet)
+# da sonst der Hilfetext von GStreamer überschrieben wird.
+from dacapo import dacapoHelp
+dacapoHelp.parser.parse_args()
+import sys
+
+if __name__ == "__main__":
+
+	if len(sys.argv) < 2:
+		dacapoHelp.parser.print_help()
+		sys.exit(1)
+
+	from dacapo import dacapo
+	dacapo.play()
+

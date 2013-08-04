@@ -1,0 +1,7 @@
+include FAQ.txt
+include CHANGES.txt
+include README
+include README_ENG.txt
+include README_GER.txt
+include MANIFEST.in
+

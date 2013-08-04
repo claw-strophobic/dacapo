@@ -1,0 +1,35 @@
+Q: Does gPlayer load images, lyrics etc. from the internet?
+A: No. If you want quality, you need to get it by yourself.
+
+Q: Where do I have to save the images?
+A: In the audiofile (FLAC, MP3)
+
+Q: Where do I have to save the lyrics?
+A: Unsynced lyrics: In the audiofile (FLAC, MP3). Use the "unycnedlyrics" or "lyrics" tag.
+For syncronized lyrics you could save it in the audiofile, or in the same directory as the audiofile, or you specify a relativ directory in the config-file.
+
+Q: What is used for the comments?
+A: Since different programms using different tags ("comment", "comments"), all tags that have *comment* in the name are displayed.
+These tags are useful if i.e. the song features a guest-singer etc.
+
+Q: How to restore a playlist?
+A: In the config-directory (~/.gPlayer/) are stored two files: lastPlaylist.tmp and lastPlaylistNumber.tmp
+lastPlaylist.tmp ist the last playlist you played (if you used the shuffle-mode, this list is shuffled).
+lastPlaylistNumber.tmp only holds the number of the song from this list.
+If you call the gPlayer with the "resume"-flag (-R or --resume), it starts on this position.
+
+Q: How has a snyced-lyric-file/lrc-file to look like?
+A: Timestamp and lyric-line. An example from wikipedia:
+[00:12.00]Line 1 lyrics
+[00:17.20]Line 2 lyrics
+[00:21.10]Line 3 lyrics
+...
+[mm:ss.xx]last lyrics line
+
+ID Tags may appear before the lyrics:
+[ar:Lyrics artist]
+[al:Album where the song is from]
+[ti:Lyrics (song) title]
+[au:Creator of the Songtext]
+[length:How long the song is]
+

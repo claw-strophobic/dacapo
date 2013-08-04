@@ -1,0 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from gplayer import gPlayerui
+
+if __name__ == "__main__":
+    gPlayerui.main()
+
