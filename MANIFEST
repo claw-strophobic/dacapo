@@ -20,16 +20,23 @@ dacapo/config/configarchive.tar.gz
 dacapo/config/createconfig.py
 dacapo/config/packconfigdir.py
 dacapo/config/readconfig.py
+dacapo/data/Music-dacapo.png
 dacapo/data/__init__.py
 dacapo/data/dacapo.conf
 dacapo/data/dacapo.conf.GER
+dacapo/data/dacapo.conf.GER~
+dacapo/data/dacapo.conf~
 dacapo/data/english.ini
 dacapo/data/german.ini
 dacapo/data/leerCD.png
 dacapo/data/treble_clef.png
 dacapo/errorhandling/__init__.py
 dacapo/metadaten/__init__.py
+dacapo/metadaten/audiofile (Kopie).py
 dacapo/metadaten/audiofile.py
+dacapo/metadaten/mp3.py
+dacapo/metadaten/ogg.py
+dacapo/metadaten/vorbis.py
 dacapo/playlist/__init__.py
 dacapo/playlist/generate.py
 dacapo/ui/__init__.py

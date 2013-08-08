@@ -59,7 +59,7 @@
 			<picNoCover typ="text">leerCD.png</picNoCover> 	 <!-- Bild, das angezeigt werden soll, wenn kein Cover verfügbar ist -->
 			<fullscreen typ="boolean">True</fullscreen> 	 <!-- standardmäßig im Fullscreenmodus ausführen? -->
 			<caption typ="text">dacapo</caption> 	 <!-- Fenster-Beschreibung -->
-			<icon typ="text">treble_clef.png</icon> 	 <!-- Fenster-Icon -->
+			<icon typ="text">Music-dacapo.png</icon> 	 <!-- Fenster-Icon -->
 			<iconsize typ="int">50</iconsize>   <!-- Fenster-Icon-Größe in Pixel -->
 			<showComments typ="boolean">True</showComments> 	 <!-- Kommentare (*comment* in Frames) anzeigen? -->
 			<overlayComments typ="boolean">True</overlayComments> 	 <!-- Kommentare (*comment* in Frames) ggf. über die Bilder blenden -->

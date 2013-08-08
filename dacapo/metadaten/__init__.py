@@ -16,4 +16,61 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from dacapo import errorhandling
+import sys
+import os
+try:
+	import mimetypes
+	import logging
+	import traceback
+	from dacapo.metadaten import vorbis, mp3, ogg
+except ImportError, err:
+	errorhandling.Error.show()
+	sys.exit(2)
+
+def getAudioFile(playerGUI, filename):
+	'''
+		Abhängig vom Audio-Typ wird eine Subklasse von Audiofile geladen.
+		In dieser werden die Metadaten eingelesen (notfalls konvertiert) 
+		und die Texte und Bilder in einer Liste aufbereitet zur Verfügung 
+		gestellt.
+	'''
+	audioFile = None
+	contentType = mimetypes.guess_type(filename) # Mimetype herausfinden
+	mimeType = contentType[0]
+	if os.path.isfile(filename):
+		# Versuche FLAC-Datei zu laden
+		if mimeType == 'audio/flac': 
+			try:
+				audioFile = vorbis.VorbisFile(playerGUI, filename)	
+			except BaseException :
+				logging.error("FEHLER bei %s" % (filename) )
+				exc_type, exc_value, exc_traceback = sys.exc_info()
+				lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+				for line in lines :
+					logging.error(line)
+
+		# Versuche MP3-Datei zu laden
+		if mimeType == 'audio/mpeg' : 
+			try:
+				audioFile = mp3.Mp3File(playerGUI, filename)	
+			except BaseException :
+				logging.error("FEHLER bei %s" % (filename) )
+				exc_type, exc_value, exc_traceback = sys.exc_info()
+				lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+				for line in lines :
+					logging.error(line)
+
+		# Versuche OGG-Datei zu laden
+		if mimeType == 'audio/ogg' : 
+			try:
+				audioFile = ogg.OggFile(playerGUI, filename)	
+			except BaseException :
+				logging.error("FEHLER bei %s" % (filename) )
+				exc_type, exc_value, exc_traceback = sys.exc_info()
+				lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+				for line in lines :
+					logging.error(line)
+
+	return audioFile
 

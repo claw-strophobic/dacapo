@@ -84,7 +84,10 @@ class PlayList(object):
 		if os.path.isfile(song):
 			contentType = mimetypes.guess_type(song) # Mimetype herausfinden
 			if self.isDebug() : logging.debug("appendList() -> Angegebene Datei ist vom Typ: %s" % (contentType[0]) )
-			if contentType[0] == 'audio/flac' or contentType[0] == 'audio/mpeg' : self.__List.append(song)
+			if contentType[0] == 'audio/flac' \
+			or contentType[0] == 'audio/mpeg' \
+			or contentType[0] == 'audio/ogg' : 
+				self.__List.append(song)
 			elif contentType[0] == None or contentType[0] == 'audio/x-mpegurl' : self.readPlaylist()
 		else : 
 			print >> sys.stderr, "FEHLER: Kann Datei %s nicht finden. " % (song)

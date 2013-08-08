@@ -9,4 +9,7 @@ V0.1.3a, 2013-08-01 -- 	Last line of synced lyrics was flickering. Fixed.
 						Two new points in FAQ
 V0.1.4, 2013-08-04 -- 	Changing the name of the project to "dacapo" due to name conflicts.
 						A new point in FAQ
-
+V0.1.5, 2013-08-04 -- 	Setup -> existing config-dir: Bug in Gtk-Question/return
+						Creating modules "vorbis.py" and "mp3.py" for FLAC- and MP3-metadata
+						as an subclass from audiofile
+						Adding Ogg-Vorbis

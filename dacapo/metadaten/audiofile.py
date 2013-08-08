@@ -1,24 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Dieses Modul enthält eine Klasse um Audiodateien zu verarbeiten (momentan FLAC und MP3). """
+"""
+	Dieses Modul enthält eine Klasse um die Metadaten einer Audiodatei 
+	zu verarbeiten. 
+	Für die einzelnen Formate (FLAC, MP3 usw.) wird von dieser Klasse
+	abgeleitet und die folgenden Methoden implementiert:
+
+	def loadFile(self):
+	def loadFrontCover(self):
+	def loadStoredPictures(self):
+
+"""
 from dacapo import errorhandling
 import sys
 import os
 try:
-	from mutagen.flac import FLAC, Picture
-	from mutagen.id3 import ID3, APIC
-	from mutagen.mp3 import MP3
 	import string
-	import mutagen
 	import pygame
 	import random
-	import mimetypes
 	import logging
 	import traceback
-	import threading
 	import codecs      # utf8 support
 	import platform
+	import StringIO
 	from dacapo.config import readconfig
 except ImportError, err:
 	errorhandling.Error.show()
@@ -27,64 +32,25 @@ except ImportError, err:
 # ----------- Globale Variablen/Objekte ----------------------- #
 HOMEDIR = os.path.expanduser('~')
 
-class AudioFile(threading.Thread):
+class AudioFile(object):
 
-	def __init__(self, playerGUI, ausschalter):
-		threading.Thread.__init__(self)
-		self.ausschalter = ausschalter
+	def __init__(self, playerGUI, filename):
 		self.fileOpen = False
 		self.guiPlayer = playerGUI
 		self.config = readconfig.getConfigObject()
 		self.LEERCD = HOMEDIR + '/.dacapo/' + self.config.getConfig('gui', 'misc', 'picNoCover')
 		self.debug = self.config.getConfig('debug', ' ', 'debugM')
 		self.mp3Tags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
-
-
-	def loadFile(self, filename):
 		self.fileOpen = False
 		self.filename = filename
 		self.clearTags()
+		self.tags = dict()
+		self.loadFile()
+		self.syncLyrics = self.config.getConfig('gui', 'misc', 'showLyricsSynced')
+		# synchronisierte Texte laden?
+		if self.syncLyrics == True: self.setSyncLyrics()
 
-		contentType = mimetypes.guess_type(filename) # Mimetype herausfinden
-		self.mimeType = contentType[0]
-		if self.debug : logging.debug("Angegebene Datei ist vom Typ: %s" % (self.mimeType))
-		if os.path.isfile(filename):
-			# Versuche FLAC-Datei zu laden
-			if self.mimeType == 'audio/flac':
-				try:
-					self.audio = FLAC(filename)	
-					self.loadFLACMetaData()
-					self.fileOpen = True
-				except BaseException :
-					self.fileOpen = False
-					logging.error("FEHLER bei %s" % (self.filename) )
-					exc_type, exc_value, exc_traceback = sys.exc_info()
-					lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-					for line in lines :
-						logging.error(line)
 
-			# Versuche MP3-Datei zu laden
-			if self.mimeType == 'audio/mpeg' : 
-				try:
-					if self.debug : logging.debug("Versuche MP3-Datei zu laden -> %s " % (self.filename))
-					self.audio = MP3(filename, ID3=ID3)
-					if self.debug : logging.debug("Versuche MP3-Metadaten zu lesen -> %s " % (self.filename))
-					self.loadMP3MetaData()
-					if self.debug : logging.debug("alles super ... ")
-					self.fileOpen = True
-				except BaseException :
-					self.fileOpen = False
-					logging.error("FEHLER bei %s" % (self.filename) )
-					exc_type, exc_value, exc_traceback = sys.exc_info()
-					lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-					for line in lines :
-						logging.error(line)
-
-			self.syncLyrics = self.config.getConfig('gui', 'misc', 'showLyricsSynced')
-			# synchronisierte Texte laden?
-			if self.syncLyrics == True: self.setSyncLyrics()
-
-		return self.fileOpen
 
 	def setSyncLyrics(self):
 		self.syncTime, self.syncText = self.loadSyncLyrics()
@@ -100,9 +66,6 @@ class AudioFile(threading.Thread):
 				self.syncCount   als counter mit 0
 		"""
 		syncedTag = self.config.getConfig('gui', 'syncLyrics', 'tag')
-		if self.mimeType == 'audio/mpeg' : 
-			if self.mp3Tags.has_key(syncedTag) :
-				syncedTag = self.mp3Tags[syncedTag] 
 		syncedDir = self.config.getConfig('gui', 'syncLyrics', 'dir')
 		# Ersatzvariablen auflösen
 		while True :
@@ -193,23 +156,20 @@ class AudioFile(threading.Thread):
 			Da diese Variablen sich auf FLAC-Tags
 			beziehen, muss bei MP3 vorher umgesetzt
 			werden.
-			Auch diese Umsetzung wird in der Config-
+			Auch diese Umsetzung wird u.a. in der Config-
 			Datei festgelegt.
 		"""
 		# Besonderheit, da auch gerne mal tracknumber = "5/7"
 		# gespeichert wird... (gerade bei MP3)
 		if key == "tracknumber" : return self.getTrack()
 		if key == "tracktotal" : return self.getTrackTotal()
-
-		if self.mimeType == 'audio/mpeg' : 
-			if self.mp3Tags.has_key(key) :
-				key = self.mp3Tags[key] 
-		value = ''
+		if self.debug : logging.debug("Angeforderter Key: %s" % (key))
+		value = "  "
 		bFirst = True
-		if self.audio.has_key(key) :
+		if self.tags.has_key(key) :
 			try : 
-				for text in self.audio[key]:
-					# print "TYPE Key %s (%s) = %s" % (key, text, type(text))
+				for text in self.tags[key]:
+					if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, text, type(text)))
 					if isinstance(text, str) or isinstance(text, unicode):
 						if bFirst : value = text
 						else: value += '\n' + text
@@ -218,104 +178,15 @@ class AudioFile(threading.Thread):
 						else: value += '\n' + text.get_text() 
 					bFirst = False
 			except : pass
+		if self.debug : logging.debug("Zurueck Key: %s Value %s" % (key, value))
 		return value
 
 
 
-	def loadFLACMetaData(self):
-		"""
-			Die FLAC-Metadaten werden eingelesen.
-			Ursprünglich wurden die Daten einzeln
-			behandelt. Mitlerweile wird das alles
-			durch Ersatzvariablen in der Config-
-			Datei behandelt.
-			Für ein paar Sachen kann es aber
-			noch ganz nütlich sein, die Felder
-			einzeln aufzubereiten (z.B. TrackNr)
-		"""
-
-		for tag in self.audio.keys():
-			for text in self.audio[tag]:
-				if tag == 'title' :
-					if self.debug : logging.debug('Title? {0}: {1}'.format(tag, text.encode('UTF-8')) ) 
-					self.setTitle(text)
-				elif tag == 'artist' :
-					if self.debug : logging.debug( 'Artist? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setArtist(text)
-				elif tag == 'album' :
-					if self.debug : logging.debug( 'Album? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setAlbum(text)
-				elif tag == 'tracknumber' :
-					if self.debug : logging.debug( 'Track? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setTrack(text)
-				elif tag == 'tracktotal' :
-					if self.debug : logging.debug( 'Tracks? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setTrackTotal(text)
-				elif tag == 'discnumber' :
-					if self.debug : logging.debug( 'Discnumber? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setDiscNo(text)
-				elif tag == 'cddb' :
-					if self.debug : logging.debug( 'CDDB? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setCDDB(text)
-				elif tag == 'date' :
-					if self.debug : logging.debug( 'Year? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setYear(text)
-				elif tag == 'lyrics' :
-					if self.debug : logging.debug( 'Lyrics? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-				elif 'comment' in tag :
-					if self.debug : logging.debug( 'Comment? {0}: {1}'.format(tag, text.encode('UTF-8')) )
-					self.setComments(text)
-				else:
-					if self.debug : logging.debug('Unhandled Tag {0}: {1}'.format(tag, text.encode('UTF-8')) )
-
-		if self.debug : logging.debug("LENGTH? %s" % (self.audio.info.length) )
-
-
-	def loadMP3MetaData(self):
-		"""
-			Die MP3-Metadaten werden eingelesen.
-			Ursprünglich wurden die Daten einzeln
-			behandelt. Mitlerweile wird das alles
-			durch Ersatzvariablen in der Config-
-			Datei behandelt.
-			Für ein paar Sachen kann es aber
-			noch ganz nütlich sein, die Felder
-			einzeln aufzubereiten (z.B. TrackNr)
-		"""
-
-		if self.debug : logging.debug("-> Versuche Titel zu lesen: %s" % (self.filename))
-		if self.audio.has_key('TIT2'):
-			self.songtitle = " " + self.audio["TIT2"][0]
-			if self.debug : logging.debug( "... geschafft! ... %s " % (self.songtitle))
-		else:
-			self.songtitle = " ????" 
-			if self.debug : logging.warning( "... NICHT geschafft! ... ")
-
-		if self.debug : logging.debug("-> Versuche Artist zu lesen: %s" % (self.filename))
-		if self.audio.has_key('TPE1'):
-			self.artist = " " + self.audio["TPE1"][0]
-			if self.debug : logging.debug( "... geschafft! ... %s " % (self.artist))
-		else:
-		    self.artist = " " + self.audio["TPE2"][0]
-		self.album = self.audio["TALB"][0] + " "
-		if self.audio.has_key('TRCK'):
-			self.setTrack(self.audio["TRCK"][0])
-			# self.tracknumber = self.audio["TRCK"][0]
-		else:
-			self.tracknumber = "??"
-		if self.audio.has_key('TDRC'):
-			self.date = self.audio["TDRC"][0].get_text() 
-		else:
-			self.date = "???? "
-
-		if self.debug : logging.debug("LENGTH? %s" % (self.audio.info.length))
-
 
 	def loadPictures(self) :
-		if self.debug : logging.debug("Angegebene Datei ist vom Typ: %s" % (self.mimeType) )
 		self.setMiscPic()
-		if self.mimeType == 'audio/flac': self.loadFLACPictures()
-		else : self.loadMP3Pictures()
+		self.loadStoredPictures()
 		# Sind Texte vorhanden? Anzeigen als Bild? Dann los!
 		if self.debug : logging.debug("Texte als Bild anzeigen? %s" % (self.guiPlayer.showLyricsAsPics))		
 		listLyrics = list()
@@ -354,139 +225,11 @@ class AudioFile(threading.Thread):
 		return
 
 	def getFrontCover(self):
-		if self.debug : logging.info("Angegebene Datei ist vom Typ: %s" % (self.mimeType) )
-		if self.mimeType == 'audio/flac': self.loadFLACFrontCover()
-		else : self.loadMP3FrontCover()
+		self.loadFrontCover()
 		if self.debug : logging.info("done.")
 		return self.cover
 
-	def loadFLACFrontCover(self):
-		import StringIO
-		pics = self.audio.pictures		
-		if self.debug : logging.debug('Insgesamt %s Bilder' %(len(pics)))
-		foundPic = False
-		if len(pics) > 0:
-			# Versuchen ein Frontcover laut dekleration zu finden
-			# oder, wenn es nur ein Bild gibt, dieses nehmen
-			for p in pics:
-				if p.type == 3 or len(pics) == 1:
-					datei = StringIO.StringIO()
-					datei.write(p.data)
-					datei.seek(0)
-					foundPic = True
-					break
-
-			# Wenn nix gefunden wurde, nehmen wir das erste Bild
-			if foundPic == False :
-				for p in pics:
-					datei = StringIO.StringIO()
-					datei.write(p.data)
-					datei.seek(0)
-					foundPic = True
-					break
-				
-		if foundPic == True:
-			self.setCover(pygame.image.load(datei))
-		else:
-			self.setCover(pygame.image.load(self.LEERCD))		
-		return
-
-	def loadFLACPictures(self):
-		import StringIO
-		diaMode = self.guiPlayer.getDiaMode()
-		pics = self.audio.pictures
-		if self.debug : logging.info('Insgesamt %s Bilder' %(len(pics)))
-		# wenn nur ein Bild vorhanden ->
-		# abbrechen, denn dies wurde als Frontcover
-		# behandelt
-		if len(pics) <= 1 : 
-			return
-
-		foundBackcover = False
-		for p in pics:
-			if self.debug : logging.debug('Bild gefunden. Typ {0}: {1}'.format(p.type, p.desc.encode('UTF-8')) )
-			if not p.type == 3:			
-				if (diaMode == 3 or diaMode == 5) or (p.type > 3 and p.type < 7) :
-					if self.debug : logging.debug('Write StringIO')
-					datei = StringIO.StringIO()
-					datei.write(p.data)
-					datei.seek(0)
-					if self.debug : logging.debug('done.')
-					if self.debug : logging.debug('pygame.image.load')
-					if p.type == 4 and not foundBackcover and diaMode > 3 :
-						foundBackcover = True
-						self.setBackcover(pygame.image.load(datei))
-					else :
-						self.setMiscPic(pygame.image.load(datei))
-					if self.debug : logging.debug('done.')
 		
-		if self.debug : logging.info('done.')
-		return
-		
-
-	def loadMP3FrontCover(self):
-		import StringIO
-		if self.debug : logging.debug("Suche MP3-Cover... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
-		foundPic = False
-
-		for tag in self.audio.keys():
-			if 'APIC' in tag:
-				if self.audio[tag].type == 3:
-					if self.debug : logging.debug('Cover gefunden. Typ {0}: {1}'.format(self.audio[tag].type, tag) )
-					datei = StringIO.StringIO()
-					datei.write(self.audio[tag].data)
-					datei.seek(0)
-					foundPic = True
-					break
-
-		if foundPic == True:
-			if self.debug : logging.debug("... gefunden! ... ")
-			self.cover = pygame.image.load(datei)
-		else:
-			if self.debug : logging.warning("... NICHT gefunden! ... ")
-			self.cover = pygame.image.load(self.LEERCD)
-
-		return
-
-		
-	def loadMP3Pictures(self):
-		import StringIO
-		if self.debug : logging.debug("Suche MP3-Bilder... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
-		foundPic = False
-		if diaMode > 1:
-			for tag in self.audio.keys():
-				if 'APIC' in tag:
-					if not self.audio[tag].type == 3:
-						if (diaMode == 3 or diaMode == 5) or (self.audio[tag].type > 3 and self.audio[tag].type < 7) :
-							if self.debug : logging.debug('Bild gefunden. Typ {0}: {1}'.format(self.audio[tag].type, tag) )
-							datei = StringIO.StringIO()
-							datei.write(self.audio[tag].data)
-							datei.seek(0)
-							self.setMiscPic(pygame.image.load(datei))
-
-
-
-		for tag in self.audio.keys():
-			if 'APIC' in tag:
-				if self.audio[tag].type == 3:
-					if self.debug : logging.debug('Cover gefunden. Typ {0}: {1}'.format(self.audio[tag].type, tag))
-					datei = StringIO.StringIO()
-					datei.write(self.audio[tag].data)
-					datei.seek(0)
-					foundPic = True
-					break
-
-		if foundPic == True:
-			if self.debug : logging.debug("... gefunden! ... ")
-			self.cover = pygame.image.load(datei)
-		else:
-			if self.debug : logging.warning("... NICHT gefunden! ... ")
-			self.cover = pygame.image.load(self.LEERCD)
-
-		return
-
 
 # -------------------- getLyrics ----------------------------------------------------------------
 
@@ -550,6 +293,13 @@ class AudioFile(threading.Thread):
 		if self.debug : logging.info("done.")
 		return
 ## --------------- Getter -----------------------------------
+
+	def getTempPic(self, data):
+		datei = StringIO.StringIO()
+		datei.write(data)
+		datei.seek(0)
+		return datei
+
 	def getCover(self):
 		return self.cover 
 
@@ -712,9 +462,4 @@ class AudioFile(threading.Thread):
 		self.syncText = []
 		self.syncCount = 0
 
-	def doEnd(self):
-		self.ausschalter.set()
-
-	def run(self):
-		if self.debug : logging.debug('->start ')	
 

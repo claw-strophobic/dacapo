@@ -30,7 +30,7 @@ try:
 	import gtk
 	from pygame.locals import *	
 	import pygame
-	from dacapo.metadaten import audiofile
+	from dacapo.metadaten import *
 	from dacapo.dacapoGST import GstPlayer
 	from dacapo.config import readconfig
 	from dacapo.dacapoHelp import SHOWPIC_CHOICES
@@ -97,8 +97,6 @@ class playerGUI():
 		if self.fullscreen: self.winState = 'fullscreen'
 
 		self.doInitDisplay()
-		self.audioFile = audiofile.AudioFile(self, ausschalter)
-		self.audioFile.start()
 		self.playNextSong()
 		return
 
@@ -782,7 +780,8 @@ class playerGUI():
 			self.actSong += 1
 			if os.path.isfile(self.filename):
 				if self.ShowGUI == True :
-					if self.audioFile.loadFile(self.filename) == True :
+					self.audioFile = getAudioFile(self, self.filename)
+					if self.audioFile <> None :
 						# if self.getDebug() : print 'Hole Cover: {0}'.format(self.filename)
 						# self.pic = self.audioFile.getCover()
 						if self.getDebug() : logging.info('Starte GStreamer: {0} '.format(self.filename))
@@ -888,7 +887,6 @@ class playerGUI():
 		self.gstPlayer.doEnd()
 		del self.gstPlayer
 		if self.getDebug() : logging.debug("audioFile beenden... ")
-		self.audioFile.doEnd()
 		del self.audioFile
 		if self.getDebug() : logging.debug("pygame beenden... ")
 		pygame.quit()

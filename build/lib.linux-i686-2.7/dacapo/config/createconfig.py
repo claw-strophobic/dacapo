@@ -24,7 +24,7 @@ def showMsg(msg):
 		)
 		answer = dlg.run()
 		dlg.destroy()
-		if answer == -5 : print "True"
+		if answer == -5 : return True
 
 	return False
 
@@ -48,7 +48,9 @@ print("does the config-dir exist? %s " % (is_dir))
 doit = True
 if is_dir :
 	doit = showMsg(FILE_EXISTS_MSG)
+	print("replace the existing config-dir? %s " % (doit))
 
-if doit: tar.extractall(path=root_dir)
+if doit: 
+	tar.extractall(path=root_dir)
 
 
