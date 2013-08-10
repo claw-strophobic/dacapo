@@ -24,8 +24,6 @@ dacapo/data/Music-dacapo.png
 dacapo/data/__init__.py
 dacapo/data/dacapo.conf
 dacapo/data/dacapo.conf.GER
-dacapo/data/dacapo.conf.GER~
-dacapo/data/dacapo.conf~
 dacapo/data/english.ini
 dacapo/data/german.ini
 dacapo/data/leerCD.png

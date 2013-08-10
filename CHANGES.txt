@@ -13,3 +13,4 @@ V0.1.5, 2013-08-04 -- 	Setup -> existing config-dir: Bug in Gtk-Question/return
 						Creating modules "vorbis.py" and "mp3.py" for FLAC- and MP3-metadata
 						as an subclass from audiofile
 						Adding Ogg-Vorbis
+						Bug from renaming gplayer -> dacapo: dacapoui cannot import dacapo

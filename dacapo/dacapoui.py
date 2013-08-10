@@ -33,7 +33,7 @@ try :
 	import subprocess
 	from config import readconfig
 	from dacapoHelp import SHOWPIC_CHOICES, getLangText
-	from dacapo import dacapo 
+	import dacapo 
 	from pkg_resources import resource_string
 except ImportError, err:
 	errorhandling.Error.show()
