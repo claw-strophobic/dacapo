@@ -18,6 +18,7 @@ try:
 	import sys, os
 	import random
 	import mimetypes
+	from dacapo.metadata import mimehelp
 	import pickle
 	import logging
 	import traceback
@@ -26,12 +27,9 @@ except ImportError, err:
     sys.exit(2)
 
 # ----------- Globale Variablen/Objekte ----------------------- #
-SHOWPIC_CHOICES=["NO","coverOnly", "allCover", "allPics", "diaShowAllCover", "diaShowAllPics", "help"] 		
 HOMEDIR = os.path.expanduser('~')
 CONFIG_DIR = HOMEDIR + '/.dacapo/'
 LIST_NAME = CONFIG_DIR + 'lastPlaylist.tmp'
-mimetypes.add_type('audio/flac', '.flac')
-mimetypes.init()
 
 ### Klassendefinitionen
 
@@ -84,9 +82,10 @@ class PlayList(object):
 		if os.path.isfile(song):
 			contentType = mimetypes.guess_type(song) # Mimetype herausfinden
 			if self.isDebug() : logging.debug("appendList() -> Angegebene Datei ist vom Typ: %s" % (contentType[0]) )
-			if contentType[0] == 'audio/flac' \
-			or contentType[0] == 'audio/mpeg' \
-			or contentType[0] == 'audio/ogg' : 
+			if contentType[0] in mimehelp.FLAC_MIMES \
+			or contentType[0] in mimehelp.OGG_MIMES \
+			or contentType[0] in mimehelp.WMA_MIMES \
+			or contentType[0] in mimehelp.MPG_MIMES : 
 				self.__List.append(song)
 			elif contentType[0] == None or contentType[0] == 'audio/x-mpegurl' : self.readPlaylist()
 		else : 

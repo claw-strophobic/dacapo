@@ -29,12 +29,13 @@ dacapo/data/german.ini
 dacapo/data/leerCD.png
 dacapo/data/treble_clef.png
 dacapo/errorhandling/__init__.py
-dacapo/metadaten/__init__.py
-dacapo/metadaten/audiofile (Kopie).py
-dacapo/metadaten/audiofile.py
-dacapo/metadaten/mp3.py
-dacapo/metadaten/ogg.py
-dacapo/metadaten/vorbis.py
+dacapo/metadata/__init__.py
+dacapo/metadata/audiofile.py
+dacapo/metadata/mimehelp.py
+dacapo/metadata/mp3.py
+dacapo/metadata/ogg.py
+dacapo/metadata/vorbis.py
+dacapo/metadata/wma.py
 dacapo/playlist/__init__.py
 dacapo/playlist/generate.py
 dacapo/ui/__init__.py

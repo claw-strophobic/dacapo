@@ -16,8 +16,8 @@ class my_install():
 
 setup(
     name = "dacapo",
-    version = "0.1.5",
-    packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 'dacapo.errorhandling', 'dacapo.metadaten', 'dacapo.playlist'],
+    version = "0.1.6",
+    packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist'],
     scripts = ["bin/dacapo", "bin/dacapoui"],
 
     # Project uses reStructuredText, so ensure that the docutils get
@@ -50,7 +50,7 @@ setup(
     description = "Lightweight Music Player with cover- and lyrics-display",
     license = "GNU General Public License (v2 or later)",
     keywords = "FLAC MP3 Player Coverart lyrics karaoke",
-    url = "http://sourceforge.net/projects/dacapo-audio",   # project home page, if any
+    url = "http://sourceforge.net/projects/dacapo-player",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
 	# cmdclass={'setconfig': my_install},

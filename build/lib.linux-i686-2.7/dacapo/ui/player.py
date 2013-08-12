@@ -30,7 +30,7 @@ try:
 	import gtk
 	from pygame.locals import *	
 	import pygame
-	from dacapo.metadaten import *
+	from dacapo.metadata import *
 	from dacapo.dacapoGST import GstPlayer
 	from dacapo.config import readconfig
 	from dacapo.dacapoHelp import SHOWPIC_CHOICES
@@ -110,7 +110,7 @@ class playerGUI():
 		    return ""
 
 	def blitText(self):
-		"""In dieser Funktion werden die Metadaten (inkl. Bilder)
+		"""In dieser Funktion werden die metadata (inkl. Bilder)
 		in das Fenster projeziert.
 		Zuerst wird das Fenster mit der Hintergrundfarbe gefüllt,
 		welche aus der Konfiguration geholt wird.
@@ -128,7 +128,7 @@ class playerGUI():
 		# Fenstergröße holen
 		width, height = self.resolution
 
-		# Metadaten holen und aufbereiten
+		# metadata holen und aufbereiten
 		if self.getDebug(): logging.debug(\
 			'rendere Texte: {0}'.format(self.filename))
 		textMetaVar = []
@@ -887,7 +887,8 @@ class playerGUI():
 		self.gstPlayer.doEnd()
 		del self.gstPlayer
 		if self.getDebug() : logging.debug("audioFile beenden... ")
-		del self.audioFile
+		try : del self.audioFile
+		except : pass
 		if self.getDebug() : logging.debug("pygame beenden... ")
 		pygame.quit()
 		if self.getDebug() : logging.debug("Hauptschalter setzen... ")

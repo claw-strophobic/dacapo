@@ -1,2 +1,0 @@
-python pyinstaller.py -w gPlayer\gPlayer.spec
-

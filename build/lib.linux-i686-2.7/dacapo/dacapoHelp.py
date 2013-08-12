@@ -76,7 +76,7 @@ parser.add_argument("FILE", help=getLangText('HelpMessages', 'FILE'), nargs='*')
 def showFullHelp(version):
 	'''
 	"Lightweight-Music-Player, spielt FLAC- oder MP3-Datei ab und zeigt das 
-	Cover und Metadaten an. Tasten: \n 
+	Cover und metadata an. Tasten: \n 
 	HOME=Erstes Lied der Playlist \n 
 	END=Letztes Lied der Playlist 		
 	SPACE=Pause/Start \n 
@@ -125,7 +125,7 @@ def fver(tup):
 
 def showPicsHelp():
 	'''		<!-- showPics: Bilder anzeigen? Mögliche Werte: 
-				NO = Keine Bilder anzeigen, nur Metadaten
+				NO = Keine Bilder anzeigen, nur metadata
 				coverOnly = Nur Frontcover anzeigen
 				allCover = alle Cover-Bilder anzeigen (Typ 3-6 / Front, Back, Leaflet, Label)
 				allPics = alle Bilder

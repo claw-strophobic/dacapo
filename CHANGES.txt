@@ -14,3 +14,7 @@ V0.1.5, 2013-08-04 -- 	Setup -> existing config-dir: Bug in Gtk-Question/return
 						as an subclass from audiofile
 						Adding Ogg-Vorbis
 						Bug from renaming gplayer -> dacapo: dacapoui cannot import dacapo
+V0.1.6, 2013-08-12 -- 	Renaming Module metadaten -> metadata
+						Adding mimehelp to metadata
+						Adding WMA-format
+						Bug: getMetaData() returned "  " if key was not found
