@@ -14,7 +14,7 @@ def showMsg(msg):
 		import win32ui
 		import win32con
 		answer = win32ui.MessageBox(msg, "Error", win32con.MB_OKCANCEL)
-		if answer == win32con.MB_IDOK: return True
+		if answer == win32con.IDOK: return True
 	else :
 		import gtk
 		dlg = gtk.MessageDialog(None, 

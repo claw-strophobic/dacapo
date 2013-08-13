@@ -69,7 +69,7 @@ syncedGroup.add_argument("-nsl", "--showNotSyncedLyrics", help=getLangText('Help
 parser.add_argument("--showPics", help=getLangText('HelpMessages', 'showPics'), choices=SHOWPIC_CHOICES )
 parser.add_argument("--fullhelp", help=getLangText('HelpMessages', 'fullhelp'), action="store_true")
 parser.add_argument("FILE", help=getLangText('HelpMessages', 'FILE'), nargs='*')
-
+parser.parse_args()
 
 # -------------------- showFullHelp() -----------------------------------------------------------------
 

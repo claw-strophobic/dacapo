@@ -91,20 +91,24 @@ class AudioFile(object):
 
 		# 3. Im Verzeichnis lt. config mit selben Namen wie Audio-Datei aber der Erweiterung *.lrc
 		if len(text) <= 0 and len(syncedDir) > 0:
-			testPath = os.path.normpath(os.path.join(pathName, syncedDir))
-			testFile = testPath + "/" + lrcFile
-			if self.debug : logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
-			if os.path.isfile(testFile) :
-				f = codecs.open(testFile, 'r', 'utf-8')
-				try: text = f.read()
-				except: 
-					logging.error("Konnte Datei %s nicht lesen" % (testFile) )
-					f.close()
-					f = open(testFile, 'r')
+			try:
+				# testPath = os.path.normpath(os.path.join(pathName, syncedDir))
+				testPath = os.path.join(pathName, syncedDir)
+				testFile = testPath + "/" + lrcFile
+				if self.debug : logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
+				if os.path.isfile(testFile) :
+					f = codecs.open(testFile, 'r', 'utf-8')
 					try: text = f.read()
 					except: 
 						logging.error("Konnte Datei %s nicht lesen" % (testFile) )
-				finally: f.close()
+						f.close()
+						f = open(testFile, 'r')
+						try: text = f.read()
+						except: 
+							logging.error("Konnte Datei %s nicht lesen" % (testFile) )
+					finally: f.close()
+			except: 
+				logging.error("Konnte Datei %s %s nicht oeffnen" % (pathName, syncedDir) )
 
 		# 4. Im Verzeichnis der Audio-Datei mit selben Namen aber der Erweiterung *.lrc
 		if len(text) <= 0:

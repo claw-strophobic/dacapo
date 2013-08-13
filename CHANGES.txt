@@ -18,3 +18,5 @@ V0.1.6, 2013-08-12 -- 	Renaming Module metadaten -> metadata
 						Adding mimehelp to metadata
 						Adding WMA-format
 						Bug: getMetaData() returned "  " if key was not found
+						Bug: Windows -> import gtk failed
+						Bug: Windows -> setup-overwrite-config-message OK-Button=win32con.IDOK

@@ -20,8 +20,8 @@ dacapo/config/configarchive.tar.gz
 dacapo/config/createconfig.py
 dacapo/config/packconfigdir.py
 dacapo/config/readconfig.py
+dacapo/data/Music-dacapo.ico
 dacapo/data/Music-dacapo.png
-dacapo/data/__init__.py
 dacapo/data/dacapo.conf
 dacapo/data/dacapo.conf.GER
 dacapo/data/english.ini
