@@ -155,6 +155,9 @@ class Mp3File(audiofile.AudioFile):
 
 
 	def loadFrontCover(self):
+		"""
+			Es wird nur nach dem Frontcover (Typ 3) gesucht
+		"""
 		if self.debug : logging.debug("Suche MP3-Cover... %s" % (self.filename))
 		diaMode = self.guiPlayer.getDiaMode()
 		datei = None
@@ -177,6 +180,9 @@ class Mp3File(audiofile.AudioFile):
 
 		
 	def loadStoredPictures(self):
+		"""
+			Es werden nur nach dem weiteren Bilder (Typ <> 3) gesucht
+		"""
 		import StringIO
 		if self.debug : logging.debug("Suche MP3-Bilder... %s" % (self.filename))
 		diaMode = self.guiPlayer.getDiaMode()
@@ -187,25 +193,8 @@ class Mp3File(audiofile.AudioFile):
 					if not self.audio[tag].type == 3:
 						if (diaMode == 3 or diaMode == 5) or (self.audio[tag].type > 3 and self.audio[tag].type < 7) :
 							if self.debug : logging.debug('Bild gefunden. Typ {0}: {1}'.format(self.audio[tag].type, tag) )
-							datei = self.getTempPic(p.data)
+							datei = self.getTempPic(self.audio[tag].data)
 							self.setMiscPic(pygame.image.load(datei))
 
-
-
-		for tag in self.audio.keys():
-			if 'APIC' in tag:
-				if self.audio[tag].type == 3:
-					if self.debug : logging.debug('Cover gefunden. Typ {0}: {1}'.format(self.audio[tag].type, tag))
-					datei = self.getTempPic(self.audio[tag].data)
-					break
-
-		if datei:
-			if self.debug : logging.debug("... gefunden! ... ")
-			self.cover = pygame.image.load(datei)
-		else:
-			if self.debug : logging.warning("... NICHT gefunden! ... ")
-			self.cover = pygame.image.load(self.LEERCD)
-
-		return
 
 

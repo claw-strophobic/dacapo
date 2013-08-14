@@ -25,6 +25,7 @@
 	it then calls the dacapo.play() function, which
 	reads the config to get the options.
 '''
+import sys
 from dacapo import errorhandling
 try :
 	import gtk
@@ -68,6 +69,8 @@ class GUI:
 		filter.add_pattern("*.m3u");
 		filter.add_pattern("*.flac");
 		filter.add_pattern("*.mp3");
+		filter.add_pattern("*.ogg");
+		filter.add_pattern("*.wma");
 
 		self.chkVal = dict()
 

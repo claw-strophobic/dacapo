@@ -4,9 +4,12 @@
 # argparse muss vor dem GStreamer-Import ausgeführt werden
 # (welcher in dacapo stattfindet)
 # da sonst der Hilfetext von GStreamer überschrieben wird.
+# gtk import als erstes, sonst gibt es unter Windows Probleme
+import gtk
 from dacapo import dacapoHelp
-dacapoHelp.parser.parse_args()
+
 import sys
+
 
 if __name__ == "__main__":
 

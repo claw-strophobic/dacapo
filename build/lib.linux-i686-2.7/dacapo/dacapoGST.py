@@ -210,12 +210,15 @@ class GstPlayer(threading.Thread):
 		elif not pipeline or pipeline == "gconf":
 		    pipeline = "gconfaudiosink profile=music"
 
-		try: pipe = [gst.parse_launch(element) for element in pipeline.split('!')]
+		try: 
+			pipe = [gst.parse_launch(element) for element in pipeline.split('!')]
 		except gobject.GError, err:
 		    logging.warning("Invalid GStreamer output pipeline, trying default. ")
-		    try: pipe = [gst.parse_launch("autoaudiosink")]
+		    try: 
+				pipe = [gst.parse_launch("autoaudiosink")]
 		    except gobject.GError: pipe = None
-		    else: pipeline = "autoaudiosink"
+		    else: 
+				pipeline = "autoaudiosink"
 
 		if pipe:
 		    # In case the last element is linkable with a fakesink
