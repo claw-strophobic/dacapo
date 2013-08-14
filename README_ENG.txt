@@ -1,13 +1,13 @@
 =======
-gPlayer
+dacapo
 =======
 
 Introduction
 ============
 First: 
-*What is the gPlayer?* It is a small, "lightweight" music
+*What is dacapo?* It is a small, "lightweight" music
 Player, with a few special features.
-*What is the gplayer not?* A system for managing music collections.
+*What is dacapo not?* A system for managing music collections.
 It can't create playlists, will not do changes in the audio data
 nor organize any directories.
 *Why another player?* Because most players neither show the images properly
@@ -31,7 +31,7 @@ In addition, my buddy uses Windows ...
 It's just a player, no management of the collection! This is done by
 excellent programs such as Quod Libet [2], or MP3Tag [3] in Windows.
 With these programs, the metadata can be maintained, as well as fine
-Playlists could be created, which are then processed by gPlayer.
+Playlists could be created, which are then processed by dacapo.
 With MP3Tag or easytag [4] you can easily put the images in the files. 
 For the ReplayGain analysis/storage I recommend RGain [5].
 
@@ -43,7 +43,7 @@ Since GStreamer requires Gtk+ anyway, I've used this for the GUI, too.
 
 Features
 --------
-Thus, the gplayer has now the following features:
+Thus, dacapo has now the following features:
  - Replay Gain [1] is supported
  - Gapless (gapless playback) is supported
    (important during live music or transitions)
@@ -96,47 +96,47 @@ Just install it like any other Python package: Unpack, then (as root/with
 After installation, the configuration file should be adapted.
 This should be located in the user directory:
 
- # ~/.gPlayer/gPlayer.conf
+ # ~/.dacapo/dacapo.conf
 
 Linux example:
-  /home/claw/.gPlayer/gPlayer.conf
+  /home/claw/.dacapo/dacapo.conf
 
 Windows example:
-  C:\Dokumente und Einstellungen\Claw\.gPlayer\gPlayer.conf
+  C:\Dokumente und Einstellungen\Claw\.dacapo\dacapo.conf
 
 Should something gone wrong during the installation,
 the directory could be copied manually from the package.
-Copy the contents of the package directory gplayer/data in the
+Copy the contents of the package directory dacapo/data in the
 directory mentioned above.
 
 
 Program start
 =============
 
-The scripts gplayer and gplayerui should have been copied during installation
+The scripts dacapo and dacapoui should have been copied during installation
 in the directory */usr/local/bin* or on Windows in the python subdirectory *Scripts*.
 
-**gplayer**
+**dacapo**
 -----------
 This is the command line part.
 Basic usage is simple:
 
- $ gplayer AUDIOFILE1 AUDIOFILE2 ...
+ $ dacapo AUDIOFILE1 AUDIOFILE2 ...
  or
- $ gplayer PLAYLIST 
+ $ dacapo PLAYLIST 
  or
- $ gplayer /PATH/TO/MY/MUSIC/
+ $ dacapo /PATH/TO/MY/MUSIC/
 
 There are some options; see them by running
 
- $ gplayer --help
+ $ dacapo --help
 
-**gplayerui**
+**dacapoui**
 =============
 Thre you go with the graphical part (Gtk+).
 Simple:
 
- $ gplayerui
+ $ dacapoui
 
 **Function-Keys**
 =================

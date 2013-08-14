@@ -1,13 +1,13 @@
 =======
-gPlayer
+dacapo
 =======
 
 Einleitung
 ==========
 Zuerst: 
-*Was ist der gPlayer?* Es ist ein kleines, „leichtes“ Musik-
+*Was ist dacapo?* Es ist ein kleines, „leichtes“ Musik-
 Abspielprogramm („Player“), mit ein paar Besonderheiten.
-*Was ist der gPlayer nicht?* Ein Verwaltungsprogramm für Musiksammlungen. 
+*Was ist dacapo nicht?* Ein Verwaltungsprogramm für Musiksammlungen. 
 Es kann keine Abspiellisten erstellen, keine Änderungen in den Audiodaten 
 vornehmen und keine Verzeichnisse organisieren.
 *Warum noch einen Player?* Weil die wenigsten Player weder die Bilder 
@@ -32,7 +32,7 @@ Zudem nutzt mein Kumpel Windows...
 Es ist nur ein Abspielprogramm, keine Verwaltung der Sammlung! Dies erledigen 
 hervorragende Programme wie Quod Libet [2], oder MP3Tag [3] unter Windows. 
 Mit diesen Programmen können die Metadaten gepflegt werden, sowie schöne 
-Abspiellisten erstellt werden, die vom gPlayer dann verarbeitet werden. 
+Abspiellisten erstellt werden, die vom dacapo dann verarbeitet werden. 
 Mit MP3Tag oder easytag [4] können bequem die Bilder in die Dateien gebracht 
 werden. Für die Replay Gain Analyse/Speicherung empfehle ich rgain [5].
 
@@ -45,7 +45,7 @@ verwendet.
 
 Funktionen
 ----------
-So hat der gPlayer nun folgende Funktionen:
+So hat dacapo nun folgende Funktionen:
  - Replay Gain [1] wird unterstützt
  - Gapless (lückenloses Abspielen) wird unterstützt 
    (wichtig bei Live-Aufnahmen oder Überblendungen)
@@ -95,47 +95,47 @@ Wie jedes andere Python Paket: Entpacken, und dann (als root/mit **sudo**)
 Nach der Installation muss ggf. die Konfigurationsdatei angepasst werden.
 Diese sollte sich im Benutzerverzeichnis befinden:
 
- # ~/.gPlayer/gPlayer.conf
+ # ~/.dacapo/dacapo.conf
 
 Linux Beispiel:
-  /home/claw/.gPlayer/gPlayer.conf
+  /home/claw/.dacapo/dacapo.conf
 
 Windows Beispiel:
-  C:\Dokumente und Einstellungen\Claw\.gPlayer\gPlayer.conf
+  C:\Dokumente und Einstellungen\Claw\.dacapo\dacapo.conf
 
 Sollte etwas nicht bei der Installation nicht funktioniert haben, kann
 das Verzeichnis manuell aus dem Paket kopiert werden.
-Dazu den Inhalt des Paket-Verzeichnises gplayer/data in das o.g. 
+Dazu den Inhalt des Paket-Verzeichnises dacapo/data in das o.g. 
 Verzeichnis kopieren. 
 
 Programmstart
 =============
 
-Die Skripte gplayer und gplayerui sollten bei der Installation 
+Die Skripte dacapo und dacapoui sollten bei der Installation 
 in das Verzeichnis */usr/local/bin* bzw. unter Windows in das
 Python-Unterverzeichnis *Scripts* kopiert worden sein.
 
-**gplayer**
+**dacapo**
 -----------
 Dies ist der Kommandozeilen-Teil.
 Der einfache Aufruf ist simpel:
 
- $ gplayer AUDIOFILE1 AUDIOFILE2 ...
+ $ dacapo AUDIOFILE1 AUDIOFILE2 ...
  oder
- $ gplayer PLAYLIST
+ $ dacapo PLAYLIST
  oder
- $ gplayer /PATH/TO/MY/MUSIC/
+ $ dacapo /PATH/TO/MY/MUSIC/
 
 Es gibt einige Aufrufoptionen; anschauen durch
 
- $ gplayer --help
+ $ dacapo --help
 
-**gplayerui**
+**dacapoui**
 =============
 Damit wird der graphische Aufruf gestartet (Gtk+).
 Einfach:
 
- $ gplayerui
+ $ dacapoui
 
 **Betrieb**
 =============
