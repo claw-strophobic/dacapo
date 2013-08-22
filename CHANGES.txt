@@ -16,10 +16,15 @@ V0.1.5, 2013-08-04 -- 	Setup -> existing config-dir: Bug in Gtk-Question/return
 						Bug from renaming gplayer -> dacapo: dacapoui cannot import dacapo
 V0.1.6, 2013-08-12 -- 	Renaming Module metadaten -> metadata
 						Adding mimehelp to metadata
-						Adding WMA-format
-						Bug: getMetaData() returned "  " if key was not found
-						Bug: Windows -> import gtk failed
-						Bug: Windows -> setup-overwrite-config-message OK-Button=win32con.IDOK						
-						Bug: MP3 -> additional Pictures
+						Adding WMA-format (ticket 1)
+						Bugfix: getMetaData() returned "  " if key was not found
+						Bugfix: Windows -> import gtk failed  (ticket 4)
+						Bugfix: Windows -> setup-overwrite-config-message 
+#								OK-Button=win32con.IDOK (ticket 3)					
+						Bugfix: MP3 -> additional Pictures
 V0.1.7, 2013-08-16 -- 	requirements: setuptools
 						setup.py: adding classifiers
+						Bugfix: center pictures in Diamode
+						Bugfix: Switching between window and fullscreen - 
+							unnecessary cleaning screen  (ticket 6)
+						Bugfix: synced lyrics from lrc-file with spacelines  (ticket 5)
