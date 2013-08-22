@@ -24,7 +24,7 @@ try:
 	import logging
 	import traceback
 	from dacapo.metadata import mimehelp
-	from dacapo.metadata import vorbis, mp3, ogg, wma
+	from dacapo.metadata import flac, mp3, ogg, wma
 except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
@@ -43,7 +43,7 @@ def getAudioFile(playerGUI, filename):
 		# Versuche FLAC-Datei zu laden
 		if mimeType in mimehelp.FLAC_MIMES: 
 			try:
-				audioFile = vorbis.VorbisFile(playerGUI, filename)	
+				audioFile = flac.FlacFile(playerGUI, filename)	
 			except BaseException :
 				logging.error("FEHLER bei %s" % (filename) )
 				exc_type, exc_value, exc_traceback = sys.exc_info()

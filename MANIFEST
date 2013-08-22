@@ -2,8 +2,7 @@
 CHANGES.txt
 FAQ.txt
 MANIFEST.in
-README
-README_ENG.txt
+README.txt
 README_GER.txt
 setup.py
 bin/dacapo
@@ -31,10 +30,10 @@ dacapo/data/treble_clef.png
 dacapo/errorhandling/__init__.py
 dacapo/metadata/__init__.py
 dacapo/metadata/audiofile.py
+dacapo/metadata/flac.py
 dacapo/metadata/mimehelp.py
 dacapo/metadata/mp3.py
 dacapo/metadata/ogg.py
-dacapo/metadata/vorbis.py
 dacapo/metadata/wma.py
 dacapo/playlist/__init__.py
 dacapo/playlist/generate.py

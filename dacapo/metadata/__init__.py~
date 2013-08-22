@@ -24,7 +24,7 @@ try:
 	import logging
 	import traceback
 	from dacapo.metadata import mimehelp
-	from dacapo.metadata import vorbis, mp3, ogg, wma
+	from dacapo.metadata import flac, mp3, ogg, wma
 except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
@@ -41,7 +41,7 @@ def getAudioFile(playerGUI, filename):
 	mimeType = contentType[0]
 	if os.path.isfile(filename):
 		# Versuche FLAC-Datei zu laden
-		if mimeType in FLAC_MIMES: 
+		if mimeType in mimehelp.FLAC_MIMES: 
 			try:
 				audioFile = vorbis.VorbisFile(playerGUI, filename)	
 			except BaseException :
@@ -52,7 +52,7 @@ def getAudioFile(playerGUI, filename):
 					logging.error(line)
 
 		# Versuche MP3-Datei zu laden
-		if mimeType in MPG_MIMES : 
+		if mimeType in mimehelp.MPG_MIMES : 
 			try:
 				audioFile = mp3.Mp3File(playerGUI, filename)	
 			except BaseException :
@@ -63,7 +63,7 @@ def getAudioFile(playerGUI, filename):
 					logging.error(line)
 
 		# Versuche OGG-Datei zu laden
-		if mimeType in OGG_MIMES : 
+		if mimeType in mimehelp.OGG_MIMES : 
 			try:
 				audioFile = ogg.OggFile(playerGUI, filename)	
 			except BaseException :
@@ -74,7 +74,7 @@ def getAudioFile(playerGUI, filename):
 					logging.error(line)
 
 		# Versuche WMA-Datei zu laden
-		if mimeType in WMA_MIMES : 
+		if mimeType in mimehelp.WMA_MIMES : 
 			try:
 				audioFile = wma.WmaFile(playerGUI, filename)	
 			except BaseException :

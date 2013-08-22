@@ -21,4 +21,5 @@ V0.1.6, 2013-08-12 -- 	Renaming Module metadaten -> metadata
 						Bug: Windows -> import gtk failed
 						Bug: Windows -> setup-overwrite-config-message OK-Button=win32con.IDOK						
 						Bug: MP3 -> additional Pictures
-
+V0.1.7, 2013-08-16 -- 	requirements: setuptools
+						setup.py: adding classifiers

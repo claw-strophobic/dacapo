@@ -375,9 +375,14 @@ class playerGUI():
 		# <-- skalieren -------------------------------
 		# --> positionieren ---------------------------
 		h = self.fontHeight
+		h = int(round( (height - picH) / 2 ))
 		if len(self.audioFile.syncText) > 0  and \
 			self.oConfig.getConfig('gui', 'syncLyrics', 'position').upper()  == "TOP" :
-				h += self.lyricFontHeight
+				h += self.lyricFontHeight / 2
+		elif len(self.audioFile.syncText) > 0  and \
+			self.oConfig.getConfig('gui', 'syncLyrics', 'position').upper()  == "BOTTOM" :
+				h -= self.lyricFontHeight / 2
+
 		if self.audioFile.getNoOfPics() > 1 and self.getDiaMode() > 1 and self.getDiaMode() < 4:
 			w = 0
 			# h = int(round( (height - picH) / 2 ))
@@ -462,11 +467,15 @@ class playerGUI():
 			picW, picH = self.diaShowPics[self.diaIndex].get_size()
 			# --> positionieren ---------------------------
 			w = (width - picW) / 2
-			# h = (height - picH) / 2
-			h = self.fontHeight
+			h = (height - picH) / 2
+			# h = self.fontHeight
+			# h = self.fontHeight / 2
 			if len(self.audioFile.syncText) > 0  and \
 				self.oConfig.getConfig('gui', 'syncLyrics', 'position').upper()  == "TOP" :
-					h += self.lyricFontHeight
+					h += self.lyricFontHeight / 2
+			elif len(self.audioFile.syncText) > 0  and \
+				self.oConfig.getConfig('gui', 'syncLyrics', 'position').upper()  == "BOTTOM" :
+					h -= self.lyricFontHeight / 2
 
 			# <-- positionieren ---------------------------
 
@@ -578,7 +587,7 @@ class playerGUI():
 		if len(self.audioFile.syncText) <= 0 : return
 		# List-Index > Anzahl Text-Zeilen = Abbruch
 		if self.audioFile.syncCount > len(self.audioFile.syncText) : return
-		logging.debug("Soll Text darstellen: %s" % \
+		if self.getDebug() : logging.debug("Soll Text darstellen: %s" % \
 			(self.audioFile.syncText[self.audioFile.syncCount]))
 		width, height = self.resolution
 		h = self.fontHeight 
@@ -734,7 +743,9 @@ class playerGUI():
 		if self.fullscreen : self.winState = 'fullscreen'
 		self.doInitDisplay()
 		self.resize = True
+		self.__lastWidthPos = None
 		self.blitText()
+		if self.getDiaMode() > 3 : self.diaShow()
 		return
 
 	def start_stop(self):

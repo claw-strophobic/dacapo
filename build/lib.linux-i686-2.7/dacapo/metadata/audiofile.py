@@ -134,7 +134,7 @@ class AudioFile(object):
 				lineText = line[line.find("]")+1:]
 				if len(lineText) > 0:
 					try : minutes = int(lineTime[:lineTime.find(":")])
-					except : minutes = 0
+					except : continue
 					if "." in lineTime :
 						try: seconds = int(lineTime[lineTime.find(":")+1:lineTime.find(".")])
 						except: seconds = 0
