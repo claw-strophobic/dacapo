@@ -28,3 +28,4 @@ V0.1.7, 2013-08-16 -- 	requirements: setuptools
 						Bugfix: Switching between window and fullscreen - 
 							unnecessary cleaning screen  (ticket 6)
 						Bugfix: synced lyrics from lrc-file with spacelines  (ticket 5)
+V0.1.8, 2013-08-28 -- 	use empty LRC-lines to display blank line

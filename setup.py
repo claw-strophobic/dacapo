@@ -19,7 +19,7 @@ class my_install():
 
 setup(
     name = "dacapo",
-    version = "0.1.7",
+    version = "0.1.8",
     packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist'],
     scripts = ["bin/dacapo", "bin/dacapoui"],
 
