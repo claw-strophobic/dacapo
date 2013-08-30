@@ -132,7 +132,7 @@ class AudioFile(object):
 			for line in lines:
 				lineTime = line[line.find("[")+1:line.find("]")]
 				lineText = line[line.find("]")+1:]
-				if len(lineText) > 0:
+				if len(lineTime) > 0:
 					try : minutes = int(lineTime[:lineTime.find(":")])
 					except : continue
 					if "." in lineTime :
@@ -148,7 +148,10 @@ class AudioFile(object):
 					seconds += ( minutes * 60 )
 					msecs += (seconds * 1000)
 					syncTime.append(msecs)
-					syncText.append(lineText)
+					if len(lineText) > 0:
+						syncText.append(lineText)
+					else :
+						syncText.append("  ")
 					if self.debug : logging.debug("Sekunden: %s lineTime: %s Text: %s " % (seconds, lineTime, lineText))
 		return (syncTime, syncText)
 

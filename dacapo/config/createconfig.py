@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import pkg_resources
-import os, sys
-import tarfile
+import os, sys, shutil
+import tarfile, tempfile
+from datetime import datetime
+from dacapo.config.mergeconfig import XMLCombiner
 
 FILE="configarchive.tar.gz"
 FILE_EXISTS_MSG="The Config-Dir already exists! Overide existing files?"
@@ -42,15 +44,50 @@ except :
 	sys.exit(1)
 # tar.list()
 
+
+doit = True
+mergeConfig = False
+
 root_dir =  os.path.expanduser(os.path.join('~', '.dacapo'))
 is_dir = os.path.isdir(root_dir)
 print("does the config-dir exist? %s " % (is_dir))
-doit = True
 if is_dir :
-	doit = showMsg(FILE_EXISTS_MSG)
-	print("replace the existing config-dir? %s " % (doit))
+    doit = False
+    # doit = showMsg(FILE_EXISTS_MSG)
+    # print("replace the existing config-dir? %s " % (doit))
 
 if doit: 
 	tar.extractall(path=root_dir)
+else:
+    tempdir = tempfile.mkdtemp()
+    for tarinfo in tar:
+        if tarinfo.isreg():
+            if os.path.isfile(os.path.join(root_dir, tarinfo.name)) :   
+                # print("%s existiert bereits." % (tarinfo.name))
+                if ('./dacapo.conf' == tarinfo.name) : 
+                    mergeConfig = True
+                    tar.extract(tarinfo, path=tempdir)
+                    # print("Extracting %s to %s" % (tarinfo.name, tempdir))
+            else:
+                tar.extract(tarinfo, path=root_dir)
+        elif tarinfo.isdir():
+            if os.path.isdir(os.path.join(root_dir, tarinfo.name)) :   
+                # print("%s existiert bereits." % (tarinfo.name))
+                pass
+            else:
+                tar.extract(tarinfo, path=root_dir)
+        else:
+            print("%s is something else." % (tarinfo.name))
+    tar.close()
 
+if mergeConfig: 
+    save_config = os.path.join(root_dir, 'dacapo.conf.' + 
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S" + '.bak'))
+    print("save the existing configuration-file to %s" % (save_config))
+    shutil.copy(os.path.join(root_dir, 'dacapo.conf'), save_config)
+    print("updating the configuration")
+    fileOld = os.path.join(root_dir, 'dacapo.conf')
+    fileNew = os.path.join(tempdir, 'dacapo.conf')
+    r = XMLCombiner((fileOld, fileNew)).combine()
+    print("done.")
 

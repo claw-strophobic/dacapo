@@ -28,7 +28,7 @@ except ImportError, err:
 	sys.exit(2)
 
 # ----------- Globale Variablen/Objekte ----------------------- #
-VERSION = [0, 1, 7]
+VERSION = [0, 1, 8]
 oConfig = readconfig.getConfigObject()
 
 levels = {'CRITICAL' : logging.CRITICAL,
@@ -73,9 +73,8 @@ def play(config=None):
 	# print "Config Version: ", oConfig.getConfig('version')
 	try : 
 		if VERSION > oConfig.getConfig('version') :
-			pass
-			# raise Exception("Programm-Version: %s > Config-Version: %s" % \
-			#  (dacapoHelp.fver(VERSION), dacapoHelp.fver(oConfig.getConfig('version'))))
+			raise Exception("Programm-Version: %s > Config-Version: %s" % \
+			  (dacapoHelp.fver(VERSION), dacapoHelp.fver(oConfig.getConfig('version'))))
 	except :
 		errorhandling.Error.show()
 		sys.exit(2)
