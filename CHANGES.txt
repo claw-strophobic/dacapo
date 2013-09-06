@@ -29,4 +29,9 @@ V0.1.7, 2013-08-16 -- 	requirements: setuptools
 							unnecessary cleaning screen  (ticket 6)
 						Bugfix: synced lyrics from lrc-file with spacelines  (ticket 5)
 V0.1.8, 2013-08-28 -- 	use empty LRC-lines to display blank line
-                        merge dacapo.conf and the folder instead of replacing
+                        merge dacapo.conf and the folder instead of replacing   (ticket 7)
+                        create dacapo.conf.sample.eng and dacapo.conf.sample.ger as 
+                        documentation for dacapo.conf
+                        new option "showLyricsWhenSynced" 
+                        new option "lyricFontSpace" 
+                        Bugfix: GStreamer overwrites cmdline-help  (ticket 8)

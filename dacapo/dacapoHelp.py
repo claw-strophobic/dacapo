@@ -9,7 +9,7 @@
 
 SHOWPIC_CHOICES = ["NO", "coverOnly", "allCover", "allPics",
 	"diaShowAllCover", "diaShowAllPics", "help"]
-
+import argparse as myArg
 from dacapo import errorhandling
 import os, sys
 try:
@@ -40,7 +40,7 @@ except :
 # argparse muss vor dem GStreamer-Import ausgeführt werden
 # (welcher in dacapo stattfindet)
 # da sonst der Hilfetext von GStreamer überschrieben wird.
-import argparse as myArg
+
 parser = myArg.ArgumentParser(description=getLangText('HelpMessages', 'description'))
 parser.add_argument("-R", "--resume", help=getLangText('HelpMessages', 'resume'), action="store_true")
 parser.add_argument("-NG", "--nogui", help=getLangText('HelpMessages', 'nogui'), action="store_true")

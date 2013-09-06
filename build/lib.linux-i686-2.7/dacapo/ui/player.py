@@ -593,7 +593,7 @@ class playerGUI():
 		h = self.fontHeight 
 		if self.oConfig.getConfig('gui', 'syncLyrics', 'position').upper()  == "BOTTOM" :
 			# Fenstergröße holen (h = Fensterschriftgröße)
-			h = (self.txtTitleH - self.lyricFontHeight )
+			h = (self.txtTitleH - self.lyricFontRealHeight )
 
 		# versuchen, alten Text zu löschen
 		if not self.fontLyrics == None:
@@ -874,6 +874,9 @@ class playerGUI():
 		self.lyricFontColor = self.oConfig.getConfig('gui', self.winState, 'lyricFontColor')
 		fontHeightFont = self.lyricFont.render("AAA", True, self.lyricFontColor)
 		self.lyricFontWidth, self.lyricFontHeight = fontHeightFont.get_size()
+		self.lyricFontRealHeight = self.lyricFontHeight 
+		self.lyricFontHeight += self.oConfig.getConfig('gui', self.winState, 'lyricFontSpace')
+		
 
 		if self.getDebug() : logging.debug('Mouse verstecken. ')
 		try : pygame.mouse.set_visible(self.oConfig.getConfig('gui', self.winState, 'mouseVisible'))

@@ -13,9 +13,9 @@
 	commandline (argparse) or the Gtk+ -gui (config).
 	the playlist is generated and finally it calls the ui/player.
 '''
+import errorhandling
 import sys
 import os
-import errorhandling
 import dacapoHelp
 try:
 	import threading
@@ -64,7 +64,6 @@ def play(config=None):
 	#	from optparse import OptionParser as myArg
 	#	print "Lade >>optparse<<"
 	#else :
-	import argparse as myArg	
 	global oConfig, VERSION
 
 	if not config == None : oConfig=config
@@ -193,6 +192,7 @@ def play(config=None):
 
 	oConfig.setConfig('gui', 'misc', 'showLyricsSynced', bShowSyncedLyrics)
 	oConfig.setConfig('gui', 'misc', 'showLyricsAsPics', bshowLyricAsPic)
+	oConfig.setConfig('gui', 'misc', 'showPics', sDiaShow)
 
 	if len(args.FILE) <= 0 and \
 	  bResume == False :

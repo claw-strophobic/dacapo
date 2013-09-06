@@ -59,7 +59,7 @@ So hat dacapo nun folgende Funktionen:
  - läuft unter Linux als auch Windows
  - läuft auch auf „kleinen“ Computern (800 MHz mit 1 GB RAM)
  - ist frei Konfigurierbar
- - Spielt (z. Zt.) FLAC und MP3, weitere Formate in der Vorbereitung
+ - Spielt (z. Zt.) FLAC, Ogg-Vorbis, WMA und MP3, weitere Formate in der Vorbereitung
  - Mehrsprachig (Übersetzer willkommen)
 
 Es steht und fällt natürlich mit den Daten. Was nicht in den Audiodateien
@@ -103,10 +103,14 @@ Linux Beispiel:
 Windows Beispiel:
   C:\Dokumente und Einstellungen\Claw\.dacapo\dacapo.conf
 
+Ebenfalls sollte sich eine dacapo.conf.sample.ger in diesem Verzeichnis
+befinden. Darin findet sich die Dokumentation zur Konfiguration.
+
 Sollte etwas nicht bei der Installation nicht funktioniert haben, kann
 das Verzeichnis manuell aus dem Paket kopiert werden.
 Dazu den Inhalt des Paket-Verzeichnises dacapo/data in das o.g. 
 Verzeichnis kopieren. 
+
 
 Programmstart
 =============

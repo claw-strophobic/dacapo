@@ -25,6 +25,11 @@ setup(
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
+    requires=[
+			'pygame (>=1.9)',
+			'setuptools (>=0.9)',
+			'mutagen (>=1.21)'
+			],
     install_requires = [
 			# 'gtk==2.24',
 			# 'pygtk==2.24', 
