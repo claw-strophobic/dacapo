@@ -789,9 +789,17 @@ class playerGUI():
 			datei.close()
 			self.fontLyrics = None
 			self.actSong += 1
-			if os.path.isfile(self.filename):
+			
+			#if os.path.isfile(self.filename):
+			if mimehelp.isInMimeTypes(self.filename) :
 				if self.ShowGUI == True :
+					if self.getDebug() : logging.info('Versuche Metadaten zu laden ')
 					self.audioFile = getAudioFile(self, self.filename)
+					if self.getDebug() : 
+						antwort = "Ja"
+						if self.audioFile == None :
+							antwort = "Nein"
+						logging.info('Metadaten geladen? %s' % (antwort)  )
 					if self.audioFile <> None :
 						# if self.getDebug() : print 'Hole Cover: {0}'.format(self.filename)
 						# self.pic = self.audioFile.getCover()

@@ -15,7 +15,7 @@
 """Dieses Modul enthält die Playlist-Verarbeitung / -Aufbereitung. """
 from dacapo import errorhandling
 try:
-	import sys, os
+	import sys, os, locale
 	import random
 	import mimetypes
 	from dacapo.metadata import mimehelp
@@ -31,6 +31,10 @@ HOMEDIR = os.path.expanduser('~')
 CONFIG_DIR = HOMEDIR + '/.dacapo/'
 LIST_NAME = CONFIG_DIR + 'lastPlaylist.tmp'
 
+fs_encoding = sys.getfilesystemencoding()
+encoding = locale.getpreferredencoding()
+utf8conv = lambda x : unicode(x, fs_encoding).encode('utf8')
+
 ### Klassendefinitionen
 
 
@@ -43,8 +47,7 @@ class PlayList(object):
 		self.setIsPlaylist( bIsPlaylist )
 		self.__List = []
 		mimetypes.init()
-
-
+	
 #-------- Setter -----------------------------#
 	
 	def setDebug(self, bDebug):
@@ -79,18 +82,22 @@ class PlayList(object):
 #-------- Funktionen -------------------------#
 
 	def appendList(self, song) :
+		if self.isDebug(): 
+			logging.debug("Betriebssytem unterstuetzt Unicode? %s" % (os.path.supports_unicode_filenames) )
+		song = song.replace('\\', '/') 
 		if os.path.isfile(song):
 			contentType = mimetypes.guess_type(song) # Mimetype herausfinden
-			if self.isDebug() : logging.debug("appendList() -> Angegebene Datei ist vom Typ: %s" % (contentType[0]) )
+			if self.isDebug() : logging.debug("Angegebene Datei ist vom Typ: %s" % (contentType[0]) )
 			if contentType[0] in mimehelp.FLAC_MIMES \
 			or contentType[0] in mimehelp.OGG_MIMES \
 			or contentType[0] in mimehelp.WMA_MIMES \
 			or contentType[0] in mimehelp.MPG_MIMES : 
 				self.__List.append(song)
-			elif contentType[0] == None or contentType[0] == 'audio/x-mpegurl' : self.readPlaylist()
+			elif contentType[0] in mimehelp.M3U_MIMES : 
+				self.readPlaylist()
 		else : 
 			print >> sys.stderr, "FEHLER: Kann Datei %s nicht finden. " % (song)
-			logging.warning("appendList() -> Kann Datei %s nicht finden. " % (song) )
+			logging.warning("Kann Datei %s nicht finden. " % (song) )
 			exc_type, exc_value, exc_traceback = sys.exc_info()
 			lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
 			for line in lines :
@@ -115,6 +122,9 @@ class PlayList(object):
 
 			for f in self.getInput() :
 				if f == None : break
+				if type(f) <> 'unicode' :
+					f = utf8conv(f)
+				f = f.replace('\\', '/')
 				if os.path.isdir(f): self.walkPath(f)
 				else : self.appendList(f)
 
@@ -138,7 +148,7 @@ class PlayList(object):
 		self.__List.sort()
 
 	def walkPath(self, startPath):
-		for root, dirs, files in os.walk(startPath):
+		for root, dirs, files in os.walk(utf8conv(startPath)):
 			for filename in files:
 				self.appendList( os.path.join(root, filename) )
 		

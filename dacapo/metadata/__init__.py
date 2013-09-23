@@ -39,7 +39,8 @@ def getAudioFile(playerGUI, filename):
 	audioFile = None
 	contentType = mimetypes.guess_type(filename) # Mimetype herausfinden
 	mimeType = contentType[0]
-	if os.path.isfile(filename):
+	# if os.path.isfile(filename):
+	if mimehelp.isInMimeTypes(filename) :
 		# Versuche FLAC-Datei zu laden
 		if mimeType in mimehelp.FLAC_MIMES: 
 			try:

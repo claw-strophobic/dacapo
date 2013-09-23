@@ -31,11 +31,13 @@ MPG_MIMES = ["audio/mp3", "audio/x-mp3", "audio/mpeg", "audio/mpg",
              "audio/x-mpeg"]
 FLAC_MIMES = ["audio/flac"]
 OGG_MIMES = ["audio/ogg"]
+M3U_MIMES = ['audio/x-mpegurl']
 
 types.add_type('audio/flac', '.flac')
 types.add_type('audio/ogg', '.ogg')
 types.add_type('audio/x-wma', '.wma')
 types.add_type('audio/mp3', '.mp3')
+types.add_type('audio/x-mpegurl', '.m3u')
 types.init()
 
 

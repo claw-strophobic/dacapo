@@ -82,7 +82,7 @@ else:
 
 if mergeConfig: 
     save_config = os.path.join(root_dir, 'dacapo.conf.' + 
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S" + '.bak'))
+        datetime.now().strftime("%Y-%m-%d %H-%M-%S" + '.bak'))
     print("save the existing configuration-file to %s" % (save_config))
     shutil.copy(os.path.join(root_dir, 'dacapo.conf'), save_config)
     print("updating the configuration")

@@ -1,3 +1,9 @@
+V0.1.9, 2013-09-23 -- 	Windows: supporting filenames with special characters
+						(internal playlist only follows UTF-8)
+						some new features in dacapoGST.py for LRC-generator QtSyncLyrics
+                        
+
+						
 V0.1.2c, 2013-07-13 -- 	Remove TK from errorhandling, replace it by Gtk+
 						Check, if the path to the logfile is existing
 						Create this CHANGES.txt
