@@ -1,3 +1,5 @@
+V0.1.9a, 2013-09-23 -- 	Adding manpages, changing setup.py
+
 V0.1.9, 2013-09-23 -- 	Windows: supporting filenames with special characters
 						(internal playlist only follows UTF-8)
 						some new features in dacapoGST.py for LRC-generator QtSyncLyrics

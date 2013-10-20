@@ -41,3 +41,7 @@ dacapo/playlist/__init__.py
 dacapo/playlist/generate.py
 dacapo/ui/__init__.py
 dacapo/ui/player.py
+man/de/man1/dacapo.1.gz
+man/de/man5/dacapo.conf.5.gz
+man/man1/dacapo.1.gz
+man/man5/dacapo.conf.5.gz

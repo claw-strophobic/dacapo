@@ -2,24 +2,57 @@
 # -*- coding: utf-8 -*-
 
 from distutils.core import setup
-import sys
+from distutils.command.install import install
+import sys, os
 
 with open('README.txt') as file:
     long_description = file.read()
 
-class my_install():
+class dacapo_install(install):
+	description = "Custom Install Process"
+	user_options= install.user_options[:]
+	user_options.extend([('manprefix=', None, 'MAN Prefix Path if not /usr/local/share/>')])
+
+	def initialize_options(self):
+		self.manprefix = None
+		install.initialize_options(self)
+
+	def finalize_options(self):
+		if self.manprefix is None :
+			self.manprefix = "/usr/local/share/"
+		install.finalize_options(self)
+
+	def install_manpages(self):
+		import platform, string, shutil
+		if platform.system() <> 'Windows':
+			print "copy manpages..."
+			for root, dirs, files in os.walk('./man/'):
+				for filename in files:
+					src_file = os.path.join(root, filename) 
+					man_root = os.path.join(self.manprefix, \
+						string.lstrip(root, './'))
+					dest_file = os.path.join(man_root, filename)
+					if not os.path.exists(man_root):
+						os.makedirs(man_root) 					
+					print("copy %s -> %s " % (src_file, dest_file))
+					shutil.copy(src_file, dest_file)
+			
 	def run(self):
-		# install.run(self)
+		install.run(self)
 		# Custom stuff here
 		# distutils.command.install actually has some nice helper methods
 		# and interfaces. I strongly suggest reading the docstrings.
 
 		# print "und nu komm ICH dran!"
-		import dacapo.config.createconfig
+		if sys.argv[1] == "install" :
+			print "installiere config"
+			import dacapo.config.createconfig
+			self.install_manpages()
+		
 
 setup(
     name = "dacapo",
-    version = "0.1.9",
+    version = "0.1.9a",
     packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist'],
     scripts = ["bin/dacapo", "bin/dacapoui"],
 
@@ -27,6 +60,7 @@ setup(
     # installed or upgraded on the target machine
     requires=[
 			'pygame (>=1.9)',
+			'argparse (>=1.1)',
 			'setuptools (>=0.9)',
 			'mutagen (>=1.21)'
 			],
@@ -36,6 +70,7 @@ setup(
 			# 'gst>=0-10', 
 			# 'pygst>=0.10', 
 			'pygame>=1.9',
+			'argparse>=1.1',
 			'setuptools>=0.9',
 			'mutagen>=1.21'
 		],
@@ -76,11 +111,7 @@ setup(
           'Topic :: Multimedia :: Sound/Audio :: Players',
           'Topic :: Multimedia :: Sound/Audio :: Players :: MP3',
           ],
-	
+	cmdclass={"install": dacapo_install},
 
 )
-
-if sys.argv[1] == "install" :
-	print "installiere config"
-	my_install().run()
 
