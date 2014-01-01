@@ -8,10 +8,21 @@ import sys, os
 with open('README.txt') as file:
     long_description = file.read()
 
+print("Setup-Mode: %s" % (sys.argv[1]) )
+if sys.argv[1] == "sdist" or \
+	sys.argv[1] == "bdist" :    
+	import shutil
+	src_file = "dacapo/data/VERSION" 
+	dest_file = "./VERSION" 
+	shutil.copy(src_file, dest_file)
+
+VERSION = open("VERSION").read().strip()
+
 class dacapo_install(install):
 	description = "Custom Install Process"
 	user_options= install.user_options[:]
-	user_options.extend([('manprefix=', None, 'MAN Prefix Path if not /usr/local/share/>')])
+	user_options.extend([('manprefix=', None, 
+		'MAN Prefix Path if not /usr/local/share/>')])
 
 	def initialize_options(self):
 		self.manprefix = None
@@ -43,7 +54,6 @@ class dacapo_install(install):
 		# distutils.command.install actually has some nice helper methods
 		# and interfaces. I strongly suggest reading the docstrings.
 
-		# print "und nu komm ICH dran!"
 		if sys.argv[1] == "install" :
 			print "installiere config"
 			import dacapo.config.createconfig
@@ -52,8 +62,9 @@ class dacapo_install(install):
 
 setup(
     name = "dacapo",
-    version = "0.1.9a",
-    packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist'],
+    version=VERSION,
+    packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 
+    'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist'],
     scripts = ["bin/dacapo", "bin/dacapoui"],
 
     # Project uses reStructuredText, so ensure that the docutils get

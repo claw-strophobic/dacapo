@@ -1,6 +1,8 @@
 include FAQ.txt
+include VERSION
 include CHANGES.txt
 include README.txt
+include INSTALL_UBUNTU.txt
 include README_GER.txt
 include MANIFEST.in
 recursive-include man *

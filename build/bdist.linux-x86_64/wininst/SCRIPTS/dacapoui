@@ -1,0 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# gtk import als erstes, sonst gibt es unter Windows Probleme
+import gtk
+from dacapo import dacapoui
+
+if __name__ == "__main__":
+    dacapoui.main()
+

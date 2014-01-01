@@ -73,7 +73,7 @@ parser.parse_args()
 
 # -------------------- showFullHelp() -----------------------------------------------------------------
 
-def showFullHelp(version):
+def showFullHelp():
 	'''
 	"Lightweight-Music-Player, spielt FLAC- oder MP3-Datei ab und zeigt das 
 	Cover und metadata an. Tasten: \n 
@@ -101,8 +101,7 @@ def showFullHelp(version):
 	
 	print getLangText('HelpMessages', 'showFullHelp')
 	print " "
-	print "dacapo Version: %s" %(fver(version))
-	print " config Version: %s" %(fver(oConfig.getConfig('version', ' ', ' ')))
+	print "dacapo Version: %s" %(fver(oConfig.getConfig('version', ' ', ' ')))
 	print " "
 	print "Python Version: %s" %(fver(version_info))
 	print " "

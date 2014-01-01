@@ -9,7 +9,7 @@
 ###############################################################################
 '''
 	this module creates the logger and the threading for
-	the player. it sets gets the options either from the 
+	the player. it gets the options either from the 
 	commandline (argparse) or the Gtk+ -gui (config).
 	the playlist is generated and finally it calls the ui/player.
 '''
@@ -28,7 +28,7 @@ except ImportError, err:
 	sys.exit(2)
 
 # ----------- Globale Variablen/Objekte ----------------------- #
-VERSION = [0, 1, 9]
+
 oConfig = readconfig.getConfigObject()
 
 levels = {'CRITICAL' : logging.CRITICAL,
@@ -64,20 +64,9 @@ def play(config=None):
 	#	from optparse import OptionParser as myArg
 	#	print "Lade >>optparse<<"
 	#else :
-	global oConfig, VERSION
+	global oConfig
 
 	if not config == None : oConfig=config
-
-	# print "Eigene Version: %s" % (VERSION)
-	# print "Config Version: ", oConfig.getConfig('version')
-	try : 
-		if VERSION > oConfig.getConfig('version') :
-			raise Exception("Programm-Version: %s > Config-Version: %s" % \
-			  (dacapoHelp.fver(VERSION), dacapoHelp.fver(oConfig.getConfig('version'))))
-	except :
-		errorhandling.Error.show()
-		sys.exit(2)
-		
 
 	bDebugP = oConfig.getConfig('debug', ' ', 'debugPL')
 	bDebugM = oConfig.getConfig('debug', ' ', 'debugM')
@@ -104,7 +93,7 @@ def play(config=None):
 		return
 
 	if args.fullhelp:
-		dacapoHelp.showFullHelp(VERSION)
+		dacapoHelp.showFullHelp()
 		return
 
 	if args.debug:

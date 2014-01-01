@@ -12,13 +12,14 @@
 
 from dacapo import errorhandling
 try:
+	import pkg_resources
 	import sys, os
 	import xml.etree.ElementTree as ET
 except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
 
-
+FILE="configarchive.tar.gz"
 HOMEDIR = os.path.expanduser('~')
 CONFIG_DIR = HOMEDIR + '/.dacapo/'
 XML_CONFIG = 'dacapo.conf'
@@ -37,12 +38,26 @@ class Config(object):
 		self.debug = debug
 		self.XML = filename
 		if not os.path.isfile(filename):
+			import dacapo.config.createconfig
+		if not os.path.isfile(filename):
 			print  >> sys.stderr, "FEHLER: Datei nicht gefunden -> ", filename
 			errorhandling.Error.show()
 			sys.exit(2)
 			return 1 
 		else: 
+			VERSION = [0, 0, 0]
+			is_pkg = pkg_resources.resource_exists("dacapo.data", "VERSION")
+			if is_pkg :
+				res = pkg_resources.resource_stream("dacapo.data", "VERSION")
+				VERSION = res.read().strip()
+				print("Wir leben mit Version: %s" % (str(VERSION)))
 			self.loadConfig()
+			print("Config hat Version: %s" % (self.fver(self.getConfig('version')) ))
+			if not str(VERSION) == str(self.fver(self.getConfig('version'))) :
+				print("Versionen sind unterschiedlich, führe Update durch.")
+				print("%s <> %s" % \
+				(str(VERSION), str(self.fver(self.getConfig('version')))))
+				import dacapo.config.createconfig		
 		CONFIG = self
 
 
@@ -100,7 +115,10 @@ class Config(object):
 
 		version = str(root.find('version').text)
 		tmp = version.split('.')
-		self.__version = [int(tmp[0]), int(tmp[1]), int(tmp[2])]		
+		if len(tmp) == 4 :
+			self.__version = [int(tmp[0]), int(tmp[1]), int(tmp[2]), tmp[3]]		
+		else:
+			self.__version = [int(tmp[0]), int(tmp[1]), int(tmp[2])]		
 		if self.debug : print "Version: %s " % (version)
 
 		gui = root.find('gui')
@@ -195,6 +213,8 @@ class Config(object):
 				# print "Tag:  %s  - Wert: %s" % (key2, self.getConfig('debug', key2, key2) )
 
 
+	def fver(self, tup):
+		return ".".join(map(str, tup))
 # -------------------- main() -----------------------------------------------------------------
 
 

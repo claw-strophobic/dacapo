@@ -1,0 +1,15 @@
+First, install the dependencies (pygame and GStreamer for Python):
+sudo apt-get install python-pygame python-gst0.10
+
+Then unpack the tarball and change in the directory:
+tar -xvzf dacapo-0.1.9a.tar.gz
+cd dacapo-0.1.9a/
+
+After you have done this call the setup as root user
+(because setup will install the object in /usr/local/bin/):
+sudo python setup.py install 
+
+Done.
+
+For options etc. see the manpages:
+man dacapo

@@ -11,7 +11,7 @@
 '''
 	this module handles the pygame-GUI and from here the
 	playlist, the GStreamer-module as well as the metadata.
-	one could say, it the core of the dacapo.
+	one could say, it is the core of the dacapo.
 '''
 
 import sys
@@ -161,13 +161,10 @@ class playerGUI():
 		
 		
 		i = 0
+		self.posActTime = -1
+		self.textActTime = None
 		for s in textMetaData :
-			if '%time%' in s :
-				self.textActTime = s
-				self.posActTime = i
  
-			s = s.replace('%time%', self.gstPlayer.getDuration())
-			s = s.replace('%duration%', self.gstPlayer.getDuration())
 			s = s.replace('%if_playlist%', textMetaVar[0])
 			s = s.replace('%if_discNr%', textMetaVar[1])
 			if self.isPlaylist :
@@ -178,7 +175,16 @@ class playerGUI():
 			while True :
 				text = self.find_between(s, '%', '%')
 				if text == '' : break
+				if (text == 'time') or (text == 'duration') :
+					s = s.replace('%' + text + '%', '#' + text + '#')
 				s = s.replace('%' + text + '%', self.audioFile.getMetaData(text))
+
+			if '#time#' in s :
+				self.textActTime = s
+				self.posActTime = i
+
+			s = s.replace('#time#', self.gstPlayer.getDuration())
+			s = s.replace('#duration#', self.gstPlayer.getDuration())
 
 			textMetaData[i] = s
 			i += 1
@@ -512,11 +518,12 @@ class playerGUI():
 
 		if newPos == None : return		
 		if self.pos == newPos : return				
-
+		if self.textActTime  == None : return		
+		
 		self.pos = newPos 
-		textActPos = self.textActTime.replace('%duration%', self.gstPlayer.getDuration())
-		strClear = textActPos.replace('%time%', self.gstPlayer.getDuration())
-		textActPos = textActPos.replace('%time%', newPos)
+		textActPos = self.textActTime.replace('#duration#', self.gstPlayer.getDuration())
+		strClear = textActPos.replace('#time#', self.gstPlayer.getDuration())
+		textActPos = textActPos.replace('#time#', newPos)
 		
 		try: 
 			fontActPos = self.font.render(textActPos, True, self.fontColor)
