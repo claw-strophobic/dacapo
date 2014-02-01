@@ -1,5 +1,0 @@
-python pyinstaller.py -w dacapo\dacapo.spec
-
- c:\Programme\Python26\Scripts\dacapoui
-  
-  C:\pyinstaller-2.0\dacapoui\build\pyi.win32\dacap

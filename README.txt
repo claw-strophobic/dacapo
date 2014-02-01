@@ -145,7 +145,7 @@ There are some options; see them by running
 
 **dacapoui**
 =============
-Thre you go with the graphical part (Gtk+).
+There you go with the graphical part (Gtk+).
 Simple:
 
  $ dacapoui
@@ -161,6 +161,21 @@ The following keys have a function during operation:
  - Up / Down = next / previous song
  - ESC / Q = Quit
  - F = Full screen / window
+ 
+**Tools**
+=========
+
+Since version 1.9.d there are two tools in the package:
+ - QtSyncLyrics and 
+ - QtFlac2Mp3 
+
+QtSyncLyrics is a small and easy tool to create LRC-Files with
+synchronised lyrics.
+QtFlac2Mp3 is a FLAC to MP3 converter, which also convert the
+metadata, copies (only) the frontcover and applies replaygain.
+It shows also the tags from a file.
+
+Both require pyQt4, QtFlac2Mp3 also requires rgain.
 
 Copyright
 =========
