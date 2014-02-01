@@ -1,0 +1,611 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+#
+# Windows GStreamer besteht anscheinend auf einen Import
+# von Gtk ?!? Sonst import-Fehler in dacapo.dacapoGST
+import platform
+if platform.system() == 'Windows':
+	import gtk
+import sys, os, locale
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import QObject,\
+                         pyqtSignal, \
+						 Qt
+
+from PyQt4.QtGui import QDialog, \
+                        QVBoxLayout, \
+                        QPushButton, \
+                        QTextBrowser,\
+                        QApplication, \
+                        QTextCursor, \
+						QMessageBox, \
+						QCursor
+from dacapo import errorhandling						
+#import gPlayerErrorHandling
+try:
+	from dacapo.playlist import generate
+	# from gPlayerPlayList import PlayList
+	import logging
+	from dacapo.qtflac2mp3.QtConverter import converter
+	from dacapo.qtflac2mp3 import QtPrintTags
+	from rgain.script.replaygain import do_gain, show_rgain_info
+	from dacapo.qtflac2mp3.id3Trans import copyFLAC, copyFlacCover, convertMp3ToV23 
+
+except ImportError, err:
+	errorhandling.Error.show()
+	sys.exit(2)
+
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+
+VERSION = [0, 1, 2]
+HOMEDIR = os.path.expanduser('~')
+CONFIG_DIR = HOMEDIR + '/.QtFlac2Mp3/'
+LOG_NAME = CONFIG_DIR + 'QtFlac2Mp3.log'
+TEMP_NAME = CONFIG_DIR + 'last_session.tmp'
+DACAPO_CONFIG_DIR = HOMEDIR + '/.dacapo/'
+
+try:
+	logging.basicConfig(
+		level='DEBUG', 
+		format='%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s', 
+		datefmt='%Y-%m-%d %H:%M:%S')
+except :
+	errorhandling.Error.show()
+	# gPlayerErrorHandling.showError()
+	sys.exit(2)
+
+logger = logging.getLogger(__name__)
+logger.debug('Starte den QtFlac2Mp3...')
+
+encoding = locale.getpreferredencoding()
+utf8conv = lambda x : unicode(x, encoding).encode('utf8')
+
+
+class XStream(QObject):
+    _stdout = None
+    _stderr = None
+
+    messageWritten = pyqtSignal(str)
+
+    def flush( self ):
+        pass
+
+    def fileno( self ):
+        return -1
+
+    def write( self, msg ):
+		if ( not self.signalsBlocked() ):
+			self.messageWritten.emit(msg)
+			QApplication.processEvents()
+
+    @staticmethod
+    def stdout():
+        if ( not XStream._stdout ):
+            XStream._stdout = XStream()
+            sys.stdout = XStream._stdout
+        return XStream._stdout
+
+    @staticmethod
+    def stderr():
+        if ( not XStream._stderr ):
+            XStream._stderr = XStream()
+            sys.stderr = XStream._stderr
+        return XStream._stderr
+
+class Ui_Dialog(QDialog):
+	def __init__( self, parent = None ):
+		super(Ui_Dialog, self).__init__(parent)
+		# CheckBoxes
+		# ------PrintTags
+		self.PTstart = False
+		# ------ReplayGain
+		self.RGstart = False
+		self.RGskip = False
+		self.RGdry = False
+		self.RGshow = False
+		self.RGalbum = False
+		# ------Konvert
+		self.KVstart = False
+		self.KVreplace = False
+		self.KVTag = False
+		self.KVcover = False
+		self.KVRG = False
+		self.KVID = True
+		
+		# Job-Cancel
+		self.cancel = False
+
+		self.inputDir = None
+		self.outputDir = None
+
+		self.oConverter = None
+
+		self.setupUi()
+
+	def setupUi(self):
+
+		# setup the ui
+		self.setObjectName(_fromUtf8("Dialog"))
+		self.resize(654, 629)
+		self.setWindowIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'QtFlac2Mp3.png'))
+		self.layout = QVBoxLayout()
+		QtGui.QToolTip.setFont(QtGui.QFont('OldEnglish', 10))
+		
+		# create the layout: Input-Pfadangaben
+		self.inputPathLayoutWidget = QtGui.QWidget(self)
+		self.inputPathLayoutWidget.setGeometry(QtCore.QRect(10, 10, 631, 31))
+		self.inputPathLayoutWidget.setObjectName(_fromUtf8("inputPathLayoutWidget"))
+		self.layout.addWidget(self.inputPathLayoutWidget)
+		self.inputPathLayout = QtGui.QHBoxLayout(self.inputPathLayoutWidget)
+		self.inputPathLayout.setMargin(0)
+		self.inputPathLayout.setObjectName(_fromUtf8("inputPathLayout"))
+		
+		
+		# Input-Pfadangaben
+		self.inputText = QtGui.QLineEdit(self.inputPathLayoutWidget)
+		self.inputText.setObjectName(_fromUtf8("inputText"))
+		self.inputText.setReadOnly(True)
+		self.inputPathLayout.addWidget(self.inputText)
+		self.inputButton = QtGui.QToolButton(self.inputPathLayoutWidget)
+		self.inputButton.setObjectName(_fromUtf8("inputButton"))
+		self.inputButton.setFocus(True)
+		self.inputPathLayout.addWidget(self.inputButton)
+		
+
+		# create the layout: Output-Pfadangaben
+		self.outputPathLayoutWidget = QtGui.QWidget(self)
+		self.outputPathLayoutWidget.setGeometry(QtCore.QRect(10, 40, 631, 41))
+		self.outputPathLayoutWidget.setObjectName(_fromUtf8("outputPathLayoutWidget"))
+		self.layout.addWidget(self.outputPathLayoutWidget)
+		self.outputPathLayout = QtGui.QHBoxLayout(self.outputPathLayoutWidget)
+		self.outputPathLayout.setMargin(0)
+		self.outputPathLayout.setObjectName(_fromUtf8("outputPathLayout"))
+		# Output-Pfadangaben
+		self.outputText = QtGui.QLineEdit(self.outputPathLayoutWidget)
+		self.outputText.setObjectName(_fromUtf8("outputText"))
+		self.outputText.setReadOnly(True)
+		self.outputPathLayout.addWidget(self.outputText)
+		self.outputButton = QtGui.QToolButton(self.outputPathLayoutWidget)
+		self.outputButton.setObjectName(_fromUtf8("outputButton"))
+		self.outputPathLayout.addWidget(self.outputButton)
+
+
+		# Groupboxes mit CheckButtons
+		# create the layout: Groupboxes mit CheckButtons
+		self.checkButtonLayoutWidget = QtGui.QWidget(self)
+		self.checkButtonLayoutWidget.setGeometry(QtCore.QRect(10, 80, 631, 111))
+		self.checkButtonLayoutWidget.setObjectName(_fromUtf8("checkButtonLayoutWidget"))
+		self.layout.addWidget(self.checkButtonLayoutWidget)
+		self.checkButtonLayout = QtGui.QHBoxLayout(self.checkButtonLayoutWidget)
+		self.checkButtonLayout.setMargin(0)
+		
+		self.checkButtonLayout.setObjectName(_fromUtf8("checkButtonLayout"))
+
+		# GroupBox: ReplayGain
+		self.groupBox = QtGui.QGroupBox(self.checkButtonLayoutWidget)
+		self.groupBox.setObjectName(_fromUtf8("groupBox"))
+		self.checkRGstart = QtGui.QCheckBox(self.groupBox)
+		self.checkRGstart.setGeometry(QtCore.QRect(10, 20, 131, 22))
+		self.checkRGstart.setObjectName(_fromUtf8("checkRGstart"))
+		self.checkRGskip = QtGui.QCheckBox(self.groupBox)
+		self.checkRGskip.setGeometry(QtCore.QRect(10, 40, 161, 22))
+		self.checkRGskip.setObjectName(_fromUtf8("checkRGskip"))
+		self.checkRGdry = QtGui.QCheckBox(self.groupBox)
+		self.checkRGdry.setGeometry(QtCore.QRect(10, 60, 161, 22))
+		self.checkRGdry.setToolTip(_fromUtf8(""))
+		self.checkRGdry.setObjectName(_fromUtf8("checkRGdry"))
+		self.checkRGshow = QtGui.QCheckBox(self.groupBox)
+		self.checkRGshow.setGeometry(QtCore.QRect(10, 80, 161, 22))
+		self.checkRGshow.setToolTip(_fromUtf8(""))
+		self.checkRGshow.setObjectName(_fromUtf8("checkRGshow"))
+		self.checkButtonLayout.addWidget(self.groupBox)	
+		self.groupBox.setMinimumSize(180, 110)		
+		
+		# GroupBox: Konvert
+		self.groupBox_2 = QtGui.QGroupBox(self.checkButtonLayoutWidget)
+		self.groupBox_2.setGeometry(QtCore.QRect(170, 0, 199, 109))
+		self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
+		# CheckButtons
+		self.checkKVstart = QtGui.QCheckBox(self.groupBox_2)
+		self.checkKVstart.setGeometry(QtCore.QRect(10, 20, 131, 22))
+		self.checkKVstart.setObjectName(_fromUtf8("checkKVstart"))
+		self.checkKVreplace = QtGui.QCheckBox(self.groupBox_2)
+		self.checkKVreplace.setGeometry(QtCore.QRect(10, 40, 161, 22))
+		self.checkKVreplace.setObjectName(_fromUtf8("checkKVreplace"))
+		self.checkKVTag = QtGui.QCheckBox(self.groupBox_2)
+		self.checkKVTag.setGeometry(QtCore.QRect(10, 60, 161, 22))
+		self.checkKVTag.setToolTip(_fromUtf8(""))
+		self.checkKVTag.setObjectName(_fromUtf8("checkKVTag"))
+		self.checkKVcover = QtGui.QCheckBox(self.groupBox_2)
+		self.checkKVcover.setGeometry(QtCore.QRect(10, 80, 161, 22))
+		self.checkKVcover.setToolTip(_fromUtf8(""))
+		self.checkKVcover.setObjectName(_fromUtf8("checkKVcover"))
+		self.checkKVRG = QtGui.QCheckBox(self.groupBox_2)
+		self.checkKVRG.setGeometry(QtCore.QRect(10, 100, 161, 22))
+		self.checkKVRG.setToolTip(_fromUtf8(""))
+		self.checkKVRG.setObjectName(_fromUtf8("checkKVRG"))		
+		self.checkKVID = QtGui.QCheckBox(self.groupBox_2)
+		self.checkKVID.setGeometry(QtCore.QRect(10, 120, 161, 22))
+		self.checkKVID.setToolTip(_fromUtf8(""))
+		self.checkKVID.setObjectName(_fromUtf8("checkKVID"))
+		self.checkKVID.setCheckState(QtCore.Qt.Checked)
+		self.checkButtonLayout.addWidget(self.groupBox_2)
+		self.groupBox_2.setMinimumSize(150, 145)		
+
+		# GroupBox: PrintTags
+		self.groupBox_3 = QtGui.QGroupBox(self.checkButtonLayoutWidget)
+		self.groupBox_3.setGeometry(QtCore.QRect(350, 0, 301, 109))
+		self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
+		self.checkPTstart = QtGui.QCheckBox(self.groupBox_3)
+		self.checkPTstart.setGeometry(QtCore.QRect(10, 20, 131, 22))
+		self.checkPTstart.setObjectName(_fromUtf8("checkPTstart"))
+		self.checkButtonLayout.addWidget(self.groupBox_3)
+		self.groupBox_3.setMinimumSize(150, 120)		
+
+		# GroupBox: Start/Cancel-Button
+		self.buttonBox = QtGui.QDialogButtonBox(self.groupBox_3)
+		self.buttonBox.setGeometry(QtCore.QRect(0, 90, 200, 27))
+		self.applyButton = self.buttonBox.addButton(QtGui.QDialogButtonBox.Apply)
+		self.cancelButton = self.buttonBox.addButton(QtGui.QDialogButtonBox.Cancel)
+		self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+		
+		# GroupBox: TextView
+		self.textViewLayoutWidget = QtGui.QWidget(self)
+		self.textViewLayoutWidget.setGeometry(QtCore.QRect(10, 190, 631, 431))
+		self.textViewLayoutWidget.setObjectName(_fromUtf8("textViewLayoutWidget"))
+		self.textViewLayout = QtGui.QVBoxLayout(self.textViewLayoutWidget)
+		self.textViewLayout.setMargin(0)
+		self.textViewLayout.setObjectName(_fromUtf8("textViewLayout"))
+		self.label = QtGui.QLabel(self.textViewLayoutWidget)
+		self.label.setObjectName(_fromUtf8("label"))
+		self.textViewLayout.addWidget(self.label)
+		self.textBrowser = QtGui.QTextBrowser(self.textViewLayoutWidget)
+		self.textBrowser.setObjectName(_fromUtf8("textBrowser"))
+		self.textViewLayout.addWidget(self.textBrowser)
+		self.layout.addWidget(self.textViewLayoutWidget)
+
+
+		self.retranslateUi()
+		self.setLayout(self.layout)
+		# QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+		# create connections
+		self.connectUi()
+		return
+
+
+	def retranslateUi(self):
+		self.setWindowTitle(QtGui.QApplication.translate("Dialog", "FLAC Konvertierung", None, QtGui.QApplication.UnicodeUTF8))
+		self.groupBox.setTitle(QtGui.QApplication.translate("Dialog", "ReplayGain", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkRGstart.setText(QtGui.QApplication.translate("Dialog", "Ausführen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkRGskip.setText(QtGui.QApplication.translate("Dialog", "vorh. Überspringen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkRGdry.setText(QtGui.QApplication.translate("Dialog", "Nur Simulation", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkRGshow.setText(QtGui.QApplication.translate("Dialog", "Nur Tags anzeigen", None, QtGui.QApplication.UnicodeUTF8))
+		self.groupBox_2.setTitle(QtGui.QApplication.translate("Dialog", "FLAC -> MP3", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVstart.setText(QtGui.QApplication.translate("Dialog", "Ausführen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVreplace.setText(QtGui.QApplication.translate("Dialog", "vorh. Ersetzen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVTag.setText(QtGui.QApplication.translate("Dialog", "vorh. Taggen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVcover.setText(QtGui.QApplication.translate("Dialog", "Cover übernehmen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVRG.setText(QtGui.QApplication.translate("Dialog", "ReplayGain anwenden", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVID.setText(QtGui.QApplication.translate("Dialog", "Zu ID3v2.3 konvertieren", None, QtGui.QApplication.UnicodeUTF8))
+		self.groupBox_3.setTitle(QtGui.QApplication.translate("Dialog", "Tags anzeigen", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkPTstart.setText(QtGui.QApplication.translate("Dialog", "Ausführen", None, QtGui.QApplication.UnicodeUTF8))
+		self.label.setText(QtGui.QApplication.translate("Dialog", "Ausgabe", None, QtGui.QApplication.UnicodeUTF8))
+		self.inputText.setPlaceholderText(QtGui.QApplication.translate("Dialog", "Quellordner", None, QtGui.QApplication.UnicodeUTF8))
+		self.inputButton.setText(QtGui.QApplication.translate("Dialog", "...", None, QtGui.QApplication.UnicodeUTF8))
+		self.outputText.setPlaceholderText(QtGui.QApplication.translate("Dialog", "Zielordner", None, QtGui.QApplication.UnicodeUTF8))
+		self.outputButton.setText(QtGui.QApplication.translate("Dialog", "...", None, QtGui.QApplication.UnicodeUTF8))
+		self.applyButton.setText(QtGui.QApplication.translate("Dialog", "Anwenden", None, QtGui.QApplication.UnicodeUTF8))
+		self.cancelButton.setText(QtGui.QApplication.translate("Dialog", "Abbrechen", None, QtGui.QApplication.UnicodeUTF8))
+		
+		# Tooltips
+		self.inputButton.setToolTip(_fromUtf8('Hier das <b>Quell-Verzeichnis</b> auswählen'))
+		self.outputButton.setToolTip(_fromUtf8('Hier das <b>Ziel-Verzeichnis</b> auswählen'))		
+		self.checkRGstart.setToolTip(_fromUtf8('ReplayGain-Analyse für das <b>Quell-Verzeichnis</b> anwenden'))
+		self.checkRGskip.setToolTip(_fromUtf8('Bei vorhandenen ReplayGain-Tags die Datei auslassen'))
+		self.checkRGdry.setToolTip(_fromUtf8('Nur Analysieren, aber nicht schreiben. Die Dateien werden nicht verändert.'))
+		self.checkRGshow.setToolTip(_fromUtf8('Nur ReplayGain-Tags anzeigen'))
+		self.checkKVstart.setToolTip(_fromUtf8('FLAC-Dateien aus dem <b>Quell-Verzeichnis</b> verarbeiten und ggf. konvertieren'))
+		self.checkKVreplace.setToolTip(_fromUtf8('Vorhandene Dateien im <b>Ziel-Verzeichnis</b> ersetzen'))
+		self.checkKVTag.setToolTip(_fromUtf8('Bei vorhandenen Dateien im <b>Ziel-Verzeichnis</b> die Tags ersetzen'))
+		self.checkKVcover.setToolTip(_fromUtf8('Das Frontcover der FLAC-Datei in die MP3-Datei übernehmen'))
+		self.checkKVRG.setToolTip(_fromUtf8('ReplayGain-Analyse für die MP3-Datei im <b>Ziel-Verzeichnis</b> anwenden. Wird nur bei tatsächlicher Konvertierung angewendet.'))
+		self.checkPTstart.setToolTip(_fromUtf8('Alle Tags der Dateien aus dem <b>Quell-Verzeichnis</b> anzeigen (inkl. Bilder)'))
+		self.applyButton.setToolTip(_fromUtf8('Verarbeitung starten'))
+		self.cancelButton.setToolTip(_fromUtf8('Verarbeitung abbrechen'))
+		self.checkKVID.setToolTip(_fromUtf8('ID3-Tags in der Version ID3v2.3 setzen? <br>Dies ist für einige ältere Geräte notwendig.' \
+									+ '<br>ReplayGain speichert die Informationen in der neuen ID-Version ID3v2.4 ab.'\
+									+ '<br>Es wird versucht die Tags aus der Version ID3v2.4 zu ID3v2.3 zu konvertieren.'))
+		
+
+		return
+
+	def connectUi(self) :
+		# Buttons
+		self.inputButton.clicked.connect(self.on_inputButton_clicked)
+		self.outputButton.clicked.connect(self.on_outputButton_clicked)
+		self.applyButton.clicked.connect(self.on_applyButton_clicked)
+		self.cancelButton.clicked.connect(self.on_cancelButton_clicked)
+
+		# CheckBoxes
+		# ------PrintTags
+		self.checkPTstart.stateChanged.connect(self.toggle_checkPTstart)
+		# ------ReplayGain
+		self.checkRGstart.stateChanged.connect(self.toggle_checkRGstart)
+		self.checkRGskip.stateChanged.connect(self.toggle_checkRGskip)
+		self.checkRGdry.stateChanged.connect(self.toggle_checkRGdry)
+		self.checkRGshow.stateChanged.connect(self.toggle_checkRGshow)
+		# ------Konvert
+		self.checkKVstart.stateChanged.connect(self.toggle_checkKVstart)
+		self.checkKVreplace.stateChanged.connect(self.toggle_checkKVreplace)
+		self.checkKVTag.stateChanged.connect(self.toggle_checkKVTag)
+		self.checkKVcover.stateChanged.connect(self.toggle_checkKVcover)
+		self.checkKVRG.stateChanged.connect(self.toggle_checkKVRG)
+		self.checkKVID.stateChanged.connect(self.toggle_checkKVID)
+
+		# create connections
+		XStream.stdout().messageWritten.connect( self.textBrowser.insertPlainText )
+		XStream.stderr().messageWritten.connect( self.textBrowser.insertPlainText )
+		return
+
+
+	def on_applyButton_clicked(self) :
+		# print "Eingabeverzeichnis: %s" % (self.inputDir)
+		self.cancel = False
+		if self.outputDir == None and self.KVstart :
+			# QMessageBox.information (QWidget parent, QString caption, QString text,
+			# int button0, int button1 = 0, int button2 = 0)
+			QMessageBox.information(self, 'Info Message', ''' Kein Ausgabeverzeichnis angegeben!''',
+			QMessageBox.Ok)
+			return
+		if self.inputDir == None  : 
+			QMessageBox.information(self, 'Info Message', ''' Keine zu verarbeitenden Dateien angegeben!''',
+			QMessageBox.Ok)
+		else:
+			QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+			self.process_playlist()
+			QApplication.restoreOverrideCursor()
+		return
+
+	def on_cancelButton_clicked(self) :
+		self.cancel = True
+		# print "Ausgabeverzeichnis: %s" % (self.outputDir)
+		return
+
+	def on_inputButton_clicked(self) :
+		# self.inputFileChooser = FileChooser(self)
+		# self.inputFileChooser.show()
+		# self.inputFileChooser.exec_()
+		# self.inputDir = self.inputFileChooser.getSelectedFiles()
+		self.inputDir = str(QtCore.QDir.toNativeSeparators(QtGui.QFileDialog.getExistingDirectory(self, u"Quellverzeichnis auswählen" )))
+		logger.debug("Eingabeverzeichnis = " +  self.inputDir)
+		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.inputDir))
+		return
+
+	def on_outputButton_clicked(self) :
+		self.outputDir = str(QtCore.QDir.toNativeSeparators(QtGui.QFileDialog.getExistingDirectory(self, u"Zielverzeichnis auswählen")))
+		logger.debug("Ausgabeverzeichnis = " +  self.outputDir)
+		self.outputText.setText(QtCore.QDir.toNativeSeparators((self.outputDir)))
+		return
+
+
+	def process_playlist( self):
+		print(utf8conv("Starte Verarbeitung..." ))
+		QApplication.processEvents()
+		inputList = []
+		inputList.append(self.inputDir)
+		# self.oPlaylist = PlayList(bDebug = False)
+		self.oPlaylist = generate.PlayList(bDebug = False)
+		self.oPlaylist.setInput(inputList)
+		force = False
+		if self.RGskip == False : force = True
+		self.oPlaylist.proceed()
+		playlist = self.oPlaylist.getPlaylist()
+		if len(playlist) <= 0: return
+		actSong = 0
+		logger.debug('RGstart: %s  KVstart: %s PTstart: %s' % (self.RGstart, self.KVstart, self.PTstart ) )
+		while actSong < len(playlist):
+			if self.cancel : break
+			filename = os.path.realpath(playlist[actSong])
+			actSong += 1
+			print(utf8conv("Verarbeite Nr %s von %s: %s " % (actSong, len(playlist), filename) ))
+			gain_song = []
+			gain_song.append(filename)
+			# ------ReplayGain
+			if self.RGstart :
+				logger.debug('Force: %s  Album-Mode: %s Dry-Mode: %s Show-Mode: %s  Pfad: %s' % (force, self.RGalbum, self.RGdry, self.RGshow, filename ) )
+				if self.RGshow :
+					show_rgain_info(gain_song, mp3_format=None)
+				else :
+					do_gain(gain_song, ref_level=89, force=force, dry_run=self.RGdry, album=self.RGalbum,
+						mp3_format=None)
+			# ------PrintTags
+			if self.PTstart :
+				logger.debug('Versuche printTags mit: %s' % (filename ) )
+				QtPrintTags.printTags(filename)
+			# ------Konvert
+			if self.KVstart : 
+				logger.debug('Versuche Datei %s zu konvertieren...' % (filename ) )
+				self.convert_flac(filename)
+		#self.KVreplace = False
+		#self.KVTag = False
+		#self.KVcover = False
+			print " "
+			self.textBrowser.moveCursor(QTextCursor.End)
+			self.textBrowser.ensureCursorVisible()
+
+		if self.cancel : print(utf8conv("Verarbeitung abgebrochen!\n"))
+		else: print(utf8conv("Fertig.\n"))
+		self.textBrowser.moveCursor(QTextCursor.End)
+		self.textBrowser.ensureCursorVisible()
+		return
+
+	def convert_flac( self, flacFile):
+		'''
+		Konvertiert die Flac-Datei in MP3
+		flacFile = kompletter Pfad zur Datei
+		flacBasename = Dateiname ohne Pfad und ohne Erweiterung
+		flacDirname = Pfad zur Quelldatei
+		flacStrippedDirname = Pfad zur Quelldatei ohne Eingabe
+		mpegFile = kompletter Pfad zur Zieldatei
+		mpegBasename = Dateiname ohne Pfad und ohne Erweiterung
+		mpegDirname = Pfad zur Quelldatei
+		'''
+		flacBasename = os.path.splitext(os.path.basename(flacFile))[0]
+		flacDirname = os.path.dirname(flacFile)
+		mpegBasename = flacBasename
+		flacStrippedDirname = flacDirname.lstrip(self.inputDir)
+		mpegDirname = os.path.join(self.outputDir, flacStrippedDirname)
+		mpegFile = os.path.join(mpegDirname, mpegBasename + '.mp3')
+		if not os.path.isdir(mpegDirname) :
+			try: 
+				os.makedirs(mpegDirname)
+				print "Ziel-Verzeichnis %s erstellt. " % ( mpegDirname )
+			except: 
+				print "FEHLER: Konnte Ziel-Verzeichnis %s nicht erstellen!" % ( mpegDirname )
+				return
+		
+		if self.cancel : return
+		
+		if self.oConverter == None :
+			self.oConverter = converter()
+		
+		bIsConverted = False
+		# Konvertieren?
+		if not os.path.isfile(mpegFile) :
+			print "Erstelle MP3-Datei %s" % ( mpegFile )
+			self.oConverter.convert(flacFile, mpegFile)
+			bIsConverted = True
+			copyFLAC(flacFile, mpegFile)	
+			if self.KVcover	: copyFlacCover(flacFile, mpegFile)	
+		else :
+			if self.KVreplace :
+				print "Ersetze MP3-Datei %s" % ( mpegFile )
+				os.remove(mpegFile)
+				self.oConverter.convert(flacFile, mpegFile)
+				bIsConverted = True
+				copyFLAC(flacFile, mpegFile)
+				if self.KVcover	: copyFlacCover(flacFile, mpegFile)	
+			elif self.KVTag :
+				copyFLAC(flacFile, mpegFile)
+				if self.KVcover	: copyFlacCover(flacFile, mpegFile)	
+		
+		if self.cancel : return
+		
+		if bIsConverted and self.KVRG :
+			# mp3format = "replaygain.org"
+			mp3format = "default"
+			gain_song = []
+			gain_song.append(mpegFile)
+			do_gain(gain_song, ref_level=89, force=True, dry_run=False, album=self.RGalbum,
+						mp3_format=mp3format)
+
+		if self.KVID and os.path.isfile(mpegFile) :
+			print "Konvertiere MP3-Datei %s zu ID3v2.3" % ( mpegFile )
+			convertMp3ToV23(mpegFile)
+
+		return
+
+
+
+	#---- toogle-CheckButtons ---------------------#
+
+	# ------PrintTags
+	def toggle_checkPTstart(self, state):
+		if state == QtCore.Qt.Checked:
+			self.PTstart = True
+		else:
+			self.PTstart = False
+		return
+
+	# ------ReplayGain
+	def toggle_checkRGstart(self, state):
+		if state == QtCore.Qt.Checked:
+			self.RGstart = True
+		else:
+			self.RGstart = False
+		return
+	def toggle_checkRGskip(self, state):
+		if state == QtCore.Qt.Checked:
+			self.RGskip = True
+		else:
+			self.RGskip = False
+		return
+	def toggle_checkRGdry(self, state):
+		if state == QtCore.Qt.Checked:
+			self.RGdry = True
+		else:
+			self.RGdry = False
+		return
+	def toggle_checkRGshow(self, state):
+		if state == QtCore.Qt.Checked:
+			self.RGshow = True
+		else:
+			self.RGshow = False
+		return
+
+	# ------Konvert
+	def toggle_checkKVstart(self, state):
+		if state == QtCore.Qt.Checked:
+			self.KVstart = True
+		else:
+			self.KVstart = False
+		return
+	def toggle_checkKVreplace(self, state):
+		if state == QtCore.Qt.Checked:
+			self.KVreplace = True
+		else:
+			self.KVreplace = False
+		return
+	def toggle_checkKVTag(self, state):
+		if state == QtCore.Qt.Checked:
+			self.KVTag = True
+		else:
+			self.KVTag = False
+		return
+	def toggle_checkKVcover(self, state):
+		if state == QtCore.Qt.Checked:
+			self.KVcover = True
+		else:
+			self.KVcover = False
+		return
+	def toggle_checkKVRG(self, state):
+		if state == QtCore.Qt.Checked:
+			self.KVRG = True
+		else:
+			self.KVRG = False
+		return
+	def toggle_checkKVID(self, state):
+		if state == QtCore.Qt.Checked:
+			self.KVID = True
+		else:
+			self.KVID = False
+		return
+
+	#---- toogle-CheckButtons ---------------------#
+
+# -------------------- Main() -----------------------------------------------------------------
+ 
+def main(cmdline):
+	logging.basicConfig()
+	logger.debug('und los gehts...')
+	app = None
+	if ( not QApplication.instance() ):
+		app = QApplication([])
+
+	dlg = Ui_Dialog()
+	dlg.show()
+
+	sys.exit(app.exec_())
+
+
+# -------------------- Main() -----------------------------------------------------------------
+
+if ( __name__ == '__main__' ):
+	main(sys.argv)
+
+

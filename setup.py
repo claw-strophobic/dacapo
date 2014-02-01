@@ -12,11 +12,11 @@ print("Setup-Mode: %s" % (sys.argv[1]) )
 if sys.argv[1] == "sdist" or \
 	sys.argv[1] == "bdist" :    
 	import shutil
-	src_file = "dacapo/data/VERSION" 
+	src_file = "./dacapo/data/VERSION" 
 	dest_file = "./VERSION" 
-	shutil.copy(src_file, dest_file)
+	# shutil.copy(src_file, dest_file)
 
-VERSION = open("VERSION").read().strip()
+VERSION = open("./dacapo/data/VERSION").read().strip()
 
 class dacapo_install(install):
 	description = "Custom Install Process"
@@ -64,8 +64,10 @@ setup(
     name = "dacapo",
     version=VERSION,
     packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 
-    'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist'],
-    scripts = ["bin/dacapo", "bin/dacapoui"],
+    'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist',
+    'dacapo.qtflac2mp3'],
+    scripts = ["bin/dacapo", "bin/dacapoui", "bin/QtSyncLyrics",
+    "bin/QtFlac2Mp3"],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
@@ -73,18 +75,10 @@ setup(
 			'pygame (>=1.9)',
 			'argparse (>=1.1)',
 			'setuptools (>=0.9)',
-			'mutagen (>=1.21)'
+			'mutagen (>=1.21)',
+			'rgain (>=1.1)'
 			],
-    install_requires = [
-			# 'gtk==2.24',
-			# 'pygtk==2.24', 
-			# 'gst>=0-10', 
-			# 'pygst>=0.10', 
-			'pygame>=1.9',
-			'argparse>=1.1',
-			'setuptools>=0.9',
-			'mutagen>=1.21'
-		],
+    
 
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
@@ -105,7 +99,7 @@ setup(
 	long_description=long_description,
     license = "GNU General Public License (v2 or later)",
     keywords = "FLAC MP3 Player Coverart lyrics karaoke",
-    url = "http://sourceforge.net/projects/dacapo-player",   # project home page, if any
+    url = "http://dacapo.netztakt.de",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
 	# cmdclass={'setconfig': my_install},

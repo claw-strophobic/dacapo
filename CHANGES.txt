@@ -1,3 +1,4 @@
+V0.1.9d, 2014-02-01 -- 	Adding QtSyncLyrics and QtFlac2Mp3
 V0.1.9c, 2014-01-01 -- 	configuring the time-display after title causes
 						an error. (ticket #9).
 V0.1.9b, 2013-11-17 -- 	Versioncontrol, changing setup.py
