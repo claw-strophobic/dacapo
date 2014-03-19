@@ -1,0 +1,81 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2014-03-19 14:11+CET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Transfer-Encoding: iso-8859-15\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: bin/QtFlac2Mp3:9
+msgid "Convert FLAC files to MP3"
+msgstr "Konvertiere FLAC zu MP3"
+
+#: bin/QtFlac2Mp3:10
+msgid "Input directory"
+msgstr "Eingabeverzeichnis"
+
+#: bin/QtFlac2Mp3:11
+msgid "Output directory"
+msgstr "Ausgabeverzeichnis"
+
+#: bin/QtFlac2Mp3:14
+msgid "Apply ReplayGain for the input directory"
+msgstr "Wende ReplayGain für das Eingabeverzeichnis an"
+
+#: bin/QtFlac2Mp3:15
+msgid "Do not apply ReplayGain for already calculated files"
+msgstr "ReplayGain nicht auf bereits kalkulierte Dateien anwenden"
+
+#: bin/QtFlac2Mp3:16
+msgid "Do not actually modify any files"
+msgstr "ReplayGain nur simulieren, nicht festschreiben"
+
+#: bin/QtFlac2Mp3:17
+msgid "Simply show ReplayGain informations"
+msgstr "ReplayGain Informationen nur anzeigen"
+
+#: bin/QtFlac2Mp3:20
+msgid "Convert the files in the input directory"
+msgstr "Konvertierung auf Eingabeverzeichnis anwenden"
+
+#: bin/QtFlac2Mp3:21
+msgid "Convert and replace existing files"
+msgstr "Konvertiere und ersetze bereits bestehende Dateien"
+
+#: bin/QtFlac2Mp3:22
+msgid "Do not convert existing files but update metadata"
+msgstr "Konvertiere bestehende Dateien nicht erneut, aber aktualsiere Metadaten"
+
+#: bin/QtFlac2Mp3:23
+msgid "Copy the frontcover if existing"
+msgstr "Übernehme auch das Coverart"
+
+#: bin/QtFlac2Mp3:24
+msgid "Apply ReplayGain for the output directory"
+msgstr "Wende ReplayGain für das Ausgabeverzeichnis an"
+
+#: bin/QtFlac2Mp3:25
+msgid "Convert into ID3v2.3"
+msgstr "Bei Konvertierung ID3v2.3 verwenden"
+
+#: bin/QtFlac2Mp3:28
+msgid "Show Metadata"
+msgstr "Metadaten anzeigen"
+
+#: bin/QtFlac2Mp3:31
+msgid "Run the programm immediatly"
+msgstr "Programm sofort starten"
+
+#: bin/QtFlac2Mp3:33
+msgid "Run the programm without the GUI"
+msgstr "Programm ohne GUI ausführen"
+

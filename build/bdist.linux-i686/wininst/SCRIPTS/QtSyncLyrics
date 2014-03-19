@@ -1,0 +1,745 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+# Windows GStreamer besteht anscheinend auf einen Import
+# von Gtk ?!? Sonst import-Fehler in dacapo.dacapoGST
+import platform
+if platform.system() == 'Windows':
+	import gtk
+from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import *
+from PyQt4.QtGui import QDialog, \
+                        QVBoxLayout, \
+                        QPushButton, \
+                        QApplication, \
+                        QTextCursor, \
+						QMessageBox, \
+						QCursor
+import sys, os, time, math, locale
+import logging
+import traceback
+import threading
+from dacapo.metadata import *
+from dacapo.dacapoGST import GstPlayer
+import dacapo.errorhandling
+import codecs
+import ConfigParser
+import pygame
+from dacapo.config import readconfig
+
+
+encoding = locale.getpreferredencoding()
+utf8conv = lambda x : unicode(x, encoding).encode('utf8')
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+
+VERSION = [0, 1, 1]
+PLACEHOLDER = "[--:--]"
+TITLE = "[ti: "
+ARTIST = "[ar: "
+ALBUM = "[al: "
+REG = "[re: QtSyncLyrics]"
+VER = "[ve: 0.1.1]"
+HOMEDIR = os.path.expanduser('~')
+CONFIG_DIR = HOMEDIR + '/.QtSyncLyrics/'
+LOG_NAME = CONFIG_DIR + 'QtSyncLyrics.log'
+TEMP_NAME = CONFIG_DIR + 'last_session.tmp'
+DACAPO_CONFIG_DIR = HOMEDIR + '/.dacapo/'
+
+if not os.path.exists(CONFIG_DIR):
+    os.makedirs(CONFIG_DIR)
+	
+try:
+	logging.basicConfig(filename=LOG_NAME, 
+		filemode='w',
+		level=logging.DEBUG, 
+		format='%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s', 
+		datefmt='%Y-%m-%d %H:%M:%S')
+except :
+	errorhandling.Error.show()
+	sys.exit(2)
+
+logging.debug('Starte den QtSyncLyrics...')
+
+class Loop(QtCore.QThread):
+	def __init__(self, gui):
+	  QtCore.QThread.__init__(self)
+	  self.gui = gui
+
+	def run(self) :
+		#get the current thread in Qt
+		play_thread_id = self.currentThread
+		#if current thread is running
+		while play_thread_id == self.currentThread:
+			if self.gui.hauptschalter == True:
+				break  
+			if self.gui.isPlay == True:
+				self.emit(QtCore.SIGNAL("setCurTime"))
+				# self.gui.setCurTime()
+			#set timer
+			time.sleep(0.05)
+
+#this code produced using pyuic from qt designer
+class Ui_Dialog(QtGui.QMainWindow):
+	def __init__( self, parent = None ):
+		QtGui.QMainWindow.__init__(self, parent)
+		# super(Ui_Dialog, self).__init__(parent)
+		self.setupUi()
+		self.debug = True
+		self.isGapless = False
+		self.isPlay = None
+		self.hauptschalter = threading.Event()
+		self.ausschalter = threading.Event()
+		self.oDacapoConfig = readconfig.getConfigObject()
+		pygame.init()
+				
+		self.loop = Loop(self)
+		QtCore.QObject.connect(self.loop, QtCore.SIGNAL("setCurTime"), \
+			self.setCurTime, QtCore.Qt.QueuedConnection)		
+		self.loop.start()
+
+		self.__init_pipeline()
+		#the source of the player
+		self.filename = ""
+		self.last_filename = ""
+		self.sliderPressed = False
+
+		try: 
+			# cfgfile = codecs.open(TEMP_NAME,'r', 'utf8')		
+			config = ConfigParser.ConfigParser()
+			config.read(TEMP_NAME)
+			self.filename = config.get('Audio', 'filename')
+		except: 
+			exc_type, exc_value, exc_traceback = sys.exc_info()
+			lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+			logging.debug(lines)
+			self.filename = ''
+
+		logging.debug("Audiodatei = " +  self.filename)
+		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
+		self.audioFile = getAudioFile(self, self.filename)
+		if self.audioFile <> None :		
+			try: 
+				self.artistText.setText(QString(_fromUtf8(config.get('Audio', 'artist'))))
+				self.titelText.setText(QString(_fromUtf8(config.get('Audio', 'title'))))
+				self.albumText.setText(QString(_fromUtf8(config.get('Audio', 'album'))))
+				self.textEdit.setPlainText(QString(_fromUtf8(config.get('Lyrics', 'text'))))
+			except: 
+				exc_type, exc_value, exc_traceback = sys.exc_info()
+				lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+				logging.debug(lines)
+				self.artistText.setText('')
+				self.titelText.setText('')
+				self.albumText.setText('')
+				self.textEdit.setPlainText('')
+
+		logging.debug('LyricFont initialisieren. ')
+		self.lyricFont = pygame.font.SysFont( \
+			self.oDacapoConfig.getConfig('gui', 'fullscreen', 'lyricFont'), \
+			self.oDacapoConfig.getConfig('gui', 'fullscreen', 'lyricFontSize'))
+		self.lyricFontColor = self.oDacapoConfig.getConfig(\
+			'gui', 'fullscreen', 'lyricFontColor')
+		self.screenWidth = self.oDacapoConfig.getConfig('gui', 'fullscreen', 'width')
+		self.textEdit.setFocus()
+
+		
+		#sets the value of the progress bar emited
+	def setCurTime(self):
+		self.actPos = self.gstPlayer.queryNumericPosition()
+		self.actPosStr = self.gstPlayer.queryPosition()
+		self.lblTimeCur.setText( \
+			QtGui.QApplication.translate("Dialog", \
+			self.actPosStr, None, \
+			QtGui.QApplication.UnicodeUTF8))
+		self.remTime = self.gstPlayer.queryTimeRemaining()
+		self.lblTimeRemaining.setText( \
+			QtGui.QApplication.translate("Dialog", \
+			self.remTime, None, \
+			QtGui.QApplication.UnicodeUTF8))
+		value = self.actPos * self.seekSlider.maximum() / self.gstPlayer.getNumericDuration()
+		if (self.seekSlider.value() != value) :
+			self.seekSlider.setValue( value )			
+
+
+	def createToolbar(self):
+		# Toolbar		
+		# --- clear
+		self.clearAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_new.png'), 'Clear', self)
+		self.clearAction.setShortcut('Ctrl+N')
+		self.clearAction.setToolTip(u"Alles bereinigen Ctrl+N")
+		self.connect(self.clearAction, QtCore.SIGNAL('triggered()'), self.clearFile)
+		# --- save
+		self.saveAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'save.png'), 'Save', self)
+		self.saveAction.setShortcut('Ctrl+S')
+		self.saveAction.setToolTip(u"Die LRC-Datei speichern Ctrl+S")
+		self.connect(self.saveAction, QtCore.SIGNAL('triggered()'), self.saveFile)
+		# --- undo/redo
+		self.undoAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_undo.png'), 'Undo', self)
+		self.undoAction.setShortcut('Ctrl+Z')
+		self.undoAction.setToolTip(u"Die letzte Aktion zurücknehmen Crtl+Z")
+		self.connect(self.undoAction, QtCore.SIGNAL('triggered()'), self.undo)
+		self.redoAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_redo.png'), 'Redo', self)
+		self.redoAction.setShortcut('Ctrl+Shift+Z')
+		self.redoAction.setToolTip(u"Die letzte Aktion wiederholen Ctrl+Shift+Z")
+		self.connect(self.redoAction, QtCore.SIGNAL('triggered()'), self.redo)
+		# --- set-/remove Mark
+		self.markAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_clock_add.png'), 'SetMark', self)
+		self.markAction.setShortcut('F5')
+		self.markAction.setToolTip(u"Eine Zeitmarkierung setzen F5")
+		self.connect(self.markAction, QtCore.SIGNAL('triggered()'), self.insertMark)
+		self.remarkAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_clock_remove.png'), 'ReMark', self)
+		self.remarkAction.setShortcut('F8')
+		self.remarkAction.setToolTip(u"Die letzte Zeitmarkierung zurücknehmen F8")
+		self.connect(self.remarkAction, QtCore.SIGNAL('triggered()'), self.removeLastMark)
+		# --- check
+		self.checkAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_application_accept.png'), 'Check', self)
+		self.checkAction.setToolTip(u"Zeilenlänge überprüfen")
+		self.connect(self.checkAction, QtCore.SIGNAL('triggered()'), self.checkText)
+		# --- exit
+		self.exitAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'quit.png'), 'Exit', self)
+		self.exitAction.setShortcut('Ctrl+Q')
+		self.exitAction.setToolTip(u"Das Programm beenden Crtl+Q")
+		self.connect(self.exitAction, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
+
+		self.toolbar = self.addToolBar('Toolbar')
+		self.toolbar.setIconSize( QSize( 32, 32 ) )
+		self.toolbar.addAction(self.clearAction)
+		self.toolbar.addAction(self.saveAction)
+		self.toolbar.addAction(self.undoAction)
+		self.toolbar.addAction(self.redoAction)
+		self.toolbar.addAction(self.markAction)
+		self.toolbar.addAction(self.remarkAction)
+		self.toolbar.addAction(self.checkAction)
+		self.toolbar.addAction(self.exitAction)
+		
+		return
+		
+	def setupUi(self):
+
+		# setup the ui
+		self.setObjectName(_fromUtf8("Dialog"))
+		self.resize(654, 629)
+		self.setWindowIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'treble_clef.png'))
+		QtGui.QToolTip.setFont(QtGui.QFont('OldEnglish', 10))
+
+		vbox = QtGui.QVBoxLayout()
+		# vbox.addStretch(1)
+		mainWidget = QtGui.QWidget()
+		mainWidget.setLayout(vbox)
+
+		self.createToolbar()
+
+		# create the layout: Input-Audiofile
+		hbox1 = QtGui.QHBoxLayout()
+		hbox1.setMargin(0)
+		# Input-Audiofile
+		self.labelInput = QtGui.QLabel()
+		self.labelInput.setObjectName(_fromUtf8("labelInput"))
+		self.labelInput.setMinimumSize(QtCore.QSize(50, 0))
+		hbox1.addWidget(self.labelInput)
+		self.inputText = QtGui.QLineEdit()
+		self.inputText.setObjectName(_fromUtf8("inputText"))
+		self.inputText.setReadOnly(True)
+		hbox1.addWidget(self.inputText)
+		self.inputButton = QtGui.QToolButton()
+		self.inputButton.setObjectName(_fromUtf8("inputButton"))
+		self.inputButton.setFocus(True)
+		hbox1.addWidget(self.inputButton)
+		vbox.addLayout(hbox1)
+
+		# create the layout: Artist
+		hbox2 = QtGui.QHBoxLayout()
+		hbox2.setMargin(0)
+		# Artist
+		self.labelArtist = QtGui.QLabel()
+		self.labelArtist.setObjectName(_fromUtf8("labelArtist"))
+		self.labelArtist.setMinimumSize(QtCore.QSize(50, 0))
+		self.artistText = QtGui.QLineEdit()
+		self.artistText.setObjectName(_fromUtf8("artistText"))
+		hbox2.addWidget(self.labelArtist)
+		hbox2.addWidget(self.artistText)
+		vbox.addLayout(hbox2)
+		
+		# create the layout: Titel
+		hbox3 = QtGui.QHBoxLayout()
+		hbox3.setMargin(0)
+		# Titel
+		self.labelTitel = QtGui.QLabel()
+		self.labelTitel.setObjectName(_fromUtf8("labelTitel"))
+		self.labelTitel.setMinimumSize(QtCore.QSize(50, 0))
+		self.titelText = QtGui.QLineEdit()
+		self.titelText.setObjectName(_fromUtf8("titelText"))
+		hbox3.addWidget(self.labelTitel)
+		hbox3.addWidget(self.titelText)
+		vbox.addLayout(hbox3)
+
+		# create the layout: Album
+		hbox4 = QtGui.QHBoxLayout()
+		hbox4.setMargin(0)
+		# Titel
+		self.labelAlbum = QtGui.QLabel()
+		self.labelAlbum.setObjectName(_fromUtf8("labelAlbum"))
+		self.labelAlbum.setMinimumSize(QtCore.QSize(50, 0))
+		self.albumText = QtGui.QLineEdit()
+		self.albumText.setObjectName(_fromUtf8("albumText"))
+		hbox4.addWidget(self.labelAlbum)
+		hbox4.addWidget(self.albumText)
+		vbox.addLayout(hbox4)
+
+
+		# GroupBox: TextView
+		vbox2 = QtGui.QVBoxLayout()
+		vbox2.setMargin(0)
+		self.label = QtGui.QLabel()
+		self.label.setObjectName(_fromUtf8("label"))
+		vbox2.addWidget(self.label)
+		self.textEdit = QtGui.QPlainTextEdit()
+		self.textEdit.setObjectName(_fromUtf8("textEdit"))
+		self.textEdit.setGeometry(QtCore.QRect(10, 190, 631, 431))
+		vbox2.addWidget(self.textEdit)
+		vbox.addLayout(vbox2)
+
+		# create the layout for the Player
+		playerLayout = QtGui.QHBoxLayout()
+		playerLayout.setMargin(0)
+		# add the buttons
+		self.btnFwd = QtGui.QPushButton(self)
+		self.btnPausePlay = QtGui.QPushButton(self)
+		self.btnRwd = QtGui.QPushButton(self)		
+		self.btnStop = QtGui.QPushButton(self)		
+		playerLayout.addWidget(self.btnRwd)
+		playerLayout.addWidget(self.btnPausePlay)
+		playerLayout.addWidget(self.btnStop)
+		playerLayout.addWidget(self.btnFwd)
+		# add the slider
+		sliderLayout = QtGui.QHBoxLayout()
+		# sliderLayout.addStretch(1)
+		sliderLayout.setMargin(0)		
+		self.sliderGroup = QtGui.QGroupBox()
+		self.sliderGroup.setFlat(False)
+		self.lblTimeCur = QtGui.QLabel(self.sliderGroup)
+		self.btnRwdSmall = QtGui.QPushButton(self)	
+		self.btnRwdSmall.setMinimumSize(QtCore.QSize(20, 20))	
+		self.btnRwdSmall.setMaximumSize(QtCore.QSize(20, 20))	
+		self.seekSlider = QtGui.QSlider(Qt.Horizontal, self.sliderGroup)
+		self.seekSlider.setMaximum(199)
+		self.lblTimeRemaining = QtGui.QLabel(self.sliderGroup)
+		self.btnFwdSmall = QtGui.QPushButton(self)		
+		self.btnFwdSmall.setMinimumSize(QtCore.QSize(20, 20))	
+		self.btnFwdSmall.setMaximumSize(QtCore.QSize(20, 20))	
+		self.lblClock = QtGui.QLabel(self.sliderGroup)		
+		sliderLayout.addWidget(self.lblTimeCur)
+		sliderLayout.addWidget(self.btnRwdSmall)
+		sliderLayout.addWidget(self.seekSlider)
+		sliderLayout.addWidget(self.lblTimeRemaining)
+		sliderLayout.addWidget(self.btnFwdSmall)
+		sliderLayout.addWidget(self.lblClock)
+		self.sliderGroup.setLayout(sliderLayout)		
+		
+		playerLayout.addWidget(self.sliderGroup)
+		vbox.addLayout(playerLayout)
+		
+		self.retranslateUi()
+		
+		self.setCentralWidget(mainWidget)
+		self.statusBar().showMessage('Ready')
+		# QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+		# create connections
+		self.connectUi()
+		return
+
+
+	def retranslateUi(self):
+		self.setWindowTitle(QtGui.QApplication.translate("Dialog", "Synchronise Lyrics", None, QtGui.QApplication.UnicodeUTF8))
+		self.labelInput.setText(QtGui.QApplication.translate("Dialog", "Audio:", None, QtGui.QApplication.UnicodeUTF8))
+		self.label.setText(QtGui.QApplication.translate("Dialog", "Text", None, QtGui.QApplication.UnicodeUTF8))
+		self.inputText.setPlaceholderText(QtGui.QApplication.translate("Dialog", "Audiodatei", None, QtGui.QApplication.UnicodeUTF8))
+		self.inputButton.setText(QtGui.QApplication.translate("Dialog", "...", None, QtGui.QApplication.UnicodeUTF8))
+		self.labelArtist.setText(QtGui.QApplication.translate("Dialog", "Artist:", None, QtGui.QApplication.UnicodeUTF8))
+		self.labelTitel.setText(QtGui.QApplication.translate("Dialog", "Titel:", None, QtGui.QApplication.UnicodeUTF8))
+		self.labelAlbum.setText(QtGui.QApplication.translate("Dialog", "Album:", None, QtGui.QApplication.UnicodeUTF8))
+		# self.btnPausePlay.setText(QtGui.QApplication.translate("Dialog", "Play", None, QtGui.QApplication.UnicodeUTF8))
+		self.lblTimeCur.setText(QtGui.QApplication.translate("Dialog", "0:00", None, QtGui.QApplication.UnicodeUTF8))
+		self.lblTimeRemaining.setText(QtGui.QApplication.translate("Dialog", "0:00", None, QtGui.QApplication.UnicodeUTF8))
+		
+		self.lblClock.setPixmap(QtGui.QPixmap(DACAPO_CONFIG_DIR + 'dryicons_clock.png'))
+		
+		# Button-Images
+		self.pixmap = QtGui.QPixmap(DACAPO_CONFIG_DIR + 'dryicons_forward.png')
+		icon = QtGui.QIcon(self.pixmap)
+		self.btnFwd.setIcon(icon)
+		self.btnFwd.setIconSize(self.pixmap.rect().size())
+		self.btnRwd.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_rewind.png'))
+		self.btnRwd.setIconSize(self.pixmap.rect().size())		
+		self.btnStop.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_stop.png'))
+		self.btnStop.setIconSize(self.pixmap.rect().size())		
+		self.btnRwdSmall.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_rewind.png'))
+		self.btnFwdSmall.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_forward.png'))
+		
+		# Tooltips
+		self.btnPausePlay.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_play.png'))
+		self.btnPausePlay.setIconSize(self.pixmap.rect().size())
+		self.btnFwd.setToolTip(u"10 Sek vorwärts")
+		self.btnPausePlay.setToolTip(u"Start/Pause")
+		self.btnRwd.setToolTip(u"10 Sek rückwärts")
+		self.btnStop.setToolTip(u"Stop")
+		
+		self.inputButton.setToolTip(u"Eine Audiodatei auswählen")
+		self.lblTimeCur.setToolTip(u"Aktuelle Position")
+		self.seekSlider.setToolTip(u"Zeigt/Setzt die aktuelle Position")
+		self.lblTimeRemaining.setToolTip(u"Verbleibende Zeit")		
+
+		return
+
+	def connectUi(self) :
+		# Buttons
+		self.inputButton.clicked.connect(self.on_inputButton_clicked)
+		self.btnPausePlay.clicked.connect(self.on_btnPausePlay_clicked)
+		self.btnStop.clicked.connect(self.on_btnStop_clicked)
+		self.btnRwd.clicked.connect(self.on_btnRwd_clicked)
+		self.btnFwd.clicked.connect(self.on_btnFwd_clicked)
+		self.btnRwdSmall.clicked.connect(self.on_btnRwdSmall_clicked)
+		self.btnFwdSmall.clicked.connect(self.on_btnFwdSmall_clicked)
+		
+		# Slider
+		self.connect(self.seekSlider, QtCore.SIGNAL('sliderMoved(int)'), self.seekSliderChangeValue)
+		self.connect(self.seekSlider, QtCore.SIGNAL('sliderPressed()'), self.seekSliderPressed)
+		self.connect(self.seekSlider, QtCore.SIGNAL('sliderReleased()'), self.seekSliderReleased)
+		
+		# QPlainTextEdit
+		self.connect(self.textEdit, QtCore.SIGNAL('cursorPositionChanged()'), self.textEditCursorPositionChanged)
+
+		return
+		
+	def seekSliderChangeValue(self, value):
+		actPos = self.gstPlayer.queryNumericPosition()
+		slide = value * self.gstPlayer.getNumericDuration() / self.seekSlider.maximum() 
+		newPos = slide - actPos
+		self.gstPlayer.seekPosition(float(newPos))
+		if self.getDebug() : 
+			logging.debug("Slider Value: %s Alte Pos: %s Neue Position: %s" % (value, actPos, newPos)) 	
+		self.textEdit.setFocus()				
+
+	def on_btnRwdSmall_clicked(self) :
+		if self.isPlay == True :
+			self.gstPlayer.seekPosition(float(-2))
+		self.textEdit.setFocus()
+
+	def on_btnFwdSmall_clicked(self) :
+		if self.isPlay == True :
+			self.gstPlayer.seekPosition(float(+2))
+		self.textEdit.setFocus()
+		
+	def on_btnRwd_clicked(self) :
+		if self.isPlay == True :
+			self.gstPlayer.seekPosition(float(-10))
+		self.textEdit.setFocus()
+
+	def on_btnFwd_clicked(self) :
+		if self.isPlay == True :
+			self.gstPlayer.seekPosition(float(+10))
+		self.textEdit.setFocus()
+
+	def playNextSong(self) :
+		self.on_btnStop_clicked() 
+		self.textEdit.setFocus()
+		
+	def on_btnStop_clicked(self) :
+		self.isPlay = None
+		self.gstPlayer.doStop()
+		self.btnPausePlay.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_play.png'))
+		self.btnPausePlay.setIconSize(self.pixmap.rect().size())
+		self.textEdit.setFocus()
+		
+	def on_btnPausePlay_clicked(self) :
+		if self.isPlay == None :
+			if self.filename <> "":
+				self.isPlay = True
+				self.gstPlayer.doPlay(self.filename)
+				self.seekSlider.setMaximum(\
+					self.gstPlayer.getNumericDuration() )
+				self.btnPausePlay.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_pause.png'))	
+		elif self.isPlay == True :
+			self.isPlay = False
+			self.gstPlayer.doPause()
+			self.btnPausePlay.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_play.png'))
+		else :
+			self.isPlay = True
+			self.gstPlayer.doUnpause()
+			self.btnPausePlay.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_pause.png'))	
+		self.btnPausePlay.setIconSize(self.pixmap.rect().size())
+		self.textEdit.setFocus()
+	
+
+	def on_inputButton_clicked(self) :
+		self.on_btnStop_clicked()
+		if (self.filename <> '') :
+			path = os.path.dirname(self.filename)		
+		else :
+			path = os.path.dirname(self.last_filename)		
+		filter = '*.flac'
+		self.filename = str(QtCore.QDir.toNativeSeparators( \
+			QtGui.QFileDialog.getOpenFileName(self, \
+				u"Audiodatei auswählen", \
+				path, filter)))
+		logging.debug("Audiodatei = " +  self.filename)
+		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
+		self.audioFile = getAudioFile(self, self.filename)
+		if self.audioFile <> None :
+			self.artistText.setText(self.audioFile.getMetaData('artist'))
+			self.titelText.setText(self.audioFile.getMetaData('title'))
+			self.albumText.setText(self.audioFile.getMetaData('album'))
+			self.last_filename = self.filename
+		self.textEdit.setFocus()
+		return
+	
+	
+		
+	def __init_pipeline(self):
+				# gstPlayer wird als GTK-thread gestartet
+		if self.getDebug(): logging.debug(\
+			'versuche GstPlayer zu starten...')
+		self.gstPlayer = GstPlayer(self, self.ausschalter)
+		self.gstPlayer.start()
+		self.gstPlayer.setStopWhenEOS(False)
+		if self.getDebug(): logging.debug(\
+			'versuche GstPlayer zu starten... done.')
+		return
+
+	def closeEvent(self, event):
+		self.doQuit()
+		
+	def reject(self):
+		self.doQuit()
+		
+	def clearFile(self) :
+		self.last_filename = self.filename
+		self.filename = ''
+		self.inputText.setText('')
+		self.audioFile = None
+		self.artistText.setText('')
+		self.titelText.setText('')
+		self.albumText.setText('')
+		self.textEdit.setPlainText('')
+
+	def saveFile(self) :
+		self.last_filename = self.filename
+		tryFilename, ext = os.path.splitext(self.filename)
+		tryFilename += '.lrc'
+		if self.getDebug() : logging.debug("LRC Sichern")
+		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save File', tryFilename) 
+		if (filename <> None) :
+			f = open(filename, 'w') 
+			# filedata = ARTIST + self.artistText.text().simplified().toUtf8() + "]" + '\n'
+			filedata = ARTIST + self.artistText.text().simplified() + "]" + '\n'
+			filedata += TITLE + self.titelText.text().simplified() + "]" + '\n'
+			filedata += ALBUM + self.albumText.text().simplified() + "]" + '\n'
+			filedata += REG + '\n'
+			filedata += VER + '\n'
+			filedata += self.textEdit.toPlainText() 
+			if self.getDebug() : logging.debug("Schreibe LRC %s" % (filename) )
+			f.write(filedata) 
+			f.close()
+			if self.getDebug() : logging.debug("Done.")
+		else:
+			if self.getDebug() : logging.debug("Kein Dateiname angegeben: %s!" % (filename))
+			text = "Kein Dateiname angegeben! Die Datei wurde nicht gesichert."
+			QMessageBox.information(self, 'Info Message', text,
+			QMessageBox.Ok)	
+
+	def undo(self) :
+		if self.getDebug() : logging.debug("Undo")
+		self.textEdit.undo()
+
+	def redo(self) :
+		if self.getDebug() : logging.debug("Redo")
+		self.textEdit.redo()
+
+	def insertMark(self) :
+		msec = self.gstPlayer.queryPositionInMilliseconds()		
+		if self.getDebug() : logging.debug("insertMark")
+		if msec == None:
+			self.textEdit.insertPlainText(QString(PLACEHOLDER))
+		else :
+			s = self.getMillisecString(msec)
+			self.textEdit.insertPlainText(QString(s))
+		self.textEdit.moveCursor(QTextCursor.NextBlock)
+			
+	def getMillisecString(self, milliseconds):
+		s, msec = divmod(milliseconds, 1000)
+		m, s = divmod(s, 60)
+		h, m = divmod(m, 60)
+		d, h = divmod(h, 24)
+		sRes = "[%02i:%02i.%02i]" % (m, s, msec)
+		return sRes
+	
+	def doQuit(self) :
+		if self.getDebug() : logging.debug("aufraeumen und beenden... ")
+		if self.getDebug() : logging.debug("Ausschalter setzen... ")
+		self.ausschalter.set()
+		if self.getDebug() : logging.debug("gstPlayer stoppen... ")
+		self.gstPlayer.doStop()
+		if self.getDebug() : logging.debug("gstPlayer beenden... ")
+		self.gstPlayer.doEnd()
+		del self.gstPlayer
+		if self.getDebug() : logging.debug("audioFile beenden... ")
+		try : del self.audioFile
+		except : pass
+		if self.getDebug() : logging.debug("Zustand speichern")
+		config = ConfigParser.RawConfigParser()
+		cfgfile = open(TEMP_NAME,'w')
+		# cfgfile = codecs.open(TEMP_NAME,'w', 'utf8')
+		config.add_section('Audio')
+		config.set('Audio', 'filename', self.filename)
+		config.set('Audio', 'artist', \
+			self.artistText.text().simplified().toUtf8())
+		config.set('Audio', 'title', \
+			self.titelText.text().simplified().toUtf8())
+		config.set('Audio', 'album', \
+			self.albumText.text().simplified().toUtf8())
+		config.add_section('Lyrics')
+		config.set('Lyrics', 'text', \
+			self.textEdit.toPlainText().toUtf8() )
+		config.write(cfgfile)
+		cfgfile.close()
+
+		if self.getDebug() : logging.debug("Hauptschalter setzen... ")
+		self.hauptschalter.set()
+		raise SystemExit
+		if self.getDebug() : logging.debug("Feierabend... ")
+		return
+		
+	def getDebug(self):
+		return self.debug 
+		
+	def getGSDebug(self):
+		return self.debug
+		
+	def getReplayGain(self):
+		return True
+
+	def find_between(self, s, first, last ):
+		try:
+		    start = s.index( first ) + len( first )
+		    end = s.index( last, start )
+		    return s[start:end]
+		except ValueError:
+		    return ""		
+
+	def checkText(self):		
+		syncTime = list()
+		syncText = list()
+		syncLine = list()
+		text = str(self.textEdit.toPlainText().toUtf8())
+		if len(text) > 0 :
+			lines = text.splitlines()
+			actLine = -1
+			for line in lines:
+				actLine += 1
+				lineTime = line[line.find("[")+1:line.find("]")]
+				lineText = line[line.find("]")+1:]
+				if len(lineTime) > 0:							
+					syncTime.append(lineTime)
+					if len(lineText) > 0:
+						syncText.append(lineText)
+					else :
+						syncText.append("  ")
+					syncLine.append(actLine) 
+					
+			listOversize = list()
+			actLine = -1
+			bSelect = True
+			for line in syncText :
+				actLine += 1
+				fontLyrics = self.lyricFont.render(line, True, self.lyricFontColor)
+				lyricFontWidth, lyricFontHeight = fontLyrics.get_size()
+				logging.debug("Breite: %s  Text: %s " % (lyricFontWidth, line))
+				if (lyricFontWidth > self.screenWidth) :
+					listOversize.append(actLine)
+			
+			if len(listOversize) > 0 :
+				text = "Folgende Zeilen sind vermutlich zu lang: \n"
+				for line in listOversize :
+					text += str(line + 1) + ' bei ' + syncTime[line] + '\n'
+					if bSelect:
+						self.textEdit.find(syncText[line])
+						bSelect = False
+			else: 
+				text = "Scheint alles in Ordnung zu sein."
+			QMessageBox.information(self, 'Info Message', text,
+			QMessageBox.Ok)	
+					
+		self.textEdit.setFocus()		
+		return 
+	
+	def removeLastMark(self) :	
+		cursor = self.textEdit.textCursor()
+		pos = cursor.position()
+		block = cursor.blockNumber() -1
+		col = cursor.columnNumber() 
+		doc = self.textEdit.document()
+		docBlock = doc.findBlock(pos)		
+		markPosStart = -1
+		markPosEnd = -1
+		while docBlock  :
+			if docBlock.blockNumber() <= 0 : break 
+			docBlock = docBlock.previous() 
+			if docBlock.text().contains("]") :		
+				if self.getDebug() : logging.debug("Markiere: %s" % str(docBlock.text().toUtf8()))
+				markPosStart = docBlock.position()
+				markPosEnd = markPosStart + docBlock.text().indexOf("]") + 1
+				if self.getDebug() : logging.debug("Markiere von: %s bis: %s" % (markPosStart, markPosEnd))
+				break
+		if markPosStart > -1 :
+			cursor.setPosition(markPosStart)
+			cursor.setPosition(markPosEnd, QTextCursor.KeepAnchor)
+			self.textEdit.setTextCursor(cursor)			
+			self.textEdit.cut()			
+			
+			
+	
+	def removeLastMarkBackup(self) :
+		if self.getDebug() : logging.debug("removeLastMark")
+		cursor = self.textEdit.textCursor()
+		pos = cursor.position()
+		block = cursor.blockNumber() -1
+		col = cursor.columnNumber() 
+		text = str(self.textEdit.toPlainText().toUtf8()).splitlines()
+		if len(text) <= 0: return 
+		while block >= 0:
+			if "]" in text[block] :		
+				text[block] = text[block][text[block].find("]")+1:]
+				break 
+			else:
+				block -= 1
+		plainText = ''
+		for s in text:
+			plainText += s + "\n"
+		self.textEdit.setPlainText(QString(_fromUtf8(plainText)))
+		self.textEdit.cursorForPosition(QtCore.QPoint(block, col))
+		self.textEdit.setFocus()		
+		return 
+
+	def textEditCursorPositionChanged(self) :
+		cursor = self.textEdit.textCursor()
+		pos = cursor.position()
+		block = cursor.blockNumber() + 1
+		col = cursor.columnNumber() + 1
+		self.statusBar().showMessage(str(block) \
+			+ '/' + str(col))
+	
+	def seekSliderPressed(self) :
+		self.sliderPressed = True
+		# self.gstPlayer.doPause()
+		
+	def seekSliderReleased(self) :
+		self.sliderPressed = False
+		# self.gstPlayer.doUnpause()
+
+if __name__ == "__main__":
+	app = QtGui.QApplication(sys.argv)
+	ui = Ui_Dialog()
+	ui.show()
+	sys.exit(app.exec_())

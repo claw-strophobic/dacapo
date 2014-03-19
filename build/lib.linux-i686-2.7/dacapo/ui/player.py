@@ -204,6 +204,7 @@ class playerGUI():
 		#  - self.wStart = width Startposition
 		#  - self.hStart = height Startposition
 		#       = Linke obere Ecke des verbeliebenden Rechtecks
+		#  - mW/mH  = Text-Margin - kommt aus Config-File
 		#
 		#  - self.txtTitleH & self.txtTitleW wird gespeichert, da hiervon abhängig
 		# in der Function updateActTime() die Laufzeit/Position angezeigt wird.
@@ -211,46 +212,44 @@ class playerGUI():
 
 		self.wRemain = width
 		self.hRemain = height
-		self.wStart = 0
-		self.hStart = 0
+		self.wStart = self.fontMarginLeft
+		self.hStart = self.fontMarginTop
 
 		if self.getDebug():
 			logging.debug('blitte Texte: {0}'.format(self.filename))
 
-		# links oben den Artist
+		# links oben 
 		if self.getDebug():
 			logging.debug('TopLeft: {0}'.format(textMetaData[0]))
-		# if not self.screen.get_locked(): self.screen.blit(textArtist, (0, 0))
-		if not self.screen.get_locked(): self.screen.blit(fontMetaData[0], (0, 0))
-		if self.posActTime == 0 : self.rectActTime = (0, 0)
+		mW = self.fontMarginLeft
+		mH = self.fontMarginTop
+		if not self.screen.get_locked(): self.screen.blit(fontMetaData[0], (mW, mH))
+		if self.posActTime == 0 : self.rectActTime = (mW, mH)
 
-		# links unten den Titel
+		# links unten 
 		if self.getDebug():
 			logging.debug('BottomLeft: {0}'.format(textMetaData[2]))
+		mW = self.fontMarginLeft
+		mH = self.fontMarginBot
 		txtW, txtH = fontMetaData[2].get_size()
-		h = (height - txtH) 
-		if not self.screen.get_locked() : self.screen.blit(fontMetaData[2], (0, h)) 
+		h = (height - (txtH + mH)) 
+		if not self.screen.get_locked() : self.screen.blit(fontMetaData[2], (mW, h)) 
 		self.txtTitleH = h
-		self.txtTitleW = 0
-		if self.posActTime == 2 : self.rectActTime = (0, h)
+		self.txtTitleW = mW
+		if self.posActTime == 2 : self.rectActTime = (mW, h)
 
-		# rechts oben das Album
+		# rechts oben 
 		if self.getDebug() : logging.debug('TopRight: {0}'.format(textMetaData[1]))
+		mW = self.fontMarginRight
+		mH = self.fontMarginTop
 		txtW, txtH = fontMetaData[1].get_size()
-		w = (width - txtW)
-		h = 0
+		w = (width - (txtW + mW))
+		h = mH
+		txtH += mH
 		if not self.screen.get_locked() :  self.screen.blit(fontMetaData[1], (w, h)) 
 		if self.posActTime == 1 : self.rectActTime = (w, h)
 		self.hRemain -= txtH
 		h += txtH
-
-		# darunter das Jahr
-		# --> habe ich hinter den Albumtitel gesetzt
-		# txtW, txtH = textDate.get_size()
-		# w = (width - txtW)
-		# self.screen.blit(textDate, (w, h)) 
-		# h += txtH
-		# self.hRemain -= txtH
 
 		# darunter evtl. Kommentare
 		self.showComments = self.oConfig.getConfig('gui', 'misc', 'showComments')
@@ -263,19 +262,20 @@ class playerGUI():
 				for t in comments :
 					textComment = self.font.render(t + " ", True, self.fontColor)
 					txtW, txtH = textComment.get_size()
-					w = (width - txtW)
+					w = (width - (txtW + mW))
+					txtH += mH
 					if not self.screen.get_locked() : self.screen.blit(textComment, (w, h)) 
 					h += txtH
 					self.hRemain -= txtH
 		self.hStart = h
 
-		# rechts unten die Laufzeit vorsehen
+		# rechts unten 
 		if self.getDebug() : logging.debug('BottomRight: {0}'.format(textMetaData[3]))
+		mW = self.fontMarginRight
+		mH = self.fontMarginBot		
 		txtW, txtH = fontMetaData[3].get_size()
-		# textActPos = self.font.render("  :  / :   ", True, self.fontColor)
-		# txtW, txtH = textActPos.get_size()
-		h = (height - txtH) 
-		w = (width - txtW)
+		h = (height - (txtH + mH)) 
+		w = (width - (txtW + mW))
 		if not self.screen.get_locked() :  self.screen.blit(fontMetaData[3], (w, h)) 
 		if self.posActTime == 3 : self.rectActTime = (w, h)
 		self.hRemain -= txtH
@@ -283,7 +283,16 @@ class playerGUI():
 
 		# für Haupt-Bild bzw. Diashow verbleibende Fenstergröße:
 		self.winWidth = width
-		self.winHeight = height - txtH * 2
+		mT = self.fontMarginTop		
+		mB = self.fontMarginBot		
+		''' 
+			verbleibende Fenstergröße: errechnete Höhe - 
+											(Texthöhe 
+											+ Top-Margin 
+											+ Bottom-Margin) * 2 
+											- Lyric-Texthöhe
+        '''	
+		self.winHeight = height - (txtH + mT + mB) * 2
 		if len(self.audioFile.syncText) > 0 : 
 			self.winHeight -= self.lyricFontHeight
 
@@ -335,6 +344,8 @@ class playerGUI():
 
 		# Fenstergröße holen
 		width, height = self.resolution
+		mW = self.fontMarginRight
+		mH = self.fontMarginTop				
 
 		# if self.getDebug() : print 'Schreibe evtl. Kommentare ggf. ueber die Bilder: {0}'.format(self.filename)
 
@@ -346,7 +357,9 @@ class playerGUI():
 			for t in comments :
 				textComment = self.font.render(t + " ", True, self.fontColor)
 				txtW, txtH = textComment.get_size()
+				txtW += mW
 				w = (width - txtW)
+				txtH += mH
 				if not self.screen.get_locked() : self.screen.blit(textComment, (w, h)) 
 				if not self.screen.get_locked() : 
 					self.screen.lock()
@@ -691,11 +704,11 @@ class playerGUI():
 					if event.key == pygame.K_f:
 						self.doFullscreen()
 					if event.key == pygame.K_LEFT:
-						self.gstPlayer.seekPosition(float(-10))
+						self.gstPlayer.seekPosition(self.seekSecs * float(-1))
 						self.audioFile.syncCount = 0
 						self.timerIndex = self.gstPlayer.queryNumericPosition()
 					if event.key == pygame.K_RIGHT:
-						self.gstPlayer.seekPosition(float(+10))
+						self.gstPlayer.seekPosition(self.seekSecs)
 						self.timerIndex = self.gstPlayer.queryNumericPosition()
 					# if event.key == pygame.K_LSHIFT and event.key == pygame.K_LEFT:
 					#	self.gstPlayer.seekPosition(float(-30))
@@ -891,6 +904,12 @@ class playerGUI():
 		self.lyricFontWidth, self.lyricFontHeight = fontHeightFont.get_size()
 		self.lyricFontRealHeight = self.lyricFontHeight 
 		self.lyricFontHeight += self.oConfig.getConfig('gui', self.winState, 'lyricFontSpace')
+		self.fontMarginLeft = self.oConfig.getConfig('gui', self.winState, 'fontMarginLeft')
+		self.fontMarginRight = self.oConfig.getConfig('gui', self.winState, 'fontMarginRight')
+		self.fontMarginTop = self.oConfig.getConfig('gui', self.winState, 'fontMarginTop')
+		self.fontMarginBot = self.oConfig.getConfig('gui', self.winState, 'fontMarginBot')
+		self.seekSecs = self.oConfig.getConfig('gui', 'misc', 'seekSeconds')
+		if self.getDebug() : logging.debug('Anzahl Sekunden für FFW/FBW: %s' % (self.seekSecs) )
 		
 
 		if self.getDebug() : logging.debug('Mouse verstecken. ')

@@ -88,6 +88,7 @@ setup(
         # And include any *.tar.gz from the package 'dacapo.config, too:
         'dacapo.config': ['*.gz'],
         'dacapo.data': ['*'],
+        'dacapo': ['locale/*/LC_MESSAGES/*'],
     },
 
 	# data_files = ['docs'],

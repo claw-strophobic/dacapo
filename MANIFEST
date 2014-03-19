@@ -15,7 +15,6 @@ dacapo/create_build.txt
 dacapo/dacapo.py
 dacapo/dacapoGST.py
 dacapo/dacapoHelp.py
-dacapo/dacapoui.glade
 dacapo/dacapoui.py
 dacapo/config/__init__.py
 dacapo/config/configarchive.tar.gz
@@ -71,6 +70,8 @@ dacapo/data/save.png
 dacapo/data/saveas.png
 dacapo/data/treble_clef.png
 dacapo/errorhandling/__init__.py
+dacapo/locale/de/LC_MESSAGES/qtflac2mp3.mo
+dacapo/locale/de/LC_MESSAGES/qtflac2mp3.pot
 dacapo/metadata/__init__.py
 dacapo/metadata/audiofile.py
 dacapo/metadata/flac.py

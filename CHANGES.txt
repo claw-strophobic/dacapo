@@ -1,3 +1,8 @@
+V0.1.9f, 2014-03-19 --  Textmargin and seconds for fast forward/backward
+						taken from config-file
+						first part of i18n for QtFlac2Mp3 with gettext()
+V0.1.9e, 2014-02-08 -- 	Changing QtFlac2Mp3 to take parameters from 
+						the commandline
 V0.1.9d, 2014-02-01 -- 	Adding QtSyncLyrics and QtFlac2Mp3
 V0.1.9c, 2014-01-01 -- 	configuring the time-display after title causes
 						an error. (ticket #9).

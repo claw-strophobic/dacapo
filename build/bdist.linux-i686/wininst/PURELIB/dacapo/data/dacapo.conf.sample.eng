@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!-- 
+	This sample file is used to show how to configure the dacapo.
+	You have to change the parameters in the "real" configuration file
+	named dacapo.conf.
+	
+		  The individual parameters are documented locally.
+		  Some of them can be override by command parameters
+	 		when calling program.
+	- Parameters of type "boolean" can be specified as true/false .
+	- Parameter of type "color" can be specified as RGB colors (eg 250,250,250 for white).	
+-->
+
+<dacapo_preferences>
+	<doku>
+		<eng>for english documentation of this configuration-file see dacapo.conf.sample.eng</eng>
+		<ger>für eine deutsche dokumentation dieser Konfigurationsdatei siehe dacapo.conf.sample.ger</ger>
+	</doku>
+	<version>0.1.8</version>
+	<gui>
+		<!-- 	
+				This section is used to configure the interface.
+				It is divided into four chapters:
+				- Window - valid when the program is running in windowed mode
+				- Fullscreen - valid when the program is running in fullscreen mode
+				- Misc - other, regardless of the mode / cross
+				- MetaData - how the data should be processed				
+		-->
+
+		<window>
+			<width typ="int">840</width>   <!-- width in Pixel -->
+			<height typ="int">525</height>   <!-- height in Pixel -->
+			<font>timesnewromanbold</font>   <!-- font for the metadata -->
+			<fontSize typ="int">25</fontSize>   <!-- fontsize for the metadata -->
+			<fontColor typ="color">250, 250, 250</fontColor>   <!-- fontcolor for metadata in RGB e.g. 250,250,250 (white)-->
+			<backgroundColor typ="color">0,0,0</backgroundColor>   <!-- backgroundcolor in RGB e.g. 0,0,0 (black)-->
+			<mouseVisible typ="int">1</mouseVisible> 	<!-- display the mouse 0/1 (0=No/1=Yes)  -->
+			<allwaysOnTop typ="boolean">True</allwaysOnTop> 	 <!-- window always in front (only possible in MS Windows)-->
+			<lyricFont>timesnewromanbold</lyricFont>   <!-- font for the lyrics -->
+			<lyricFontSize typ="int">30</lyricFontSize>   <!-- fontsize for the lyrics -->
+			<lyricFontColor typ="color">255, 165, 0</lyricFontColor>   <!-- fontcolor for lyrics in RGB e.g. 250,250,250 (white) -->
+			<lyricFontSpace typ="int">5</lyricFontSpace>   <!-- Space between Picture and Lyric-->
+		</window>
+		<fullscreen> <!-- Same parameter as above -->
+			<width typ="int">1680</width>   <!-- width in Pixel -->
+			<height typ="int">1050</height>   <!-- height in Pixel -->
+			<font>timesnewromanbold</font>   <!-- font for the metadata -->
+			<fontSize typ="int">50</fontSize>   <!-- fontsize for the metadata -->
+			<fontColor typ="color">250,250,250</fontColor>   <!-- fontcolor for metadata in RGB e.g. 250,250,250 (white)-->
+			<backgroundColor typ="color">0,0,0</backgroundColor>   <!-- backgroundcolor in RGB e.g. 0,0,0 (black) -->
+			<mouseVisible typ="int">0</mouseVisible> 	<!-- display the mouse 0/1 (0=No/1=Yes) -->
+			<lyricFont>timesnewromanbold</lyricFont>   <!-- font for the lyrics -->
+			<lyricFontSize typ="int">60</lyricFontSize>   <!-- fontsize for the lyrics -->
+			<lyricFontColor typ="color">255,165,0</lyricFontColor>   <!-- fontcolor for lyrics in RGB e.g. 250,250,250 (white) -->
+			<lyricFontSpace typ="int">5</lyricFontSpace>   <!-- Space between Picture and Lyric-->
+		</fullscreen>
+		<misc>
+			<!-- language for help messages and GUI: german/english
+				There has to be an *.ini-file with the name of this
+				entry. You can build up your own by copy e.g. the
+				english.ini to french.ini, replace the text
+				in the french.ini and change this value to french.
+				-->
+			<language typ="text">english</language> 	 
+			<!-- showPics: Show images? Possible values: 
+				NO = Show no pictures at all, only metadata
+				coverOnly = show only frontcover
+				allCover = show all cover (Type 3-6 / Front, Back, Leaflet, Label)
+				allPics = show all pictures
+				diaShowAllCover = like allCover, but shown as a slideshow
+				diaShowAllPics = like allPics, but shown as a slideshow
+			-->
+			<showPics typ="text">diaShowAllPics</showPics> 
+			<diaShowTime typ="int">10</diaShowTime> 	 <!-- number of seconds to display an image -->
+			<picNoCover typ="text">leerCD.png</picNoCover> 	 <!-- show this image-file, if no cover is available  -->
+			<fullscreen typ="boolean">True</fullscreen> 	 <!-- start in fullscreen-mode? -->
+			<caption typ="text">dacapo</caption> 	 <!-- window title -->
+			<icon typ="text">Music-dacapo.png</icon> 	 <!-- window-icon -->
+			<iconsize typ="int">50</iconsize>   <!-- size of window-icon -->
+			<showComments typ="boolean">True</showComments> 	 <!-- display comments?-->
+			<overlayComments typ="boolean">True</overlayComments> 	 <!-- if there are comments, may hide it the images? -->
+			<shuffle typ="boolean">True</shuffle> 	 <!-- play in shuffle? -->	
+			<resume typ="boolean">False</resume> 	 <!-- resume the playlist? -->	
+			<!--
+				Lyrics.
+				A distinction is made between "unsynced" and "synced" lyrics. The latter have "time stamps" and can be displayed in synchronization with music,
+				responsible for this section is <syncLyrics>.
+				Lyrics can be displayed as images.
+				Alternatively, if no text was found, also "synced" texts (in addition) are displayed as an image,
+				then the section <syncLyrics> should be configured. Thus texts must not be retained in duplicate.
+				To scan in the TAGS in the order:
+					1. unsyncedlyrics
+					2. lyrics
+					(3. <syncedlyrics>)
+			-->
+			<showLyricsAsPics typ="boolean">True</showLyricsAsPics> 	 <!-- display lyrics (unsyncedlyrics/lyrics in Frames) like images? -->
+			<showLyricsSynced typ="boolean">True</showLyricsSynced> 	 <!-- display synchronized lyrics (karaoke)? (audio-filename.lrc) -->
+			<showSyncedLyricsAsPics typ="boolean">False</showSyncedLyricsAsPics> 	 <!-- no lyrics found (in the Frames: unsyncedlyrics/lyrics ) display synced-lyrics?-->
+			<showLyricsWhenSynced typ="boolean">False</showLyricsWhenSynced> 	 <!-- display lyrics like images, even when found synced Lyrics? -->
+		</misc>
+		<syncLyrics>
+			<!-- how should synchronized lyrics be taken and how to display them? 
+					(are they to be displayed: showLyricsSynced )
+				We are looking for the lyrics in the following order:
+					1. In the Audio-File in the TAG according to the config
+					2. In the Audio-File in the TAG "syncedlyrics"
+					3. In the directory according to the config with the same name like the audio-file but with the extension *.lrc
+					4. In the same directory like the audio-file but with the extension *.lrc
+					(be aware of the capitalization)
+
+				position:
+					top = Below the upper metadata
+					bottom = Above the lower metadata
+				style:
+					center = center it
+					left = align left
+					right = align right
+				overlay:
+					True = Dazzle on images
+					False = Images smaller to make room
+				tag:
+					The TAG in the audio file, which contains the lyrics in LRC format.
+				dir:
+					The directory, which - relative to the audio-file - contains the lrc-file.
+					The lrc-file there has the same name like the audio-file (but the extension *. Lrc).
+					In addition, TAGS from the metadata can be used here.
+					"." = Current Directory
+					".." = Parent directory
+					example: 
+					The audio-file is in the directory:
+						/Musik/flac/AC-DC/1979 Highway To Hell/01.Highway To Hell.flac
+					The LRC-lyric-file is here:
+						/Musik/flac/AC-DC/Lyrics/1979 Highway To Hell/01.Highway To Hell.lrc
+					then sould "dir" contain:
+						<dir typ="text">../Lyrics/%date% %album%/</dir> 	 
+			-->
+			<position typ="text">bottom</position> 	 <!-- top/bottom -->
+			<style typ="text">center</style> 	 <!-- left/center/right -->
+			<overlay typ="boolean">True</overlay> 	 <!-- True/False -->
+			<tag typ="text">syncedlyrics</tag> 	 <!-- TAG with lrc-text -->
+			<dir typ="text">../Texte/%date% %album%/</dir> 	 <!-- dir with lrc-file -->
+		</syncLyrics>
+		<metaData>
+			<!-- how should the metadata be represented? Possible values ​​are basically all the FLAC tags - i.e.
+				%artist% = Songartist
+				%album% = Name of the album
+				%title% = Name of the Songs
+				%date% = Year of the albums
+				%tracknumber% = No of the song on the album
+				%tracktotal% = Number of Songs on the album
+				%discnumber% = CD-Number (from ?)
+			additional:
+				%tracknumberlist% = no of the song in the playlist
+				%tracktotallist% = Number of songs in the playlist
+				%time% = current time in song (hh:mm:ss)
+				%duration% = Length of the song (hh:mm:ss)
+			Furthermore, with <if_playlist> and <if_discNr> could be defined additional variables, which could
+			be used, if you play a playlist or if it is a disk of a plurality.
+			Example: <bottomLeft typ="text"> %tracknumber%/%tracktotal% - %title% %if_playlist%</bottomLeft>
+					<if_playlist typ="text"> (%tracknumberlist%/%tracktotallist%) </if_playlist>
+			-->
+			<topLeft typ="text"> %artist% </topLeft>
+			<topRight typ="text"> %album% (%date%) %if_discNr%</topRight>
+			<bottomLeft typ="text"> %tracknumber%/%tracktotal%  %title% %if_playlist%</bottomLeft>
+			<bottomRight typ="text"> %time%/%duration% </bottomRight>
+			<if_playlist typ="text"> (%tracknumberlist%/%tracktotallist%) </if_playlist>
+			<if_discNr typ="text"> (Disc %discnumber%) </if_discNr>
+			<MP3-Tags typ="dict">
+				<artist typ="text">TPE1</artist>
+				<album typ="text">TALB</album>
+				<tracknumber typ="text">TRCK</tracknumber>
+				<title typ="text">TIT2</title>
+				<date typ="text">TDRC</date>
+				<discnumber typ="text">TPOS</discnumber>
+				<unsyncedlyrics typ="text">USLT</unsyncedlyrics>
+				<syncedlyrics typ="text">SYLT</syncedlyrics>
+			</MP3-Tags>
+		</metaData>
+	</gui>
+	<audio_engine>
+		<!-- if you get in trouble somehow, the player hangs or similary, set replayGain and/or gapless to False -->
+		<sinkType typ="text">autoaudio</sinkType> 	 <!-- output:  alsa (Linux) or autoaudio (Windows) -->
+		<replayGain typ="boolean">True</replayGain> 	 <!-- use ReplayGain ? -->
+		<gapless typ="boolean">True</gapless>	 <!-- use Gapless ? -->
+	</audio_engine>
+	<debug>
+		<!-- 
+			Debug-Informations, which could be stored in a file. For a better overview, here are various settings possible.
+			logFile: Here the information is recorded. The path must exist, the file is created.
+			logLevel:
+			DEBUG 		Detailed information, typically of interest only when diagnosing problems.
+			INFO 		Confirmation that things are working as expected.
+			WARNING 	An indication that something unexpected happened, or indicative of some problem in the near future (e.g. ‘disk space low’). 
+						The software is still working as expected.
+			ERROR 		Due to a more serious problem, the software has not been able to perform some function.
+			CRITICAL 	A serious error, indicating that the program itself may be unable to continue running.
+		-->
+		<logFile typ="text">/tmp/dacapo.log</logFile>	 <!-- Debug-output to file -->
+		<logLevel typ="text">WARNING</logLevel>	 <!-- DEBUG,INFO,WARNING,ERROR or CRITICAL  -->
+		<debugGUI typ="boolean">False</debugGUI>	 <!-- Debug-output for GUI-Module -->
+		<debugPL typ="boolean">False</debugPL>	 <!-- Debug-output for Playlisten-Module -->
+		<debugS typ="boolean">False</debugS>	 <!-- Debug-output for GStreamer-Module -->
+		<debugM typ="boolean">False</debugM>	 <!-- Debug-output for Metadaten-Module -->
+	</debug>
+
+</dacapo_preferences>

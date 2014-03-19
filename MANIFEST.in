@@ -6,4 +6,5 @@ include INSTALL_UBUNTU.txt
 include README_GER.txt
 include MANIFEST.in
 recursive-include man *
+recursive-include dacapo/locale *
 

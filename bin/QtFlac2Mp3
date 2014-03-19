@@ -1,13 +1,48 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+import gettext
+import sys, os, locale
+language = os.environ.get('LANGUAGE')
 
+trans = gettext.translation("qtflac2mp3", None, [language, 'de'], fallback=True) 
+trans.install()
+
+def createMyParser():
+	parser = myArg.ArgumentParser(description=_('Convert FLAC files to MP3'))
+	parser.add_argument("-i", "--input", help=_('Input directory') )
+	parser.add_argument("-o", "--output", help=_('Output directory') )
+
+	# ReplayGain
+	parser.add_argument("-rg", "--replayGain", help=_('Apply ReplayGain for the input directory'), action="store_true")
+	parser.add_argument("-rs", "--rg-skip", help=_('Do not apply ReplayGain for already calculated files'), action="store_true")
+	parser.add_argument("-rd", "--rg-dry-run", help=_('Do not actually modify any files'), action="store_true")
+	parser.add_argument("-rp", "--rg-show", help=_('Simply show ReplayGain informations'), action="store_true")
+
+	# Konvertieren
+	parser.add_argument("-c", "--convert", help=_('Convert the files in the input directory'), action="store_true")
+	parser.add_argument("-cr", "--c-replace", help=_('Convert and replace existing files'), action="store_true")
+	parser.add_argument("-ct", "--c-tag", help=_('Do not convert existing files but update metadata'), action="store_true")
+	parser.add_argument("-cc", "--c-cover", help=_('Copy the frontcover if existing'), action="store_true")
+	parser.add_argument("-crg", "--c-replayGain", help=_('Apply ReplayGain for the output directory'), action="store_true")
+	parser.add_argument("-cv", "--c-id3v23", help=_('Convert into ID3v2.3'), action="store_true")
+
+	# Metatags anzeigen
+	parser.add_argument("-m", "--show-meta", help=_('Show Metadata'), action="store_true")
+
+	# Programm sofort ausführen
+	parser.add_argument("--run", help=_('Run the programm immediatly'), action="store_true")
+	# Programm ohne GUI ausführen
+	parser.add_argument("--no-GUI", help=_('Run the programm without the GUI'), action="store_true")
+	return parser
 #
 # Windows GStreamer besteht anscheinend auf einen Import
 # von Gtk ?!? Sonst import-Fehler in dacapo.dacapoGST
 import platform
 if platform.system() == 'Windows':
 	import gtk
-import sys, os, locale
+import argparse as myArg
+args = createMyParser().parse_args()
+
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QObject,\
                          pyqtSignal, \
@@ -23,7 +58,7 @@ from PyQt4.QtGui import QDialog, \
 						QCursor
 from dacapo import errorhandling						
 #import gPlayerErrorHandling
-try:
+try:	
 	from dacapo.playlist import generate
 	# from gPlayerPlayList import PlayList
 	import logging
@@ -31,7 +66,6 @@ try:
 	from dacapo.qtflac2mp3 import QtPrintTags
 	from rgain.script.replaygain import do_gain, show_rgain_info
 	from dacapo.qtflac2mp3.id3Trans import copyFLAC, copyFlacCover, convertMp3ToV23 
-
 except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
@@ -97,7 +131,7 @@ class XStream(QObject):
         return XStream._stderr
 
 class Ui_Dialog(QDialog):
-	def __init__( self, parent = None ):
+	def __init__( self, parent = None, args = None ):
 		super(Ui_Dialog, self).__init__(parent)
 		# CheckBoxes
 		# ------PrintTags
@@ -123,8 +157,46 @@ class Ui_Dialog(QDialog):
 		self.outputDir = None
 
 		self.oConverter = None
+		
+		self.args = args
 
 		self.setupUi()
+		
+		if self.args.input:
+			self.on_inputButton_clicked(folder=self.args.input)
+		if self.args.output:
+			self.on_outputButton_clicked(folder=self.args.output)
+		# ReplayGain
+		if self.args.replayGain:
+			self.checkRGstart.setCheckState(QtCore.Qt.Checked)			
+		if self.args.rg_skip:
+			self.checkRGskip.setCheckState(QtCore.Qt.Checked)			
+		if self.args.rg_dry_run:
+			self.checkRGdry.setCheckState(QtCore.Qt.Checked)			
+		if self.args.rg_show:
+			self.checkRGshow.setCheckState(QtCore.Qt.Checked)		
+		# Konvertieren
+		if self.args.convert:
+			self.checkKVstart.setCheckState(QtCore.Qt.Checked)		
+		if self.args.c_replace:
+			self.checkKVreplace.setCheckState(QtCore.Qt.Checked)		
+		if self.args.c_tag:
+			self.checkKVTag.setCheckState(QtCore.Qt.Checked)		
+		if self.args.c_cover:
+			self.checkKVcover.setCheckState(QtCore.Qt.Checked)		
+		if self.args.c_replayGain:
+			self.checkKVRG.setCheckState(QtCore.Qt.Checked)		
+		if self.args.c_id3v23:
+			self.checkKVID.setCheckState(QtCore.Qt.Checked)		
+		# Metadaten anzeigen
+		if self.args.show_meta:
+			self.checkPTstart.setCheckState(QtCore.Qt.Checked)		
+				
+		# keine GUI
+		if self.args.no_GUI:
+			logger.debug('Keine GUI -> weg damit!')	
+			return
+					
 
 	def setupUi(self):
 
@@ -316,7 +388,8 @@ class Ui_Dialog(QDialog):
 		self.checkKVRG.setToolTip(_fromUtf8('ReplayGain-Analyse für die MP3-Datei im <b>Ziel-Verzeichnis</b> anwenden. Wird nur bei tatsächlicher Konvertierung angewendet.'))
 		self.checkPTstart.setToolTip(_fromUtf8('Alle Tags der Dateien aus dem <b>Quell-Verzeichnis</b> anzeigen (inkl. Bilder)'))
 		self.applyButton.setToolTip(_fromUtf8('Verarbeitung starten'))
-		self.cancelButton.setToolTip(_fromUtf8('Verarbeitung abbrechen'))
+		self.cancelButton.setToolTip(_fromUtf8('Aktuelle Verarbeitung abbrechen. Dies beendet nicht das Programm.' \
+									+ '<br>Um das Programm zu beenden bitte das Fenster schließen.'))
 		self.checkKVID.setToolTip(_fromUtf8('ID3-Tags in der Version ID3v2.3 setzen? <br>Dies ist für einige ältere Geräte notwendig.' \
 									+ '<br>ReplayGain speichert die Informationen in der neuen ID-Version ID3v2.4 ab.'\
 									+ '<br>Es wird versucht die Tags aus der Version ID3v2.4 zu ID3v2.3 zu konvertieren.'))
@@ -376,19 +449,45 @@ class Ui_Dialog(QDialog):
 		# print "Ausgabeverzeichnis: %s" % (self.outputDir)
 		return
 
-	def on_inputButton_clicked(self) :
+	def on_inputButton_clicked(self, folder=None) :
 		# self.inputFileChooser = FileChooser(self)
 		# self.inputFileChooser.show()
 		# self.inputFileChooser.exec_()
 		# self.inputDir = self.inputFileChooser.getSelectedFiles()
-		self.inputDir = str(QtCore.QDir.toNativeSeparators(QtGui.QFileDialog.getExistingDirectory(self, u"Quellverzeichnis auswählen" )))
-		logger.debug("Eingabeverzeichnis = " +  self.inputDir)
+		inputFolder = self.inputDir
+		if (folder == None) or (folder == False) :
+			logger.debug("Eingabeverzeichnis = None")
+			self.inputDir = str(QtCore.QDir.toNativeSeparators(
+				QtGui.QFileDialog.getExistingDirectory(
+					self, 
+					u"Quellverzeichnis auswählen",
+					inputFolder, 
+					QtGui.QFileDialog.ShowDirsOnly 
+					| QtGui.QFileDialog.DontResolveSymlinks
+				)))
+		else:
+			logger.debug("Eingabeverzeichnis = %s" % (folder))
+			self.inputDir = folder
+		logger.debug("Neues Eingabeverzeichnis = " +  self.inputDir)
 		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.inputDir))
 		return
 
-	def on_outputButton_clicked(self) :
-		self.outputDir = str(QtCore.QDir.toNativeSeparators(QtGui.QFileDialog.getExistingDirectory(self, u"Zielverzeichnis auswählen")))
-		logger.debug("Ausgabeverzeichnis = " +  self.outputDir)
+	def on_outputButton_clicked(self, folder=None) :
+		outputFolder = self.outputDir
+		if (folder == None) or (folder == False) :
+			logger.debug("Ausgabeverzeichnis = None")
+			self.outputDir = str(QtCore.QDir.toNativeSeparators(
+				QtGui.QFileDialog.getExistingDirectory(
+					self, 
+					u"Zielverzeichnis auswählen",
+					outputFolder, 
+					QtGui.QFileDialog.ShowDirsOnly 
+					| QtGui.QFileDialog.DontResolveSymlinks
+				)))
+		else:
+			logger.debug("Ausgabeverzeichnis = %s" % (folder))
+			self.outputDir = folder
+		logger.debug("Neues Ausgabeverzeichnis = " +  self.outputDir)
 		self.outputText.setText(QtCore.QDir.toNativeSeparators((self.outputDir)))
 		return
 
@@ -524,24 +623,28 @@ class Ui_Dialog(QDialog):
 
 	# ------ReplayGain
 	def toggle_checkRGstart(self, state):
+		logger.debug('Toggle ReplayGain: %s' % (state))	
 		if state == QtCore.Qt.Checked:
 			self.RGstart = True
 		else:
 			self.RGstart = False
 		return
 	def toggle_checkRGskip(self, state):
+		logger.debug('Toggle ReplayGain Skip: %s' % (state))	
 		if state == QtCore.Qt.Checked:
 			self.RGskip = True
 		else:
 			self.RGskip = False
 		return
 	def toggle_checkRGdry(self, state):
+		logger.debug('Toggle ReplayGain DryRun: %s' % (state))	
 		if state == QtCore.Qt.Checked:
 			self.RGdry = True
 		else:
 			self.RGdry = False
 		return
 	def toggle_checkRGshow(self, state):
+		logger.debug('Toggle ReplayGain Show: %s' % (state))	
 		if state == QtCore.Qt.Checked:
 			self.RGshow = True
 		else:
@@ -588,24 +691,39 @@ class Ui_Dialog(QDialog):
 
 	#---- toogle-CheckButtons ---------------------#
 
+
+
+
 # -------------------- Main() -----------------------------------------------------------------
  
-def main(cmdline):
+def main(args):
 	logging.basicConfig()
-	logger.debug('und los gehts...')
+	logger.debug('und los gehts...')	
+	logger.debug(vars(args)	)
 	app = None
 	if ( not QApplication.instance() ):
 		app = QApplication([])
 
-	dlg = Ui_Dialog()
-	dlg.show()
+	dlg = Ui_Dialog(args=args)	
+	# Programm sofort ausführen
+	if args.no_GUI:
+		# sofort ausführen
+		if args.run:
+			dlg.on_applyButton_clicked()
+		QApplication.quit()
+		sys.exit(0)
+	else:
+		dlg.show()
+		# sofort ausführen
+		if args.run:
+			dlg.on_applyButton_clicked()
 
 	sys.exit(app.exec_())
 
 
 # -------------------- Main() -----------------------------------------------------------------
 
-if ( __name__ == '__main__' ):
-	main(sys.argv)
+if ( __name__ == '__main__' ):	
+	main(args)
 
 
