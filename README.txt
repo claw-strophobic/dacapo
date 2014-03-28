@@ -5,8 +5,8 @@ dacapo
 Note
 ====
 I'd really appreciate any feedback. 
-Send an E-Mail (german or english) to claw <dot> strophob <at> gmx <dot> de or
-visit the project-homepage at http://sourceforge.net/projects/dacapo-audio
+Send an E-Mail (german or english) to claw <dot> strophobic <at> gmx <dot> de or
+visit the project-homepage at http://sourceforge.net/projects/dacapo-player
 where you can open a ticket (if you found a bug) or write a review or open open a discussion.
 Also, I'd welcome any translator, anybody who would create RPM- or DEB-Packages, 
 as well as Windows-Installer.
@@ -180,4 +180,4 @@ Both require pyQt4, QtFlac2Mp3 also requires rgain.
 Copyright
 =========
 
-Copyright (c) 2013 Thomas Korell <claw.strophob@gmx.de>
+Copyright (c) 2013-2014 Thomas Korell <claw.strophobic@gmx.de>
