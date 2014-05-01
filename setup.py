@@ -95,7 +95,7 @@ setup(
 
     # metadata for upload to PyPI
     author = "Thomas Korell",
-    author_email = "claw.strophob@gmx.de",
+    author_email = "claw.strophobic@gmx.de",
     description = "Lightweight Music Player with cover- and lyrics-display",
 	long_description=long_description,
     license = "GNU General Public License (v2 or later)",

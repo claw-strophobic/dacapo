@@ -1,3 +1,5 @@
+V0.1.9g, 2014-04-23 --  Bug in QtFlac2Mp3, Translations
+
 V0.1.9f, 2014-03-19 --  Textmargin and seconds for fast forward/backward
 						taken from config-file
 						first part of i18n for QtFlac2Mp3 with gettext()

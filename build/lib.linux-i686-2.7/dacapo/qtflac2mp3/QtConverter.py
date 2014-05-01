@@ -16,24 +16,44 @@ class converter():
 
 		self.source = gst.element_factory_make('filesrc', 'file-source')
 		self.decoder = gst.element_factory_make('flacdec', 'decoder')
+		self.conv = gst.element_factory_make("audioconvert", "converter")
 		self.encoder = gst.element_factory_make('lame', 'encoder')
+		self.xingmux = gst.element_factory_make('xingmux', 'xingmux')
+		self.id3mux = gst.element_factory_make('id3mux', 'id3mux')
 		# mode=1 quality=2 vbr=4 vbr-quality=2  bitrate=192
+		# self.encoder.set_property('mode', 1)
+		# self.encoder.set_property('vbr', 3)
+		# self.encoder.set_property('bitrate', 192)
 		self.encoder.set_property('mode', 4)
 		self.encoder.set_property('quality', 2)
 		self.encoder.set_property('vbr', 4)
-		# self.encoder.set_property('bitrate', 192)
 		self.encoder.set_property('vbr-quality', 1)
+		self.encoder.set_property('error-protection', True)
+		
+		# id3mux means use default id3v2.3
+		# use gst-inspect-0.10 lame for lame options
+		# use gst-inspect-0.10 id3mux for id3mux options
+		self.id3mux.set_property('write-v1', False)
+		self.id3mux.set_property('write-v2', True)
+		self.id3mux.set_property('v2-version', 4)
+				
 		self.debug = True
-
 		self.sink = gst.element_factory_make('filesink', 'sink')
-		self.converter.add(self.source, self.decoder, self.encoder, self.sink)
-		gst.element_link_many(self.source, self.decoder, self.encoder, self.sink)
+		self.converter.add(self.source, self.decoder, self.conv, self.encoder, self.xingmux, self.id3mux,  self.sink)
+		gst.element_link_many(self.source, self.decoder, self.conv, self.encoder, self.xingmux, self.id3mux, self.sink)
 		self.mainloop = gobject.MainLoop()
 		gobject.threads_init()
 		self.context = self.mainloop.get_context()
 		bus = self.converter.get_bus()
 		bus.add_signal_watch()
 		self.__bus_id = bus.connect("message", self.on_message)
+		
+		if self.debug : 
+			logging.debug("Encode mode: %s " % (self.encoder.get_property('mode') ))
+			logging.debug("Encode quality: %s " % (self.encoder.get_property('quality') ))
+			logging.debug("Encode vbr: %s " % (self.encoder.get_property('vbr') ))
+			logging.debug("Encode vbr-quality: %s " % (self.encoder.get_property('vbr-quality') ))
+			logging.debug("Encode bitrate: %s " % (self.encoder.get_property('bitrate') ))
 
 
 	def convert(self, source, target):
@@ -75,25 +95,5 @@ class converter():
 			if hasattr(message.structure, "get_name"):
 				name = message.structure.get_name()
 
-	def add_mp3_encoder(self):
-		cmd = 'lamemp3enc encoding-engine-quality=2 '
 
-		if self.mp3_mode is not None:
-		    properties = {
-		        'cbr' : 'target=bitrate cbr=true bitrate=%s ',
-		        'abr' : 'target=bitrate cbr=false bitrate=%s ',
-		        'vbr' : 'target=quality cbr=false quality=%s ',
-		    }
-
-		    cmd += properties[self.mp3_mode] % self.mp3_quality
-
-		    if 'xingmux' in available_elements and properties[self.mp3_mode][0]:
-		        # add xing header when creating VBR mp3
-		        cmd += '! xingmux '
-
-		if 'id3v2mux' in available_elements:
-		    # add tags
-		    cmd += '! id3v2mux '
-
-		return cmd
 

@@ -48,7 +48,7 @@ except :
 	errorhandling.Error.show()
 	sys.exit(2)
 
-logging.debug('Starte den GPlayer...')
+logging.debug('Starte dacapo...')
 
 # ----------- Klassendefinitionen ----------------------------- #
 

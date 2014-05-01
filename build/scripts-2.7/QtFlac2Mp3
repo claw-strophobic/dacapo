@@ -1,16 +1,23 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import gettext
+import gettext, site
 import sys, os, locale
 language = os.environ.get('LANGUAGE')
 
+## Unter Linux: /usr/local/lib/python2.7/dist-packages/dacapo/locale/de/LC_MESSAGES/qtflac2mp3.mo
+## Unter Windows muß die Datei standardmäßig in 
+## <%PYTHONHOME%/share/locale/<lang>/LC_MESSAGES> liegen. 
+## /Programme/Python26/Lib/site-packages/dacapo/locale/de/LC_MESSAGES/
+localDir = site.getsitepackages()[0] + '/dacapo'
 trans = gettext.translation("qtflac2mp3", None, [language, 'de'], fallback=True) 
+
 trans.install()
 
 def createMyParser():
 	parser = myArg.ArgumentParser(description=_('Convert FLAC files to MP3'))
 	parser.add_argument("-i", "--input", help=_('Input directory') )
 	parser.add_argument("-o", "--output", help=_('Output directory') )
+	parser.add_argument("-cut", "--cut-path", help=_('Cut Path ') )
 
 	# ReplayGain
 	parser.add_argument("-rg", "--replayGain", help=_('Apply ReplayGain for the input directory'), action="store_true")
@@ -77,13 +84,15 @@ except AttributeError:
 
 VERSION = [0, 1, 2]
 HOMEDIR = os.path.expanduser('~')
-CONFIG_DIR = HOMEDIR + '/.QtFlac2Mp3/'
+CONFIG_DIR = HOMEDIR + '/.dacapo/'
 LOG_NAME = CONFIG_DIR + 'QtFlac2Mp3.log'
 TEMP_NAME = CONFIG_DIR + 'last_session.tmp'
 DACAPO_CONFIG_DIR = HOMEDIR + '/.dacapo/'
 
 try:
 	logging.basicConfig(
+		filename=LOG_NAME,
+		filemode='w',
 		level='DEBUG', 
 		format='%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s', 
 		datefmt='%Y-%m-%d %H:%M:%S')
@@ -91,6 +100,7 @@ except :
 	errorhandling.Error.show()
 	# gPlayerErrorHandling.showError()
 	sys.exit(2)
+
 
 logger = logging.getLogger(__name__)
 logger.debug('Starte den QtFlac2Mp3...')
@@ -165,6 +175,9 @@ class Ui_Dialog(QDialog):
 		if self.args.input:
 			self.on_inputButton_clicked(folder=self.args.input)
 		if self.args.output:
+			self.on_outputButton_clicked(folder=self.args.output)
+		if self.args.cut_path:
+			self.outputSpin.setValue(int(self.args.cut_path))
 			self.on_outputButton_clicked(folder=self.args.output)
 		# ReplayGain
 		if self.args.replayGain:
@@ -244,6 +257,25 @@ class Ui_Dialog(QDialog):
 		self.outputButton = QtGui.QToolButton(self.outputPathLayoutWidget)
 		self.outputButton.setObjectName(_fromUtf8("outputButton"))
 		self.outputPathLayout.addWidget(self.outputButton)
+		self.outputSpin = QtGui.QSpinBox(self.outputPathLayoutWidget)
+		self.outputSpin.setObjectName(_fromUtf8("outputSpin"))
+		self.outputPathLayout.addWidget(self.outputSpin)
+		
+		
+		# create the layout: Output-Beispiel
+		self.examplePathLayoutWidget = QtGui.QWidget(self)
+		self.examplePathLayoutWidget.setGeometry(QtCore.QRect(10, 80, 631, 20))
+		self.examplePathLayoutWidget.setObjectName(_fromUtf8("examplePathLayoutWidget"))
+		self.layout.addWidget(self.examplePathLayoutWidget)
+		self.examplePathLayout = QtGui.QHBoxLayout(self.examplePathLayoutWidget)
+		self.examplePathLayout.setMargin(0)
+		self.examplePathLayout.setObjectName(_fromUtf8("examplePathLayout"))
+		self.examplePathLayout.setObjectName(_fromUtf8("examplePathLayout"))
+		# Output-Beispiel
+		self.outExample = QtGui.QLabel(self.examplePathLayoutWidget)
+		self.outExample.setObjectName(_fromUtf8("outExample"))
+		self.examplePathLayout.addWidget(self.outExample)
+
 
 
 		# Groupboxes mit CheckButtons
@@ -363,7 +395,7 @@ class Ui_Dialog(QDialog):
 		self.checkKVTag.setText(QtGui.QApplication.translate("Dialog", "vorh. Taggen", None, QtGui.QApplication.UnicodeUTF8))
 		self.checkKVcover.setText(QtGui.QApplication.translate("Dialog", "Cover übernehmen", None, QtGui.QApplication.UnicodeUTF8))
 		self.checkKVRG.setText(QtGui.QApplication.translate("Dialog", "ReplayGain anwenden", None, QtGui.QApplication.UnicodeUTF8))
-		self.checkKVID.setText(QtGui.QApplication.translate("Dialog", "Zu ID3v2.3 konvertieren", None, QtGui.QApplication.UnicodeUTF8))
+		self.checkKVID.setText(QtGui.QApplication.translate("Dialog", "ID3v2.3", None, QtGui.QApplication.UnicodeUTF8))
 		self.groupBox_3.setTitle(QtGui.QApplication.translate("Dialog", "Tags anzeigen", None, QtGui.QApplication.UnicodeUTF8))
 		self.checkPTstart.setText(QtGui.QApplication.translate("Dialog", "Ausführen", None, QtGui.QApplication.UnicodeUTF8))
 		self.label.setText(QtGui.QApplication.translate("Dialog", "Ausgabe", None, QtGui.QApplication.UnicodeUTF8))
@@ -373,6 +405,7 @@ class Ui_Dialog(QDialog):
 		self.outputButton.setText(QtGui.QApplication.translate("Dialog", "...", None, QtGui.QApplication.UnicodeUTF8))
 		self.applyButton.setText(QtGui.QApplication.translate("Dialog", "Anwenden", None, QtGui.QApplication.UnicodeUTF8))
 		self.cancelButton.setText(QtGui.QApplication.translate("Dialog", "Abbrechen", None, QtGui.QApplication.UnicodeUTF8))
+		self.outExample.setText(QtGui.QApplication.translate("Dialog", "Beispiel: /Meine/Musik/Mp3/Beatles/1965 Rubber Soul/01.Drive my car.mp3", None, QtGui.QApplication.UnicodeUTF8))
 		
 		# Tooltips
 		self.inputButton.setToolTip(_fromUtf8('Hier das <b>Quell-Verzeichnis</b> auswählen'))
@@ -390,8 +423,9 @@ class Ui_Dialog(QDialog):
 		self.applyButton.setToolTip(_fromUtf8('Verarbeitung starten'))
 		self.cancelButton.setToolTip(_fromUtf8('Aktuelle Verarbeitung abbrechen. Dies beendet nicht das Programm.' \
 									+ '<br>Um das Programm zu beenden bitte das Fenster schließen.'))
+		
 		self.checkKVID.setToolTip(_fromUtf8('ID3-Tags in der Version ID3v2.3 setzen? <br>Dies ist für einige ältere Geräte notwendig.' \
-									+ '<br>ReplayGain speichert die Informationen in der neuen ID-Version ID3v2.4 ab.'\
+		 							+ '<br>ReplayGain speichert die Informationen in der neuen ID-Version ID3v2.4 ab.'\
 									+ '<br>Es wird versucht die Tags aus der Version ID3v2.4 zu ID3v2.3 zu konvertieren.'))
 		
 
@@ -401,6 +435,7 @@ class Ui_Dialog(QDialog):
 		# Buttons
 		self.inputButton.clicked.connect(self.on_inputButton_clicked)
 		self.outputButton.clicked.connect(self.on_outputButton_clicked)
+		self.outputSpin.valueChanged.connect(self.on_outputSpin_changed)
 		self.applyButton.clicked.connect(self.on_applyButton_clicked)
 		self.cancelButton.clicked.connect(self.on_cancelButton_clicked)
 
@@ -455,6 +490,8 @@ class Ui_Dialog(QDialog):
 		# self.inputFileChooser.exec_()
 		# self.inputDir = self.inputFileChooser.getSelectedFiles()
 		inputFolder = self.inputDir
+		if (inputFolder == None) or (inputFolder == False) : 
+			inputFolder = "/"
 		if (folder == None) or (folder == False) :
 			logger.debug("Eingabeverzeichnis = None")
 			self.inputDir = str(QtCore.QDir.toNativeSeparators(
@@ -470,10 +507,17 @@ class Ui_Dialog(QDialog):
 			self.inputDir = folder
 		logger.debug("Neues Eingabeverzeichnis = " +  self.inputDir)
 		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.inputDir))
+		if (self.outputDir != None) and (self.outputDir != False) : 
+			self.outExample.setText(_("Beispiel") + ": " + \
+				self.convert_flac( self.process_playlist( bOnlyFirstSong=True ), \
+				bOnlyExampleSong=True))		
 		return
 
 	def on_outputButton_clicked(self, folder=None) :
 		outputFolder = self.outputDir
+		if (outputFolder == None) or (outputFolder == False) : 
+			outputFolder = "/"
+
 		if (folder == None) or (folder == False) :
 			logger.debug("Ausgabeverzeichnis = None")
 			self.outputDir = str(QtCore.QDir.toNativeSeparators(
@@ -489,11 +533,20 @@ class Ui_Dialog(QDialog):
 			self.outputDir = folder
 		logger.debug("Neues Ausgabeverzeichnis = " +  self.outputDir)
 		self.outputText.setText(QtCore.QDir.toNativeSeparators((self.outputDir)))
+		self.outExample.setText(_("Beispiel") + ": " + \
+			self.convert_flac( self.process_playlist( bOnlyFirstSong=True ), \
+			bOnlyExampleSong=True))
 		return
+	def on_outputSpin_changed(self, iValue):
+		if (self.outputDir != None) and (self.outputDir != False) : 
+			self.outExample.setText(_("Beispiel") + ": " + \
+				self.convert_flac( self.process_playlist( bOnlyFirstSong=True ), \
+				bOnlyExampleSong=True))		
+		return
+		
 
-
-	def process_playlist( self):
-		print(utf8conv("Starte Verarbeitung..." ))
+	def process_playlist( self, bOnlyFirstSong=False):
+		if (bOnlyFirstSong == False): print(utf8conv("Starte Verarbeitung..." ))
 		QApplication.processEvents()
 		inputList = []
 		inputList.append(self.inputDir)
@@ -506,10 +559,12 @@ class Ui_Dialog(QDialog):
 		playlist = self.oPlaylist.getPlaylist()
 		if len(playlist) <= 0: return
 		actSong = 0
-		logger.debug('RGstart: %s  KVstart: %s PTstart: %s' % (self.RGstart, self.KVstart, self.PTstart ) )
+		logger.debug('RGstart: %s  KVstart: %s PTstart: %s, bOnlyFirstSong: %s' % \
+			(self.RGstart, self.KVstart, self.PTstart, bOnlyFirstSong ) )
 		while actSong < len(playlist):
 			if self.cancel : break
 			filename = os.path.realpath(playlist[actSong])
+			if (bOnlyFirstSong == True): return filename 
 			actSong += 1
 			print(utf8conv("Verarbeite Nr %s von %s: %s " % (actSong, len(playlist), filename) ))
 			gain_song = []
@@ -543,7 +598,7 @@ class Ui_Dialog(QDialog):
 		self.textBrowser.ensureCursorVisible()
 		return
 
-	def convert_flac( self, flacFile):
+	def convert_flac( self, flacFile, bOnlyExampleSong=False):
 		'''
 		Konvertiert die Flac-Datei in MP3
 		flacFile = kompletter Pfad zur Datei
@@ -554,12 +609,40 @@ class Ui_Dialog(QDialog):
 		mpegBasename = Dateiname ohne Pfad und ohne Erweiterung
 		mpegDirname = Pfad zur Quelldatei
 		'''
+		logger.debug('flacFile: %s' % (flacFile))	
 		flacBasename = os.path.splitext(os.path.basename(flacFile))[0]
-		flacDirname = os.path.dirname(flacFile)
+		flacDirname = os.path.dirname(flacFile)		
 		mpegBasename = flacBasename
-		flacStrippedDirname = flacDirname.lstrip(self.inputDir)
-		mpegDirname = os.path.join(self.outputDir, flacStrippedDirname)
+		# flacStrippedDirname = flacDirname.lstrip(self.inputDir)
+		flacStrippedDirname = flacDirname[len(self.inputDir):]
+		if (flacStrippedDirname[:1] == "/") or (flacStrippedDirname[:1] == "\\") :
+			flacStrippedDirname = flacDirname[len(self.inputDir)+1:]
+		iSpinner = self.outputSpin.value()
+		logger.debug('os.sep: %s' % (os.sep))
+		logger.debug('rfind: %s' % (flacDirname.rfind(os.sep)))
+		sTest = flacDirname
+		iTest = len(sTest)
+		sStripped = ""
+		while iSpinner > 0:
+			iTest = sTest.rfind(os.sep, 0, iTest) - 1
+			sTest = sTest[:iTest + 1]
+			sStripped = flacDirname[iTest+1:]
+			logger.debug('iSpinner: %i - iTest: %i - sTest: %s' % (iSpinner, iTest, sTest))
+			logger.debug('sStripped: %s' % (sStripped))
+			iSpinner -= 1
+		
+		if (sStripped[:1] == "/") or (sStripped[:1] == "\\") :
+			sStripped = sStripped[1:]
+		mpegDirname = os.path.join(self.outputDir, flacStrippedDirname, sStripped)
 		mpegFile = os.path.join(mpegDirname, mpegBasename + '.mp3')
+		logger.debug('bOnlyExampleSong: %s' % (bOnlyExampleSong))			
+		logger.debug('inputDir: %s' % (self.inputDir))	
+		logger.debug('flacDirname: %s' % (flacDirname))
+		logger.debug('flacStrippedDirname: %s' % (flacStrippedDirname))
+		logger.debug('self.outputDir: %s' % (self.outputDir))
+		logger.debug('mpegDirname: %s' % (mpegDirname))
+		if (bOnlyExampleSong == True): return mpegFile 
+		
 		if not os.path.isdir(mpegDirname) :
 			try: 
 				os.makedirs(mpegDirname)
@@ -579,7 +662,7 @@ class Ui_Dialog(QDialog):
 			print "Erstelle MP3-Datei %s" % ( mpegFile )
 			self.oConverter.convert(flacFile, mpegFile)
 			bIsConverted = True
-			copyFLAC(flacFile, mpegFile)	
+			# copyFLAC(flacFile, mpegFile)	
 			if self.KVcover	: copyFlacCover(flacFile, mpegFile)	
 		else :
 			if self.KVreplace :
@@ -587,7 +670,7 @@ class Ui_Dialog(QDialog):
 				os.remove(mpegFile)
 				self.oConverter.convert(flacFile, mpegFile)
 				bIsConverted = True
-				copyFLAC(flacFile, mpegFile)
+				# copyFLAC(flacFile, mpegFile)
 				if self.KVcover	: copyFlacCover(flacFile, mpegFile)	
 			elif self.KVTag :
 				copyFLAC(flacFile, mpegFile)
@@ -607,6 +690,7 @@ class Ui_Dialog(QDialog):
 			print "Konvertiere MP3-Datei %s zu ID3v2.3" % ( mpegFile )
 			convertMp3ToV23(mpegFile)
 
+		self.oConverter = None
 		return
 
 
