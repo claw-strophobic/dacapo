@@ -623,13 +623,15 @@ class Ui_Dialog(QDialog):
 		sTest = flacDirname
 		iTest = len(sTest)
 		sStripped = ""
-		while iSpinner > 0:
-			iTest = sTest.rfind(os.sep, 0, iTest) - 1
-			sTest = sTest[:iTest + 1]
-			sStripped = flacDirname[iTest+1:]
-			logger.debug('iSpinner: %i - iTest: %i - sTest: %s' % (iSpinner, iTest, sTest))
-			logger.debug('sStripped: %s' % (sStripped))
-			iSpinner -= 1
+		if iSpinner > 0:
+			flacStrippedDirname = ""
+			while iSpinner >= 0:
+				iTest = sTest.rfind(os.sep, 0, iTest) - 1
+				sTest = sTest[:iTest + 1]
+				sStripped = flacDirname[iTest+1:]
+				logger.debug('iSpinner: %i - iTest: %i - sTest: %s' % (iSpinner, iTest, sTest))
+				logger.debug('sStripped: %s' % (sStripped))
+				iSpinner -= 1
 		
 		if (sStripped[:1] == "/") or (sStripped[:1] == "\\") :
 			sStripped = sStripped[1:]
@@ -686,7 +688,7 @@ class Ui_Dialog(QDialog):
 			do_gain(gain_song, ref_level=89, force=True, dry_run=False, album=self.RGalbum,
 						mp3_format=mp3format)
 
-		if self.KVID and os.path.isfile(mpegFile) and self.RGstart :
+		if self.KVID and os.path.isfile(mpegFile) and self.KVRG :
 			print "Konvertiere MP3-Datei %s zu ID3v2.3" % ( mpegFile )
 			convertMp3ToV23(mpegFile)
 

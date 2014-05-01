@@ -111,7 +111,6 @@ setup(
           'Intended Audience :: End Users/Desktop',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
-          'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
           'Programming Language :: Python',
           'Topic :: Multimedia :: Sound/Audio :: Players',

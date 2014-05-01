@@ -28,19 +28,21 @@ class converter():
 		self.encoder.set_property('quality', 2)
 		self.encoder.set_property('vbr', 4)
 		self.encoder.set_property('vbr-quality', 1)
-		self.encoder.set_property('error-protection', True)
+		# self.encoder.set_property('error-protection', True)
 		
 		# id3mux means use default id3v2.3
 		# use gst-inspect-0.10 lame for lame options
 		# use gst-inspect-0.10 id3mux for id3mux options
 		self.id3mux.set_property('write-v1', False)
 		self.id3mux.set_property('write-v2', True)
-		self.id3mux.set_property('v2-version', 4)
+		self.id3mux.set_property('v2-version', 3)
 				
 		self.debug = True
 		self.sink = gst.element_factory_make('filesink', 'sink')
 		self.converter.add(self.source, self.decoder, self.conv, self.encoder, self.xingmux, self.id3mux,  self.sink)
-		gst.element_link_many(self.source, self.decoder, self.conv, self.encoder, self.xingmux, self.id3mux, self.sink)
+		# self.converter.add(self.source, self.decoder, self.encoder, self.id3mux,  self.sink)
+		# gst.element_link_many(self.source, self.decoder, self.encoder, self.id3mux, self.sink)
+		gst.element_link_many(self.source, self.decoder, self.conv, self.encoder, self.xingmux, self.id3mux,  self.sink)
 		self.mainloop = gobject.MainLoop()
 		gobject.threads_init()
 		self.context = self.mainloop.get_context()
