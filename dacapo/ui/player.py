@@ -136,19 +136,21 @@ class playerGUI():
 		textMetaVar.append(self.oConfig.getConfig('gui', 'metaData', 'if_discNr'))
 		i = 0
 		for s in textMetaVar :
-			s = s.replace('%time%', self.gstPlayer.getDuration())
-			s = s.replace('%duration%', self.gstPlayer.getDuration())
-			if self.isPlaylist :
-				s = s.replace('%tracknumberlist%', str(self.actSong))
-				s = s.replace('%tracktotallist%', str(len(self.playlist)))
-			text = s
-			while True :
-				text = self.find_between(s, '%', '%')
-				if text == '' : break
-				s = s.replace('%' + text + '%', self.audioFile.getMetaData(text))
+			try:
+				s = s.replace('%time%', self.gstPlayer.getDuration())
+				s = s.replace('%duration%', self.gstPlayer.getDuration())
+				if self.isPlaylist :
+					s = s.replace('%tracknumberlist%', str(self.actSong))
+					s = s.replace('%tracktotallist%', str(len(self.playlist)))
+				text = s
+				while True :
+					text = self.find_between(s, '%', '%')
+					if text == '' : break
+					s = s.replace('%' + text + '%', self.audioFile.getMetaData(text))
 
-			textMetaVar[i] = s
-			i += 1
+				textMetaVar[i] = s
+				i += 1
+			except: i += 1			
 			
 		if not self.isPlaylist : textMetaVar[0] = ''
 		if self.audioFile.getDiscNo() == "0" : textMetaVar[1] = ''		
@@ -164,30 +166,31 @@ class playerGUI():
 		self.posActTime = -1
 		self.textActTime = None
 		for s in textMetaData :
- 
-			s = s.replace('%if_playlist%', textMetaVar[0])
-			s = s.replace('%if_discNr%', textMetaVar[1])
-			if self.isPlaylist :
-				s = s.replace('%tracknumberlist%', str(self.actSong))
-				s = s.replace('%tracktotallist%', str(len(self.playlist)))
+			try:
+				s = s.replace('%if_playlist%', textMetaVar[0])
+				s = s.replace('%if_discNr%', textMetaVar[1])
+				if self.isPlaylist :
+					s = s.replace('%tracknumberlist%', str(self.actSong))
+					s = s.replace('%tracktotallist%', str(len(self.playlist)))
 
-			text = s
-			while True :
-				text = self.find_between(s, '%', '%')
-				if text == '' : break
-				if (text == 'time') or (text == 'duration') :
-					s = s.replace('%' + text + '%', '#' + text + '#')
-				s = s.replace('%' + text + '%', self.audioFile.getMetaData(text))
+				text = s
+				while True :
+					text = self.find_between(s, '%', '%')
+					if text == '' : break
+					if (text == 'time') or (text == 'duration') :
+						s = s.replace('%' + text + '%', '#' + text + '#')
+					s = s.replace('%' + text + '%', self.audioFile.getMetaData(text))
 
-			if '#time#' in s :
-				self.textActTime = s
-				self.posActTime = i
+				if '#time#' in s :
+					self.textActTime = s
+					self.posActTime = i
 
-			s = s.replace('#time#', self.gstPlayer.getDuration())
-			s = s.replace('#duration#', self.gstPlayer.getDuration())
+				s = s.replace('#time#', self.gstPlayer.getDuration())
+				s = s.replace('#duration#', self.gstPlayer.getDuration())
 
-			textMetaData[i] = s
-			i += 1
+				textMetaData[i] = s
+				i += 1
+			except: i += 1
 		
 		fontMetaData = []
 		for s in textMetaData :
@@ -672,10 +675,10 @@ class playerGUI():
 			if self.ausschalter.isSet(): break			
 			
 			if self.ShowGUI == True : self.updateSyncLyrics()
-			if self.ShowGUI == True : self.updateActTime()
+			if self.ShowGUI == True : self.updateActTime()				
 			
 			for event in pygame.event.get():
-				# print "--> bin in event_loop mit event ", event
+				# if self.getDebug() : logging.debug("--> bin in event_loop mit event: %s " % (event))
 				if event.type == pygame.QUIT:
 					self.doQuit()
 				if event.type == pygame.ACTIVEEVENT :
@@ -694,7 +697,7 @@ class playerGUI():
 					self.blitText()
 					
 				elif event.type == pygame.KEYDOWN:
-					# if self.getDebug() : print "--> bin in event_loop mit event ", event
+					if self.getDebug() : logging.debug("TASTE WURDE GEDRUECKT")
 					if event.key == pygame.K_ESCAPE:
 						self.doQuit()
 					if event.key == pygame.K_q:
@@ -850,6 +853,7 @@ class playerGUI():
 
 
 	def doInitDisplay(self):
+		pygame.display.quit()
 		self.allwaysOnTop = False
 		if platform.system() == 'Windows': 
 			self.SetWindowPos = windll.user32.SetWindowPos
@@ -878,7 +882,10 @@ class playerGUI():
 		self.resolution = (self.oConfig.getConfig('gui', self.winState, 'width'), self.oConfig.getConfig('gui', self.winState, 'height'))
 		if self.getDebug() : logging.debug('Setze angeforderten Modus. ')
 		try:
-			if self.fullscreen : self.screen  = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN) 
+			if self.fullscreen : 
+				if self.getDebug() : 
+					logging.debug("Verfügbare Modi: %s " % (pygame.display.list_modes(0, pygame.FULLSCREEN)))
+				self.screen  = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN) 
 			else : 
 				self.screen  = pygame.display.set_mode(self.resolution, pygame.RESIZABLE)	
 				if self.allwaysOnTop :
@@ -887,8 +894,10 @@ class playerGUI():
 					self.SetWindowPos(pygame.display.get_wm_info()['window'], 
 						-1, 0, 0, self.resolution[0], self.resolution[1], 0x0013)
 		except: 
-			if self.error() : logging.debug('Schiefgegangen!!! ')
+			logging.error('SCHWERER FEHLER BEIM DISPLAY INITIALISIEREN!!! ')
 			logging.error(pygame.get_error())
+			errorhandling.Error.show()
+			self.doQuit()
 		if self.getDebug() : logging.debug('Font initialisieren. ')
 		self.font = pygame.font.SysFont(self.oConfig.getConfig('gui', self.winState, 'font'), self.oConfig.getConfig('gui', self.winState, 'fontSize'))
 		if self.getDebug() : logging.debug('Fontcolor initialisieren. ')
@@ -919,7 +928,11 @@ class playerGUI():
 			logging.warning(pygame.get_error())
 
 		self.diaShowTime = self.oConfig.getConfig('gui', 'misc', 'diaShowTime')
-
+		# if self.getDebug() : logging.debug("has focus?: %s " % (pygame.key.get_focused()))
+		if self.getDebug() : logging.debug("DISPLAY DRIVER: %s " % (pygame.display.get_driver()))
+		if self.getDebug() : logging.debug("DISPLAY INFO: %s " % (pygame.display.Info()))
+		if self.getDebug() : logging.debug("WM INFO: %s " % (pygame.display.get_wm_info()))
+		
 		return
 
 # -------------------- doQuit() -----------------------------------------------------------------

@@ -158,10 +158,19 @@ class GUI:
 		
 def main():
 	global PLAYER_ARGS
+	global CONFIG
 	app = GUI()
 	gtk.main()
-	sys.argv = PLAYER_ARGS
-	if PLAYER_ARGS <> [] : dacapo.play(CONFIG)
+	sys.argv = PLAYER_ARGS	
+	if PLAYER_ARGS <> [] :
+		try:
+			dacapo.play(CONFIG)
+		except SystemExit:
+			pass
+		except:
+			errorhandling.Error.show()
+			pass				
 		
 if __name__ == "__main__":
     sys.exit(main())
+        

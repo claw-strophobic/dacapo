@@ -664,7 +664,7 @@ class Ui_Dialog(QDialog):
 			print "Erstelle MP3-Datei %s" % ( mpegFile )
 			self.oConverter.convert(flacFile, mpegFile)
 			bIsConverted = True
-			# copyFLAC(flacFile, mpegFile)	
+			copyFLAC(flacFile, mpegFile)	
 			if self.KVcover	: copyFlacCover(flacFile, mpegFile)	
 		else :
 			if self.KVreplace :
@@ -692,7 +692,8 @@ class Ui_Dialog(QDialog):
 			print "Konvertiere MP3-Datei %s zu ID3v2.3" % ( mpegFile )
 			convertMp3ToV23(mpegFile)
 
-		self.oConverter = None
+		# self.oConverter.doEnd()
+		# self.oConverter = None
 		return
 
 

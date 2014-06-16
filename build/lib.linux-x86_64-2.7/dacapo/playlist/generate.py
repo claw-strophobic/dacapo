@@ -37,6 +37,7 @@ encoding = locale.getpreferredencoding()
 stdout_encoding = sys.stdout.encoding
 stdin_encoding = sys.stdin.encoding
 utf8conv = lambda x : unicode(x, stdin_encoding).encode('utf8')
+if stdin_encoding == None : stdin_encoding = fs_encoding
 
 try:
     _fromUtf8 = lambda s : s.encode(stdin_encoding)

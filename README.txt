@@ -63,7 +63,7 @@ Thus, dacapo has now the following features:
  - Lyrics can be displayed (as an additional image).
  - Synchronized Lyrics can be displayed (like "karaoke")
  - Command line and graphical call possible
- - Runs on Linux and Windows
+ - Runs on Linux
  - Runs on "small" computers (800 MHz with 1 GB RAM)
  - Is freely configurable
  - Plays (currently) FLAC, Ogg-Vorbis, WMA and MP3 (other formats are in preparation)

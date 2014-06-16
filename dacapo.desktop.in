@@ -1,13 +1,14 @@
 [Desktop Entry]
-Name=dacapo
-_GenericName=Music Player
+_Name=dacapo
+_GenericName=Dacapo Music Player
 _Comment=Listen to your playlist
-Exec=dacapoui
+Exec=/usr/local/bin/dacapoui
 Terminal=false
 StartupNotify=true
 Type=Application
-Icon=dacapo
-Categories=AudioVideo;Audio;Player;GTK;
+Icon=Music-dacapo.png
+MimeType=application/x-ogg;application/ogg;audio/x-mp3;audio/x-scpls;audio/x-mpeg;audio/mpeg;audio/x-mpegurl;application/x-flac;audio/x-wav;audio/flac;
+Categories=GNOME;GTK;AudioVideo;
 
 #http://live.gnome.org/GnomeGoals/NotificationSource
 X-GNOME-UsesNotifications=true
