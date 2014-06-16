@@ -1,4 +1,4 @@
-V0.1.9f, 2014-05-13 --  Bug in dacapoui: Call from Menu has no sys.stdin.encoding
+V0.1.9h, 2014-05-13 --  Bug in dacapoui: Call from Menu has no sys.stdin.encoding
 						Bug in dacapo: Keys not accepted after window-mode
 							changed
 
