@@ -88,17 +88,18 @@ class AudioFile(object):
             test = False
             operand = self.getMetaData(cond.get(key1)['operand'])
             if (cond.get(key1)['operator'] == 'ne') and \
-                    (operand[0].strip() <> ''):
+                    (len(operand) > 0):
                 test = True
 
             if test == True:
                 s = self.replaceTags(cond.get(key1)['value'])
                 cond.get(key1)['value'] = s
-                print "Adding:  %s zu den Tags mit Wert: %s" % (
+                if self.debug : logging.debug("Adding:  %s zu den Tags mit Wert: %s" % (
                     key1,
-                    cond.get(key1)['value']
-                )
-                self.tags[key1] = cond.get(key1)['value']
+                    s
+                ))
+                self.tags[key1] = [s]
+        if self.debug : logging.debug("TAGS:  %s " % (self.tags))
         return
 
     def loadSyncLyrics(self):
