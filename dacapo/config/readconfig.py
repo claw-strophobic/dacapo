@@ -86,6 +86,12 @@ class Config(object):
                     print " DICT   ->  ", child.tag, child.text
                 neuesDict = self.readChild(child)
                 d[child.tag]  = neuesDict
+            elif elementTyp == "cond" :
+                if self.debug :
+                    print " COND   ->  ", child.tag, child.text
+                self.__dCond[child.tag] = {}
+                self.__dCond[child.tag]["operator"] = child.get("operator", "ne")
+                self.__dCond[child.tag]["operand"] = child.get("operand", " ")
             else :
                 d[child.tag] = child.text
         return d
@@ -98,6 +104,7 @@ class Config(object):
         self.__dConfigGUI = {}
         self.__dConfigAudio = {}
         self.__dDebug = {}
+        self.__dCond = {}
         self.__dTEMP = {}
 
         try:
@@ -149,14 +156,19 @@ class Config(object):
         if Type == 'version':
             return 	self.__version
         if Type == 'gui':
-                    if Key == '':
-                        return self.__dConfigGUI.get(Cap)			
-                    else:
-                        return self.__dConfigGUI.get(Cap).get(Key)
+            if Key == '':
+                return self.__dConfigGUI.get(Cap)
+            else:
+                return self.__dConfigGUI.get(Cap).get(Key)
         elif Type == 'audio_engine':
             return self.__dConfigAudio.get(Key)
         elif Type == 'debug':
             return self.__dDebug.get(Key)
+        elif Type == 'cond':
+            if Key == '':
+                return self.__dCond
+            else:
+                return self.__dCond.get(Cap).get(Key)
         elif Type == 'TEMP':
             return self.__dTEMP.get(Key)
         else : pass
