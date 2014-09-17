@@ -92,6 +92,7 @@ class Ui_Dialog(QtGui.QMainWindow):
 		self.hauptschalter = threading.Event()
 		self.ausschalter = threading.Event()
 		self.oDacapoConfig = readconfig.getConfigObject()
+		self.oDacapoConfig.setConfig('TEMP', Key='PLAYER', Value=self)
 		pygame.init()
 				
 		self.loop = Loop(self)
@@ -118,7 +119,7 @@ class Ui_Dialog(QtGui.QMainWindow):
 
 		logging.debug("Audiodatei = " +  self.filename)
 		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
-		self.audioFile = getAudioFile(self, self.filename)
+		self.audioFile = getAudioFile(self.filename)
 		if self.audioFile <> None :		
 			try: 
 				self.artistText.setText(QString(_fromUtf8(config.get('Audio', 'artist'))))
@@ -479,18 +480,18 @@ class Ui_Dialog(QtGui.QMainWindow):
 			path = os.path.dirname(self.filename)		
 		else :
 			path = os.path.dirname(self.last_filename)		
-		filter = '*.flac'
+		filter = '*.flac;;*.*'
 		self.filename = str(QtCore.QDir.toNativeSeparators( \
 			QtGui.QFileDialog.getOpenFileName(self, \
 				u"Audiodatei auswählen", \
 				path, filter)))
 		logging.debug("Audiodatei = " +  self.filename)
 		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
-		self.audioFile = getAudioFile(self, self.filename)
+		self.audioFile = getAudioFile(self.filename)
 		if self.audioFile <> None :
-			self.artistText.setText(self.audioFile.getMetaData('artist'))
-			self.titelText.setText(self.audioFile.getMetaData('title'))
-			self.albumText.setText(self.audioFile.getMetaData('album'))
+			self.artistText.setText(' '.join(self.audioFile.getMetaData('artist')))
+			self.titelText.setText(' '.join(self.audioFile.getMetaData('title')))
+			self.albumText.setText(' '.join(self.audioFile.getMetaData('album')))
 			self.last_filename = self.filename
 		self.textEdit.setFocus()
 		return
@@ -501,7 +502,7 @@ class Ui_Dialog(QtGui.QMainWindow):
 				# gstPlayer wird als GTK-thread gestartet
 		if self.getDebug(): logging.debug(\
 			'versuche GstPlayer zu starten...')
-		self.gstPlayer = GstPlayer(self, self.ausschalter)
+		self.gstPlayer = GstPlayer(self.ausschalter)
 		self.gstPlayer.start()
 		self.gstPlayer.setStopWhenEOS(False)
 		if self.getDebug(): logging.debug(\

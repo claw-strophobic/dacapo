@@ -16,13 +16,10 @@ from dacapo import errorhandling
 import sys
 import os
 try:
-    import string
     import pygame
     import random
     import logging
-    import traceback
     import codecs      # utf8 support
-    import platform
     import StringIO
     from dacapo.config import readconfig
 except ImportError, err:
@@ -34,10 +31,10 @@ HOMEDIR = os.path.expanduser('~')
 
 class AudioFile(object):
 
-    def __init__(self, playerGUI, filename):
+    def __init__(self, filename):
         self.fileOpen = False
-        self.guiPlayer = playerGUI
         self.config = readconfig.getConfigObject()
+        self.guiPlayer = self.config.getConfig('TEMP', Key='PLAYER') 
         self.LEERCD = HOMEDIR + '/.dacapo/' + self.config.getConfig('gui', 'misc', 'picNoCover')
         self.debug = self.config.getConfig('debug', ' ', 'debugM')
         self.mp3Tags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
@@ -50,6 +47,13 @@ class AudioFile(object):
         # synchronisierte Texte laden?
         if self.syncLyrics == True: self.setSyncLyrics()
 
+    def find_between(self, s, first, last ):
+        try:
+            start = s.index( first ) + len( first )
+            end = s.index( last, start )
+            return s[start:end]
+        except ValueError:
+            return ""
 
 
     def setSyncLyrics(self):
@@ -69,7 +73,7 @@ class AudioFile(object):
         syncedDir = self.config.getConfig('gui', 'syncLyrics', 'dir')
         # Ersatzvariablen auflösen
         while True :
-            text = self.guiPlayer.find_between(syncedDir, '%', '%')
+            text = self.find_between(syncedDir, '%', '%')
             if text == '' : break
             syncedDir = syncedDir.replace('%' + text + '%', self.getMetaData(text))
 
@@ -168,10 +172,16 @@ class AudioFile(object):
         """
         # Besonderheit, da auch gerne mal tracknumber = "5/7"
         # gespeichert wird... (gerade bei MP3)
-        if key == "tracknumber" : return self.getTrack()
-        if key == "tracktotal" : return self.getTrackTotal()
         if self.debug : logging.debug("Angeforderter Key: %s" % (key))
+        if key == "tracknumber" :
+            if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrack(), type(self.getTrack())))
+            return self.getTrack()
+        if key == "tracktotal" :
+            if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrackTotal(), type(self.getTrackTotal())))
+            return self.getTrackTotal()
+        if "comment" in key : return self.getComments()
         value = ""
+        valueList = list()
         bFirst = True
         if self.tags.has_key(key) :
             try : 
@@ -180,13 +190,15 @@ class AudioFile(object):
                     if isinstance(text, str) or isinstance(text, unicode):
                         if bFirst : value = text
                         else: value += '\n' + text
+                        valueList.append(text)
                     else :
                         if bFirst : value = text.get_text() 
-                        else: value += '\n' + text.get_text() 
+                        else: value += '\n' + text.get_text()
+                        valueList.append(text.get_text())
                     bFirst = False
             except : pass
         if self.debug : logging.debug("Zurueck Key: %s Value %s" % (key, value))
-        return value
+        return valueList
 
 
 
@@ -247,11 +259,11 @@ class AudioFile(object):
     def getLyrics(self):
         listLyrics = list()
         if self.debug : logging.debug("Suche Lyrics in Tag: %s" %("unsyncedlyrics"))
-        strLyrics = self.getMetaData('unsyncedlyrics')
+        strLyrics = ''.join(self.getMetaData('unsyncedlyrics'))
         listLyrics = strLyrics.splitlines()
         if len(listLyrics) <= 0 : 
             if self.debug : logging.debug("Nichts gefunden. Suche Lyrics in Tag: %s" %("lyrics"))
-            strLyrics = self.getMetaData('lyrics')
+            strLyrics = ''.join(self.getMetaData('lyrics'))
             listLyrics = strLyrics.splitlines()
         if len(listLyrics) <= 0 and self.config.getConfig('gui', 'misc', 'showSyncedLyricsAsPics'): 
             if self.debug : logging.debug("Nichts gefunden. Suche Lyrics in %s" %("syncedlyrics"))
@@ -270,6 +282,11 @@ class AudioFile(object):
     def preBlitDiaShow(self):
 
         pics = list(self.getAllPics())
+        scaledPics = list()
+
+        picPlace = self.config.getConfig('gui', self.guiPlayer.winState, 'pictures')
+        winWidth = picPlace['width']
+        winHeight = picPlace['height']
 
         self.guiPlayer.diaShowPics = []
         if self.debug : logging.info("Anzahl zu skalierender Bilder: %s" %(len(pics)))
@@ -283,14 +300,14 @@ class AudioFile(object):
             picW, picH = pics[i].get_size()
 
             if picW == 0 : picW = 1
-            proz = (self.guiPlayer.winWidth * 100.0) / (picW)  
+            proz = (winWidth * 100.0) / (picW)
             h = int(round( (picH * proz) / 100.0))
-            w = int(round(self.guiPlayer.winWidth))
+            w = int(round(winWidth))
             if self.debug : logging.debug("Picture skalieren: " \
                 "Originalbreite: %s Hoehe: %s PROZENT: %s " \
                 "-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
-            if h > self.guiPlayer.winHeight :
-                proz = (self.guiPlayer.winHeight * 100.0) / (h)  
+            if h > winHeight :
+                proz = (winHeight * 100.0) / (h)
                 w = int(round( (w * proz) / 100.0 ))
                 h = int(round( (h * proz) / 100.0))
                 if self.debug : logging.debug(\
@@ -299,10 +316,10 @@ class AudioFile(object):
                     "-> Neue W: %s H: %s " % (picW, picH, proz, w, h))
             tmp = pygame.transform.scale(pics[i], (w, h))   
             # <-- skalieren -------------------------------
-            self.guiPlayer.diaShowPics.append(tmp)
+            scaledPics.append(tmp)
 
         if self.debug : logging.info("done.")
-        return
+        return scaledPics
 ## --------------- Getter -----------------------------------
 
     def getTempPic(self, data):
@@ -321,7 +338,7 @@ class AudioFile(object):
 
     def getAllPics(self):
         pics = []
-        pics.append(self.cover)
+        pics.append(self.getFrontCover())
         if self._Backcover <> None :
             pics.append(self._Backcover)
         return pics + self.getMiscPic()
@@ -329,20 +346,6 @@ class AudioFile(object):
     def getNoOfPics(self):
         return 1 + len(self._MiscPictures)
         
-    def getTitle(self):
-        return self.songtitle
-
-    def getArtist(self):
-        return self.artist
-
-    def getAlbum(self):
-        return self.album
-
-    def getAlbumWithNo(self):
-        if self.getDiscNo() != "0" :
-            return '{0} (Disc {1})'.format(self.getAlbum(), self.getDiscNo())
-        else :
-            return self.getAlbum()
 
     def getTrack(self):
         return self.tracknumber

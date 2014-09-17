@@ -28,8 +28,8 @@ except ImportError, err:
 
 class WmaFile(audiofile.AudioFile):
 
-	def __init__(self, playerGUI, filename):
-		super(WmaFile, self).__init__(playerGUI, filename)
+	def __init__(self, filename):
+		super(WmaFile, self).__init__(filename)
 
 	def loadFile(self):
 		try:
@@ -167,7 +167,7 @@ class WmaFile(audiofile.AudioFile):
 			Es wird nur nach dem Frontcover (Typ 3) gesucht
 		"""
 		if self.debug : logging.debug("Suche WMA-Cover... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
+		diaMode = self.guiPlayer.slide_mode
 		datei = None
 		
 		for image in self.audio.get("WM/Picture", []):
@@ -192,7 +192,7 @@ class WmaFile(audiofile.AudioFile):
 		"""
 		import StringIO
 		if self.debug : logging.debug("Suche WMA-Bilder... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
+		diaMode = self.guiPlayer.slide_mode
 		datei = None
 		if diaMode > 1:
 			for image in self.audio.get("WM/Picture", []):

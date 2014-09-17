@@ -28,8 +28,8 @@ except ImportError, err:
 
 class OggFile(audiofile.AudioFile):
 
-	def __init__(self, playerGUI, filename):
-		super(OggFile, self).__init__(playerGUI, filename)
+	def __init__(self, filename):
+		super(OggFile, self).__init__(filename)
 
 
 	def loadFile(self):
@@ -105,7 +105,7 @@ class OggFile(audiofile.AudioFile):
 
 	def loadFrontCover(self):
 		if self.debug : logging.debug("Suche OGG-Cover... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
+		diaMode = self.guiPlayer.slide_mode
 		cover = None
 
 		coverdesc = []
@@ -163,7 +163,7 @@ class OggFile(audiofile.AudioFile):
 
 	def loadStoredPictures(self):
 		return
-		diaMode = self.guiPlayer.getDiaMode()
+		diaMode = self.guiPlayer.slide_mode
 		pics = self.audio.pictures
 		if self.debug : logging.info('Insgesamt %s Bilder' %(len(pics)))
 		# wenn nur ein Bild vorhanden ->
