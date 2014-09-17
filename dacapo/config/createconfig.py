@@ -64,8 +64,9 @@ else:
         if tarinfo.isreg():
             if os.path.isfile(os.path.join(root_dir, tarinfo.name)) :   
                 # print("%s existiert bereits." % (tarinfo.name))
-                if ('./dacapo.conf' == tarinfo.name) : 
-                    mergeConfig = True
+                if ('./dacapo.conf' == tarinfo.name) :
+                    ### NICHT MEHR AUTOMATISCH AKTUALISIEREN!
+                    ### mergeConfig = True
                     tar.extract(tarinfo, path=tempdir)
                     # print("Extracting %s to %s" % (tarinfo.name, tempdir))
             else:
