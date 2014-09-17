@@ -43,6 +43,7 @@ class AudioFile(object):
         self.clearTags()
         self.tags = dict()
         self.loadFile()
+        self.addConditions()
         self.syncLyrics = self.config.getConfig('gui', 'misc', 'showLyricsSynced')
         # synchronisierte Texte laden?
         if self.syncLyrics == True: self.setSyncLyrics()
@@ -58,6 +59,47 @@ class AudioFile(object):
 
     def setSyncLyrics(self):
         self.syncTime, self.syncText = self.loadSyncLyrics()
+
+    def replaceTags(self, s):
+        while True :
+            text = self.find_between(s, '%', '%')
+
+            if text == '' : break
+            if (text == 'time') or (text == 'duration') :
+                    s = s.replace('%' + text + '%', '#' + text + '#')
+            res = self.getMetaData(text)
+            if self.debug : logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
+            if isinstance(res, list) :
+                t = '<br>'.join(res)
+                if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
+            else:
+                t = res
+            s = s.replace('%' + text + '%', t)
+        return s
+
+    def addConditions(self):
+        cond = self.config.getConfig('cond', '')
+        for key1 in cond.iterkeys() :
+            if self.debug : logging.debug("Condition:  %s Operator: %s Operand: %s" % (
+                key1,
+                cond.get(key1)['operator'],
+                cond.get(key1)['operand']
+                ))
+            test = False
+            operand = self.getMetaData(cond.get(key1)['operand'])
+            if (cond.get(key1)['operator'] == 'ne') and \
+                    (operand[0].strip() <> ''):
+                test = True
+
+            if test == True:
+                s = self.replaceTags(cond.get(key1)['value'])
+                cond.get(key1)['value'] = s
+                print "Adding:  %s zu den Tags mit Wert: %s" % (
+                    key1,
+                    cond.get(key1)['value']
+                )
+                self.tags[key1] = cond.get(key1)['value']
+        return
 
     def loadSyncLyrics(self):
         """

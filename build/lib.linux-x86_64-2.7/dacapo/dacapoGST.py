@@ -31,17 +31,17 @@ except ImportError:
 
 class GstPlayer(threading.Thread):
 
-    def __init__(self, playerGUI, ausschalter):
+    def __init__(self, ausschalter):
         from gst import Pipeline, element_factory_make, Format, FORMAT_TIME
         threading.Thread.__init__(self)
         self.ausschalter = ausschalter	
         self.stopWhenEOS = True
         self._last_position = 0
         self.actualTitel = ""
-        self.guiPlayer = playerGUI
         self.config = readconfig.getConfigObject()
-        self.debug = playerGUI.getGSDebug()
-        self._gapless = playerGUI.isGapless
+        self.guiPlayer = self.config.getConfig('TEMP', Key='PLAYER') 
+        self.debug = self.config.getConfig('debug', ' ', 'debugS')
+        self._gapless = self.config.getConfig('audio_engine', 'audio_engine', 'gapless')
         self.setDuration( datetime.timedelta(seconds=0) )
         self.is_Playing = False
         self.format = Format(FORMAT_TIME)
@@ -54,7 +54,7 @@ class GstPlayer(threading.Thread):
 
 
     def __init_pipeline(self):
-	    bReplayGain = self.guiPlayer.getReplayGain()
+	    bReplayGain = self.config.getConfig('audio_engine', 'audio_engine', 'replayGain')
 	    # Pipeline erstellen
 	    self.player = gst.Pipeline("player")
 	    # File-Source erstellen und der Pipeline zufügen
@@ -104,7 +104,7 @@ class GstPlayer(threading.Thread):
 	    return
 
     def __init_pipelineGapless(self):
-	    bReplayGain = self.guiPlayer.getReplayGain()
+	    bReplayGain = self.config.getConfig('audio_engine', 'audio_engine', 'replayGain')
 	    USE_QUEUE = True
 
 	    # Pipeline erstellen
@@ -252,7 +252,7 @@ class GstPlayer(threading.Thread):
 	    #The current song is about to finish, if we want to play another
 	    #song after this, we have to do that now
 	    if self.debug : logging.debug("--> bin in on_about_to_finish ")
-	    if self._gapless : self.guiPlayer.playNextSong(True)
+	    if self._gapless : self.guiPlayer.play_next_song(True)
 
     def doGaplessPlay(self, filename):
 	    self.filename = filename
@@ -311,7 +311,7 @@ class GstPlayer(threading.Thread):
             if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
             if self.stopWhenEOS :
                 self.player.set_state(STATE_NULL)
-                self.guiPlayer.playNextSong()
+                self.guiPlayer.play_next_song()
         elif t == MESSAGE_ERROR:
             if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
             self.player.set_state(STATE_NULL)

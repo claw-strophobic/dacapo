@@ -252,7 +252,7 @@ class GstPlayer(threading.Thread):
 	    #The current song is about to finish, if we want to play another
 	    #song after this, we have to do that now
 	    if self.debug : logging.debug("--> bin in on_about_to_finish ")
-	    if self._gapless : self.guiPlayer.playNextSong(True)
+	    if self._gapless : self.guiPlayer.play_next_song(True)
 
     def doGaplessPlay(self, filename):
 	    self.filename = filename
@@ -311,7 +311,7 @@ class GstPlayer(threading.Thread):
             if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
             if self.stopWhenEOS :
                 self.player.set_state(STATE_NULL)
-                self.guiPlayer.playNextSong()
+                self.guiPlayer.play_next_song()
         elif t == MESSAGE_ERROR:
             if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
             self.player.set_state(STATE_NULL)

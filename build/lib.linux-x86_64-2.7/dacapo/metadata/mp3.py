@@ -3,23 +3,17 @@
 
 """Dieses Modul enthält eine Klasse um Audiodateien zu verarbeiten (momentan FLAC und MP3). """
 import sys
-import os
 from dacapo import errorhandling
 try:
 	from dacapo.metadata import audiofile
 	import logging
 	import traceback
-	from mutagen.id3 import ID3, APIC
+	from mutagen.id3 import ID3
 	from mutagen.mp3 import MP3
-	import string
-	import mutagen
 	import pygame
-	import random
 	import logging
 	import traceback
-	import codecs      # utf8 support
 	import copy
-	import platform
 	from dacapo.config import readconfig
 
 except ImportError, err:
@@ -29,8 +23,8 @@ except ImportError, err:
 
 class Mp3File(audiofile.AudioFile):
 
-	def __init__(self, playerGUI, filename):
-		super(Mp3File, self).__init__(playerGUI, filename)
+	def __init__(self, filename):
+		super(Mp3File, self).__init__(filename)
 
 	def loadFile(self):
 		try:
@@ -159,7 +153,7 @@ class Mp3File(audiofile.AudioFile):
 			Es wird nur nach dem Frontcover (Typ 3) gesucht
 		"""
 		if self.debug : logging.debug("Suche MP3-Cover... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
+		diaMode = self.guiPlayer.slide_mode
 		datei = None
 
 		for tag in self.audio.keys():
@@ -185,7 +179,7 @@ class Mp3File(audiofile.AudioFile):
 		"""
 		import StringIO
 		if self.debug : logging.debug("Suche MP3-Bilder... %s" % (self.filename))
-		diaMode = self.guiPlayer.getDiaMode()
+		diaMode = self.guiPlayer.slide_mode
 		datei = None
 		if diaMode > 1:
 			for tag in self.audio.keys():

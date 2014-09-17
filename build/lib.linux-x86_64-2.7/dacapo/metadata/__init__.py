@@ -29,7 +29,7 @@ except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
 
-def getAudioFile(playerGUI, filename):
+def getAudioFile(filename):
 	'''
 		Abhängig vom Audio-Typ wird eine Subklasse von Audiofile geladen.
 		In dieser werden die metadata eingelesen (notfalls konvertiert) 
@@ -44,7 +44,7 @@ def getAudioFile(playerGUI, filename):
 		# Versuche FLAC-Datei zu laden
 		if mimeType in mimehelp.FLAC_MIMES: 
 			try:
-				audioFile = flac.FlacFile(playerGUI, filename)	
+				audioFile = flac.FlacFile(filename)	
 			except BaseException :
 				logging.error("FEHLER bei %s" % (filename) )
 				exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -55,7 +55,7 @@ def getAudioFile(playerGUI, filename):
 		# Versuche MP3-Datei zu laden
 		if mimeType in mimehelp.MPG_MIMES : 
 			try:
-				audioFile = mp3.Mp3File(playerGUI, filename)	
+				audioFile = mp3.Mp3File(filename)	
 			except BaseException :
 				logging.error("FEHLER bei %s" % (filename) )
 				exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -66,7 +66,7 @@ def getAudioFile(playerGUI, filename):
 		# Versuche OGG-Datei zu laden
 		if mimeType in mimehelp.OGG_MIMES : 
 			try:
-				audioFile = ogg.OggFile(playerGUI, filename)	
+				audioFile = ogg.OggFile(filename)	
 			except BaseException :
 				logging.error("FEHLER bei %s" % (filename) )
 				exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -77,7 +77,7 @@ def getAudioFile(playerGUI, filename):
 		# Versuche WMA-Datei zu laden
 		if mimeType in mimehelp.WMA_MIMES : 
 			try:
-				audioFile = wma.WmaFile(playerGUI, filename)	
+				audioFile = wma.WmaFile(filename)	
 			except BaseException :
 				logging.error("FEHLER bei %s" % (filename) )
 				exc_type, exc_value, exc_traceback = sys.exc_info()

@@ -68,6 +68,7 @@ syncedGroup.add_argument("-nsl", "--showNotSyncedLyrics", help=getLangText('Help
 
 parser.add_argument("--showPics", help=getLangText('HelpMessages', 'showPics'), choices=SHOWPIC_CHOICES )
 parser.add_argument("--fullhelp", help=getLangText('HelpMessages', 'fullhelp'), action="store_true")
+parser.add_argument("--fonthelp", help=getLangText('HelpMessages', 'fonthelp'), action="store_true")
 parser.add_argument("FILE", help=getLangText('HelpMessages', 'FILE'), nargs='*')
 parser.parse_args()
 
@@ -134,3 +135,11 @@ def showPicsHelp():
 	print getLangText('HelpMessages', 'showPicsHelp')
 	return
 
+# -------------------- showPicsHelp() -----------------------------------------------------------------
+
+def showFontHelp():
+	import pygame
+	pygame.init()
+	fonts = pygame.font.get_fonts()
+	for font in fonts:		
+		print font 		

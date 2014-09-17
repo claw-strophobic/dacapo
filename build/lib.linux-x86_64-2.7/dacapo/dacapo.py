@@ -85,7 +85,7 @@ def play(config=None):
 	
 
 	oPlaylist = generate.PlayList(bDebug = bDebugP)
-	
+            
 	args = dacapoHelp.parser.parse_args()
 	
 	if args.showPics == 'help':
@@ -94,6 +94,10 @@ def play(config=None):
 
 	if args.fullhelp:
 		dacapoHelp.showFullHelp()
+		return
+
+	if args.fonthelp:
+		dacapoHelp.showFontHelp()
 		return
 
 	if args.debug:
@@ -178,6 +182,7 @@ def play(config=None):
 	oConfig.setConfig('TEMP', Key='SHOWGUI', Value=bShowGUI)
 	oConfig.setConfig('TEMP', Key='RESUME', Value=bResume)
 	oConfig.setConfig('TEMP', Key='FULLSCREEN', Value=bFullscreen)
+	oConfig.setConfig('TEMP', Key='PLAYLIST', Value=oPlaylist)
 
 	oConfig.setConfig('gui', 'misc', 'showLyricsSynced', bShowSyncedLyrics)
 	oConfig.setConfig('gui', 'misc', 'showLyricsAsPics', bshowLyricAsPic)
@@ -204,7 +209,7 @@ def play(config=None):
 	ausschalter = threading.Event()
 
 	# Klasseninstanzen erstellen und die Schalter übergeben.
-	GUI = player.playerGUI(oPlaylist, ausschalter, hauptschalter)
+	GUI = player.playerGUI(ausschalter, hauptschalter)
 	   
 	# Starten
 	#GUI.start()

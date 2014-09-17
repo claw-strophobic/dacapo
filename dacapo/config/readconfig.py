@@ -92,6 +92,7 @@ class Config(object):
                 self.__dCond[child.tag] = {}
                 self.__dCond[child.tag]["operator"] = child.get("operator", "ne")
                 self.__dCond[child.tag]["operand"] = child.get("operand", " ")
+                self.__dCond[child.tag]["value"] = child.text
             else :
                 d[child.tag] = child.text
         return d
