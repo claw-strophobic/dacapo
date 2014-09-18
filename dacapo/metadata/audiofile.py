@@ -70,11 +70,12 @@ class AudioFile(object):
             res = self.getMetaData(text)
             if self.debug : logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
             if isinstance(res, list) :
-                t = '<br>'.join(res)
+                t = '\\n'.join(res)
                 if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
             else:
                 t = res
             s = s.replace('%' + text + '%', t)
+            ## s = s.replace('#NEWLINE#', '\\n')
         return s
 
     def addConditions(self):
