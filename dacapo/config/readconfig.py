@@ -46,18 +46,18 @@ class Config(object):
             return 1
         else:
             VERSION = [0, 0, 0]
-            is_pkg = pkg_resources.resource_exists("dacapo.data", "VERSION")
-            if is_pkg :
-                res = pkg_resources.resource_stream("dacapo.data", "VERSION")
-                VERSION = res.read().strip()
-                print("Wir leben mit Version: %s" % (str(VERSION)))
+            # is_pkg = pkg_resources.resource_exists("dacapo.data", "VERSION")
+            #if is_pkg :
+            #    res = pkg_resources.resource_stream("dacapo.data", "VERSION")
+            #    VERSION = res.read().strip()
+            #    print("Wir leben mit Version: %s" % (str(VERSION)))
             self.loadConfig()
             print("Config hat Version: %s" % (self.fver(self.getConfig('version')) ))
-            if not str(VERSION) == str(self.fver(self.getConfig('version'))) :
-                print("Versionen sind unterschiedlich, führe Update durch.")
-                print("%s <> %s" % \
-                (str(VERSION), str(self.fver(self.getConfig('version')))))
-                import dacapo.config.createconfig
+            #if not str(VERSION) == str(self.fver(self.getConfig('version'))) :
+            #    print("Versionen sind unterschiedlich, führe Update durch.")
+            #    print("%s <> %s" % \
+            #    (str(VERSION), str(self.fver(self.getConfig('version')))))
+            #    import dacapo.config.createconfig
         CONFIG = self
 
 
