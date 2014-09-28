@@ -81,10 +81,11 @@ class AudioFile(object):
     def addConditions(self):
         cond = self.config.getConfig('cond', '')
         for key1 in cond.iterkeys() :
-            if self.debug : logging.debug("Condition:  %s Operator: %s Operand: %s" % (
+            if self.debug : logging.debug("Condition:  %s Operator: %s Operand: %s Value: %s" % (
                 key1,
                 cond.get(key1)['operator'],
-                cond.get(key1)['operand']
+                cond.get(key1)['operand'],
+                cond.get(key1)['value']
                 ))
             test = False
             operand = self.getMetaData(cond.get(key1)['operand'])
@@ -93,13 +94,16 @@ class AudioFile(object):
                 test = True
 
             if test == True:
+                if self.debug : logging.debug("Replace  %s " % (
+                    cond.get(key1)['value']
+                ))
                 s = self.replaceTags(cond.get(key1)['value'])
-                cond.get(key1)['value'] = s
                 if self.debug : logging.debug("Adding:  %s zu den Tags mit Wert: %s" % (
                     key1,
                     s
                 ))
                 self.tags[key1] = [s]
+        del cond
         if self.debug : logging.debug("TAGS:  %s " % (self.tags))
         return
 

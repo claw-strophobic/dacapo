@@ -167,7 +167,7 @@ class Config(object):
             return self.__dDebug.get(Key)
         elif Type == 'cond':
             if Key == '':
-                return self.__dCond
+                return self.__dCond.copy()
             else:
                 return self.__dCond.get(Cap).get(Key)
         elif Type == 'TEMP':
