@@ -344,11 +344,10 @@ class playerGUI():
             ##self.blit_sync_lyrics(nextLine=False)
             self.update_overlay_text()
             pygame.display.update(picRect)
-        except pygame.error, err:
+        except:
             logging.error( \
                 "Error at slide-show picture (%s). %s " % (
-                    self.diaIndex, err))
-            self.quit()
+                    self.diaIndex, sys.exc_info()[0]))
         # self.blitSyncLyrics()
         # self.update_act_time()
 
