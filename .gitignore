@@ -11,3 +11,10 @@ Install-Dacapo-Windows.odt
 *.DS_Store
 *.swp
 *.out
+
+BACKUP/**
+TEMP/**
+build/**
+dist/**
+nbproject/**
+.idea/**
