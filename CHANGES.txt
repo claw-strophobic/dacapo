@@ -1,3 +1,5 @@
+V0.1.9i, 2014-11-15 --  Moved project to github
+
 V0.1.9i, 2014-05-13 --  Filter in OpenFileDialog from QtSyncLyrics extended to *.*
 						Help for Fonts
 						
