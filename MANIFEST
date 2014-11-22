@@ -27,7 +27,6 @@ dacapo/data/Music-dacapo.png
 dacapo/data/QtFlac2Mp3.png
 dacapo/data/VERSION
 dacapo/data/__init__.py
-dacapo/data/__init__.pyc
 dacapo/data/application_icon.png
 dacapo/data/casio.jpg
 dacapo/data/clear.png
