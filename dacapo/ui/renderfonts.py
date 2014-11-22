@@ -29,10 +29,7 @@ class MetaFonts(object):
         self._player = self._config.getConfig('TEMP', Key='PLAYER')
         assert isinstance(self._player.gstPlayer, object)
         self._gstPlayer = self._player.gstPlayer
-        if self._config.getConfig('TEMP', Key='FULLSCREEN') :
-            self._winState = 'fullscreen'
-        else:
-            self._winState = 'window'
+        self._winState = self._config.getConfig('TEMP', 'gui', 'winState')
         self._isPlaylist = self._config.getConfig(
                     'TEMP', Key='PLAYLIST').isPlaylist()
         self._audioFile = None
@@ -55,8 +52,8 @@ class MetaFonts(object):
                 self._winState,
                 'fields'
                 )
-        
-        if self._debug : logging.debug('Font initialisieren. ')
+
+        if self._debug : logging.debug('Font initialisieren. Modus: %s ' % (self._winState))
         self.__metaFields['standardFont'] = {}
         self.__metaFields.get('standardFont')['value'] = None
         self.__metaFields.get('standardFont')['font'] = \

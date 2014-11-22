@@ -65,7 +65,6 @@ class playerGUI():
         self._config.setConfig('TEMP', Key='PLAYER', Value=self)
         self._showGUI = bool(self._config.getConfig('TEMP', Key='SHOWGUI'))
         bResume = self._config.getConfig('TEMP', Key='RESUME')
-        self._clock = pygame.time.Clock()
         # Erstellt einen Zeitnehmer
         self._debug = self._config.getConfig('debug', ' ', 'debugGUI')
         self._gapless = self._config.getConfig('audio_engine', 'audio_engine', 'gapless')
@@ -96,7 +95,6 @@ class playerGUI():
         self.winState = 'window'
         if self.fullscreen: self.winState = 'fullscreen'
 
-        self.metaFontsObject = renderfonts.MetaFonts()
         self.init_display()
         self.play_next_song()
         return
@@ -473,9 +471,8 @@ class playerGUI():
     def run(self):
         while True:
             # Verhindert, dass das Programm zu schnell laeuft
-            self._clock.tick(10)
-            # pygame.event.wait()
-            # if self._debug : print "playerGUI - run() -> frage Status ab "
+            FPS = 30
+            fpsClock = pygame.time.Clock()
             if self._ausschalter.isSet(): break
 
             if self._showGUI == True: self.update_sync_lyrics()
@@ -498,7 +495,7 @@ class playerGUI():
                 # self.doBlitText()
 
                 elif event.type == pygame.KEYDOWN:
-                    if self._debug: logging.debug("TASTE WURDE GEDRUECKT")
+                    if self._debug: logging.debug("Keydown-Event: %s" % (event.key))
                     if event.key == pygame.K_ESCAPE:
                         self.quit()
                     if event.key == pygame.K_q:
@@ -533,6 +530,7 @@ class playerGUI():
                 else:
                     # if self._debug : logging.debug("--> bin in event_loop mit event " + event + '')
                     pass
+            fpsClock.tick(FPS)
 
         return
 
@@ -544,16 +542,18 @@ class playerGUI():
     def toggle_fullscreen(self):
         if self.fullscreen == True:
             self.fullscreen = False
+            if self._debug: logging.debug('Going to window-mode')
         else:
             self.fullscreen = True
+            if self._debug: logging.debug('Going to fullscreen-mode')
         self.winState = 'window'
         if self.fullscreen: self.winState = 'fullscreen'
         self.init_display()
         self._resize = True
         self.__lastWidthPos = None
+        self._metaFields = None
         self._metaFields = self.metaFontsObject.getRenderedMetadata()
         self.blit_text()
-        if self.slide_mode > 3: self.slide_show()
         return
 
     def start_stop(self):
@@ -643,7 +643,11 @@ class playerGUI():
 
 
     def init_display(self):
-        pygame.display.quit()
+        try:
+            pygame.display.quit()
+        except:
+            logging.error('Could not quit pygame.display! ')
+            logging.error(pygame.get_error())
         self._config.setConfig('TEMP', 'gui', 'winState', self.winState)
         self.allwaysOnTop = False
         if platform.system() == 'Windows':
@@ -655,6 +659,7 @@ class playerGUI():
         except:
             logging.error('Konnte Display nicht initialisieren! ')
             logging.error(pygame.get_error())
+            self.quit()
         if self._debug: logging.debug('setze Ueberschrift ')
         try:
             pygame.display.set_caption(self._config.getConfig('gui', 'misc', 'caption'))
@@ -719,7 +724,8 @@ class playerGUI():
         if self._debug: logging.debug("DISPLAY DRIVER: %s " % (pygame.display.get_driver()))
         if self._debug: logging.debug("DISPLAY INFO: %s " % (pygame.display.Info()))
         if self._debug: logging.debug("WM INFO: %s " % (pygame.display.get_wm_info()))
-
+        self.metaFontsObject = None
+        self.metaFontsObject = renderfonts.MetaFonts()
         self.metaFontsObject.doPrepareFonts()
 
         return

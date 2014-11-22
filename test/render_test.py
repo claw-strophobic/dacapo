@@ -32,7 +32,8 @@ class  RenderTestCase(unittest.TestCase):
     def setUp(self):
         self.verbosity=4
         configObject = readconfig.getConfigObject()
-        configObject.setConfig('TEMP', Key='FULLSCREEN', Value=True)        
+        configObject.setConfig('TEMP', Key='FULLSCREEN', Value=True)
+        configObject.setConfig('TEMP', 'gui', 'winState', 'fullscreen')
         configObject.setConfig('TEMP', Key='FILENAME', Value=self.__filename)
         ## Playlisten-Objekt
         oPlaylist = mock.MagicMock()
