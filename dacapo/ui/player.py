@@ -115,6 +115,7 @@ class playerGUI():
             skaliert und geschrieben."""
 
         # Fenster initialisieren (mit Hintergrundfarbe füllen
+        self._actScreen = None
         try:
             self.screen.fill(self._config.getConfig('gui', self.winState,
                                                     'backgroundColor'))
@@ -152,7 +153,6 @@ class playerGUI():
        #  sorted_x.reverse()
         for x in sorted_x:
             key1 = x[0]
-
             mW = 0
             mH = 0
             textWidth, textHeight = self._metaFields.get(key1)['renderedSize']
@@ -201,7 +201,11 @@ class playerGUI():
 
         self.diaShowPics = []
         self.diaIndex = - 1
+         # der Bereich der aktuellen Position wird bereinigt
+        key1 = self._metaFields.get('TIME')['posActTime']
+        self.clearRect(self._metaFields, key1)
         self._saveScreen = self.screen.copy()
+        self._actScreen = self.screen.copy()
 
         if not self._resize: self.timerIndex = self._gstPlayer.queryNumericPosition()
         if not self._resize:
@@ -278,7 +282,7 @@ class playerGUI():
                 self.quit()
             self.screen.unlock()
 
-    # -------------------- Diashow ----------------------------------------------------------------
+    # -------------------- slideshow ----------------------------------------------------------------
 
     def slide_show(self):
 
@@ -303,33 +307,24 @@ class playerGUI():
         w = picPlace['left']
         h = picPlace['top']
         picRect = Rect(w, h, width, height)
+        wWidth, wHeight = self.resolution
+        clearRect = Rect(0, 0, wWidth, wHeight)
 
-        # Altes Bild löschen
+        # delete the old picture
         if self.diaIndex > -1 :
-            # Der gesicherte screen wird zurückgeholt
-            tmp = self._saveScreen.subsurface(picRect).copy()
+            # get the hole screen back, because on slow machines
+            # the time-pos can make trouble
+            tmp = self._saveScreen.subsurface(clearRect).copy()
             self.blit_rect(
                 tmp,
-                picRect,
+                clearRect,
                 text="clear picture area",
                 update=False
             )
-            # der Bereich der aktuellen Position wird bereinigt
-            key1 = self._metaFields.get('TIME')['posActTime']
-            self.clearRect(self._metaFields, key1)
-            self.blit_rect(
-                self._metaFields.get(key1)['renderedData'],
-                Rect(
-                    self._metaFields.get(key1)['blitPos'],
-                    self._metaFields.get(key1)['renderedSize']
-                ),
-                text=self._metaFields.get(key1)['data'],
-                update=False
-            )
-                    # Index größer als Anzahl Bilder -> Index initialisieren
+
+        # if Index bigger than number of pics -> initialize the Index
         self.diaIndex += 1
         if self.diaIndex > (len(self.diaShowPics) - 1): self.diaIndex = 0
-
 
         ## -- Hier kann es passieren, dass die Liste noch nicht aufgebaut ist... deshalb evtl. Fehler abfangen!
         try:
@@ -347,22 +342,23 @@ class playerGUI():
             )
             ##self.blit_sync_lyrics(nextLine=False)
             self.update_overlay_text()
+            ## save the actual without time display
+            self._actScreen = self.screen.copy()
+            self.update_act_time(force=True)
             pygame.display.update(picRect)
         except:
             logging.error( \
                 "Error at slide-show picture (%s). %s " % (
                     self.diaIndex, sys.exc_info()[0]))
-        # self.blitSyncLyrics()
-        # self.update_act_time()
 
         return
-    # -------------------- Diashow ----------------------------------------------------------------
+    # -------------------- slideshow ----------------------------------------------------------------
 
 
 
     # -------------------- Timer -----------------------------------------------------------------
 
-    def update_act_time(self):
+    def update_act_time(self, force=False):
 
         if self.screen.get_locked(): return
 
@@ -373,20 +369,21 @@ class playerGUI():
 
         if newPos == None: return
 
-        if self.pos == newPos: return
+        if (self.pos == newPos) and (force==False) : return
 
         if self._metaFields.get('TIME')['textActTime'] == None: return
 
+        # if self._debug : print "Aktuelle Position: %s " % (self._gstPlayer.queryNumericPosition())
+        if self._gstPlayer.queryNumericPosition() > (self.timerIndex + self.diaShowTime):
+            if not force:
+                self.slide_show()
+            self.timerIndex = self._gstPlayer.queryNumericPosition()
+
         key1 = self._metaFields.get('TIME')['posActTime']
-        self.clearRect(self._metaFields, key1)
+        self.clearUpdateRect(self._metaFields, key1)
 
         self.pos = newPos
         self._metaFields = self.metaFontsObject.getRenderedActTime()
-
-        # if self._debug : print "Aktuelle Position: %s " % (self._gstPlayer.queryNumericPosition())
-        if self._gstPlayer.queryNumericPosition() > (self.timerIndex + self.diaShowTime):
-            self.slide_show()
-            self.timerIndex = self._gstPlayer.queryNumericPosition()
 
         self.blit_rect(
             self._metaFields.get(key1)['renderedData'],
@@ -813,6 +810,34 @@ class playerGUI():
                     update=True
 
                 )
+        return
+
+    def clearUpdateRect(self, array, key):
+        if self._actScreen == None:
+            return self.clearUpdateRect(array,key)
+        if not isinstance(array, dict) : return
+        if not array.has_key(key) : return
+        if not isinstance(array.get(key), dict) : return
+        if not array.get(key).has_key('blitPos') : return
+
+        picRect = Rect(
+                        array.get(key)['blitPos'],
+                        array.get(key)['renderedSize']
+                    )
+        tmp = self._actScreen.subsurface(picRect).copy()
+
+        text = ''
+        if array.get(key).has_key('data') :
+            text = array.get(key)['data']
+            if isinstance(array.get(key)['data'], list) :
+                text = ' '.join(array.get(key)['data'])
+
+        self.blit_rect(
+            tmp,
+            picRect,
+            text="clear picture area",
+            update=False
+        )
         return
 
 
