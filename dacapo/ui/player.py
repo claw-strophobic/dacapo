@@ -248,11 +248,11 @@ class playerGUI():
     def blit_rect(self, img, rect, text='', update=False):
         if (rect == None):
             logging.warning( \
-                "Rect is None für blit: %s " % (
+                "Rect is None for blit: %s " % (
                     text))
             return False
         logging.debug( \
-            "Versuche blit für %s an Position %s " % (
+            "Trying blit for %s at position %s " % (
                 text, rect))
         if not self.screen.get_locked():
             try:
