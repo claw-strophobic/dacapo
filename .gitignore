@@ -11,6 +11,7 @@ Install-Dacapo-Windows.odt
 *.DS_Store
 *.swp
 *.out
+*.tar.gz
 
 BACKUP/**
 TEMP/**
