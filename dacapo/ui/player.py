@@ -820,7 +820,7 @@ class playerGUI():
 
     def clearUpdateRect(self, array, key):
         if self._actScreen == None:
-            return self.clearUpdateRect(array,key)
+            return self.clearRect(array,key)
         if not isinstance(array, dict) : return
         if not array.has_key(key) : return
         if not isinstance(array.get(key), dict) : return
