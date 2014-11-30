@@ -25,7 +25,7 @@ if platform.system() == 'Windows':
     except ImportError, err:
         errorhandling.Error.show()
         sys.exit(2)
-#   os.environ['SDL_VIDEODRIVER'] = 'directx'
+# os.environ['SDL_VIDEODRIVER'] = 'directx'
 try:
     from pygame.locals import *
     import pygame
@@ -50,7 +50,6 @@ LIST_NAME = CONFIG_DIR + 'lastPlaylistNumber.tmp'
 
 
 class playerGUI():
-
     def __init__(self, ausschalter, hauptschalter):
 
         self._ausschalter = ausschalter
@@ -101,7 +100,7 @@ class playerGUI():
 
     # -------------------- Texte anzeigen ----------------------------------------
 
-    def blit_text(self):
+    def display_text(self):
         """In dieser Funktion werden die metadata (inkl. Bilder)
             in das Fenster projeziert.
             Zuerst wird das Fenster mit der Hintergrundfarbe gefüllt,
@@ -123,11 +122,10 @@ class playerGUI():
         # Fenstergröße holen
         width, height = self.resolution
         self.blit_rect(self.screen,
-                           Rect(0,0,width,height),
-                           text="Initialisierung",
-                           update=True
+                       Rect(0, 0, width, height),
+                       text="Initialisierung",
+                       update=True
         )
-
 
         if self._debug:
             logging.debug('blitte Texte: {0}'.format(self.filename))
@@ -138,58 +136,22 @@ class playerGUI():
         #
         zindex = dict()
         for key1 in self._metaFields.iterkeys():
+            if self._metaFields.get(key1).has_key('blitPos'):
+                del self._metaFields.get(key1)['blitPos']
             if self._metaFields.get(key1).has_key('renderedData') and \
                             self._metaFields.get(key1)['renderedData'] != None:
 
                 i = 0
-                if self._metaFields.get(key1).has_key('zIndex') :
+                if self._metaFields.get(key1).has_key('zIndex'):
                     i = self._metaFields.get(key1)['zIndex']
 
                 zindex[key1] = i
 
         sorted_x = sorted(zindex.iteritems(), key=operator.itemgetter(1))
-       #  sorted_x.reverse()
         for x in sorted_x:
-            key1 = x[0]
-            mW = 0
-            mH = 0
-            textWidth, textHeight = self._metaFields.get(key1)['renderedSize']
-            ## Rechts oder Links oder Mittig ausrichten
-            if self._metaFields.get(key1).has_key('alignH'):
-                if self._metaFields.get(key1)['alignH'] == 'left':
-                    mW = self._metaFields.get(key1)['posH']
-                elif self._metaFields.get(key1)['alignH'] == 'right':
-                    mW = self._metaFields.get(key1)['posH'] + textWidth
-                    mW = width - mW
-                elif self._metaFields.get(key1)['alignH'] == 'center':
-                    mW = (width - textWidth) / 2
+            self.blit_text(x[0], width, height)
 
-            ## Oben oder Unten oder Mittig ausrichten
-            if self._metaFields.get(key1).has_key('alignV'):
-                if self._metaFields.get(key1)['alignV'] == 'top':
-                    mH = self._metaFields.get(key1)['posV']
-                elif self._metaFields.get(key1)['alignV'] == 'bottom':
-                    mH = self._metaFields.get(key1)['posV'] + textHeight
-                    mH = height - mH
-                elif self._metaFields.get(key1)['alignV'] == 'center':
-                    mH = (height - textHeight) / 2
-
-
-            if self._debug: logging.debug(
-                'Blittext %s: %s an Pos W: %s x H: %s' %
-                (key1, self._metaFields.get(key1)['data'],
-                 mW, mH))
-            self._metaFields.get(key1)['blitPos'] = (mW, mH)
-
-            self.blit_rect(
-                self._metaFields.get(key1)['renderedData'],
-                Rect(
-                    self._metaFields.get(key1)['blitPos'],
-                    self._metaFields.get(key1)['renderedSize']
-                ),
-                text=self._metaFields.get(key1)['data'],
-                update=True
-            )
+            #  sorted_x.reverse()
 
         ### ----
 
@@ -199,7 +161,7 @@ class playerGUI():
 
         self.diaShowPics = []
         self.diaIndex = - 1
-         # der Bereich der aktuellen Position wird bereinigt
+        # der Bereich der aktuellen Position wird bereinigt
         key1 = self._metaFields.get('TIME')['posActTime']
         self.clearRect(self._metaFields, key1)
         self._saveScreen = self.screen.copy()
@@ -214,6 +176,64 @@ class playerGUI():
         self._resize = False
         return
 
+    def blit_text(self, key1, width, height):
+        mW = 0
+        mH = 0
+        textWidth, textHeight = self._metaFields.get(key1)['renderedSize']
+        # relativ zu einem anderen Tag ausrichten
+        if (self._metaFields.get(key1).has_key('posRefH')):
+            key2 = self._metaFields.get(key1)['posRefH']
+            if (key2 != '') and (self._metaFields.has_key(key2)):
+                if not self._metaFields.get(key2).has_key('blitPos'):
+                    self.blit_text(key2, width, height)
+                refPosW, refPosH = self._metaFields.get(key2)['blitPos']
+                refWidth, refHeight = self._metaFields.get(key2)['renderedSize']
+                mW = refPosW + refWidth
+
+        if (self._metaFields.get(key1).has_key('posRefV')):
+            key2 = self._metaFields.get(key1)['posRefV']
+            if (key2 != '') and (self._metaFields.has_key(key2)):
+                if not self._metaFields.get(key2).has_key('blitPos'):
+                    self.blit_text(key2, width, height)
+                refPosW, refPosH = self._metaFields.get(key2)['blitPos']
+                refWidth, refHeight = self._metaFields.get(key2)['renderedSize']
+                mH = refPosH + refHeight
+
+        ## Rechts oder Links oder Mittig ausrichten
+        if self._metaFields.get(key1).has_key('alignH'):
+            if self._metaFields.get(key1)['alignH'] == 'left':
+                mW += self._metaFields.get(key1)['posH']
+            elif self._metaFields.get(key1)['alignH'] == 'right':
+                mW += self._metaFields.get(key1)['posH'] + textWidth
+                mW = width - mW
+            elif self._metaFields.get(key1)['alignH'] == 'center':
+                mW = (width - textWidth) / 2
+
+        ## Oben oder Unten oder Mittig ausrichten
+        if self._metaFields.get(key1).has_key('alignV'):
+            if self._metaFields.get(key1)['alignV'] == 'top':
+                mH += self._metaFields.get(key1)['posV']
+            elif self._metaFields.get(key1)['alignV'] == 'bottom':
+                mH += self._metaFields.get(key1)['posV'] + textHeight
+                mH = height - mH
+            elif self._metaFields.get(key1)['alignV'] == 'center':
+                mH = (height - textHeight) / 2
+
+        if self._debug: logging.debug(
+            'Blittext %s: %s an Pos W: %s x H: %s' %
+            (key1, self._metaFields.get(key1)['data'],
+             mW, mH))
+        self._metaFields.get(key1)['blitPos'] = (mW, mH)
+
+        self.blit_rect(
+            self._metaFields.get(key1)['renderedData'],
+            Rect(
+                self._metaFields.get(key1)['blitPos'],
+                self._metaFields.get(key1)['renderedSize']
+            ),
+            text=self._metaFields.get(key1)['data'],
+            update=True
+        )
 
     def update_overlay_text(self):
         zindex = dict()
@@ -225,13 +245,13 @@ class playerGUI():
                     self._metaFields.get(key1).has_key('blitPos') and \
                             self._metaFields.get(key1)['blitPos'] != None:
                 i = 0
-                if self._metaFields.get(key1).has_key('zIndex') :
+                if self._metaFields.get(key1).has_key('zIndex'):
                     i = self._metaFields.get(key1)['zIndex']
 
                 zindex[key1] = i
 
         sorted_x = sorted(zindex.iteritems(), key=operator.itemgetter(1))
-       #  sorted_x.reverse()
+        #  sorted_x.reverse()
         for x in sorted_x:
             key1 = x[0]
             self.blit_rect(
@@ -246,7 +266,6 @@ class playerGUI():
         return
 
 
-
     def blit_rect(self, img, rect, text='', update=False):
         if (rect == None):
             logging.warning( \
@@ -259,8 +278,8 @@ class playerGUI():
         if not self.screen.get_locked():
             try:
                 self.screen.blit(
-                   img ,
-                   rect
+                    img,
+                    rect
                 )
             except pygame.error, err:
                 logging.warning( \
@@ -268,7 +287,7 @@ class playerGUI():
                         text, rect, err))
                 self.quit()
         if not self.screen.get_locked() \
-                and update==True:
+                and update == True:
             self.screen.lock()
             try:
                 pygame.display.update(rect)
@@ -309,7 +328,7 @@ class playerGUI():
         clearRect = Rect(0, 0, wWidth, wHeight)
 
         # delete the old picture
-        if self.diaIndex > -1 :
+        if self.diaIndex > -1:
             # get the hole screen back, because on slow machines
             # the time-pos can make trouble
             tmp = self._saveScreen.subsurface(clearRect).copy()
@@ -350,6 +369,7 @@ class playerGUI():
                     self.diaIndex, sys.exc_info()[0]))
 
         return
+
     # -------------------- slideshow ----------------------------------------------------------------
 
 
@@ -367,7 +387,7 @@ class playerGUI():
 
         if newPos == None: return
 
-        if (self.pos == newPos) and (force==False) : return
+        if (self.pos == newPos) and (force == False): return
 
         if self._metaFields.get('TIME')['textActTime'] == None: return
 
@@ -412,7 +432,7 @@ class playerGUI():
 
     def blit_sync_lyrics(self, nextLine=False):
         # keine Texte = Abbruch
-        key1= 'syncedLyricsLine'
+        key1 = 'syncedLyricsLine'
         if len(self.audioFile.syncText) <= 0: return
         # List-Index > Anzahl Text-Zeilen = Abbruch
         if self.audioFile.syncCount > len(self.audioFile.syncText): return
@@ -445,13 +465,13 @@ class playerGUI():
         if not self._metaFields[key1]['renderedData'] == None:
             txtW, txtH = self._metaFields[key1]['renderedData'].get_size()
             w = 0
-            h = self._config.getConfig('gui', self.winState ,'lyricFontPos')
+            h = self._config.getConfig('gui', self.winState, 'lyricFontPos')
             if self._config.getConfig('gui', 'syncLyrics', 'style').upper() == "CENTER":
                 w = (width - txtW) / 2
             if self._config.getConfig('gui', 'syncLyrics', 'style').upper() == "RIGHT":
                 w = (width - txtW)
             self._metaFields[key1]['renderedSize'] = (txtW, txtH)
-            self._metaFields[key1]['blitPos'] = (w,h)
+            self._metaFields[key1]['blitPos'] = (w, h)
 
             self.clearRect(self._metaFields, key1)
             self.blit_rect(
@@ -553,7 +573,7 @@ class playerGUI():
         self.__lastWidthPos = None
         self._metaFields = None
         self._metaFields = self.metaFontsObject.getRenderedMetadata()
-        self.blit_text()
+        self.display_text()
         return
 
     def start_stop(self):
@@ -620,7 +640,7 @@ class playerGUI():
                             self._gstPlayer.doPlay(self.filename)
                         if self._debug: logging.debug('Bereite Texte auf: {0} '.format(self.filename))
                         self._metaFields = self.metaFontsObject.getRenderedMetadata()
-                        self.blit_text()
+                        self.display_text()
                         if self._debug: logging.debug('Alles super: {0} '.format(self.filename))
                         break
                     else:
@@ -684,7 +704,7 @@ class playerGUI():
             self._config.getConfig('gui', self.winState, 'height'))
 
         logging.debug(u'Angeforderte Größe: %s x %s' %
-                                  (self.resolution[0], self.resolution[1]))
+                      (self.resolution[0], self.resolution[1]))
         try:
             if self.fullscreen:
                 if self._debug:
@@ -792,50 +812,50 @@ class playerGUI():
 
 
     def clearRect(self, array, key):
-        if not isinstance(array, dict) : return
-        if not array.has_key(key) : return
-        if not isinstance(array.get(key), dict) : return
-        if not array.get(key).has_key('blitPos') : return
+        if not isinstance(array, dict): return
+        if not array.has_key(key): return
+        if not isinstance(array.get(key), dict): return
+        if not array.get(key).has_key('blitPos'): return
 
         image = pygame.Surface(array.get(key)['renderedSize'])
         image.fill(self._config.getConfig('gui', self.winState, 'backgroundColor'))
 
         text = ''
-        if array.get(key).has_key('data') :
+        if array.get(key).has_key('data'):
             text = array.get(key)['data']
-            if isinstance(array.get(key)['data'], list) :
+            if isinstance(array.get(key)['data'], list):
                 text = ' '.join(array.get(key)['data'])
 
         self.blit_rect(
-                    image,
-                    Rect(
-                        array.get(key)['blitPos'],
-                        array.get(key)['renderedSize']
-                    ),
-                    text="clear_rect: " + text,
-                    update=True
+            image,
+            Rect(
+                array.get(key)['blitPos'],
+                array.get(key)['renderedSize']
+            ),
+            text="clear_rect: " + text,
+            update=True
 
-                )
+        )
         return
 
     def clearUpdateRect(self, array, key):
         if self._actScreen == None:
-            return self.clearRect(array,key)
-        if not isinstance(array, dict) : return
-        if not array.has_key(key) : return
-        if not isinstance(array.get(key), dict) : return
-        if not array.get(key).has_key('blitPos') : return
+            return self.clearRect(array, key)
+        if not isinstance(array, dict): return
+        if not array.has_key(key): return
+        if not isinstance(array.get(key), dict): return
+        if not array.get(key).has_key('blitPos'): return
 
         picRect = Rect(
-                        array.get(key)['blitPos'],
-                        array.get(key)['renderedSize']
-                    )
+            array.get(key)['blitPos'],
+            array.get(key)['renderedSize']
+        )
         tmp = self._actScreen.subsurface(picRect).copy()
 
         text = ''
-        if array.get(key).has_key('data') :
+        if array.get(key).has_key('data'):
             text = array.get(key)['data']
-            if isinstance(array.get(key)['data'], list) :
+            if isinstance(array.get(key)['data'], list):
                 text = ' '.join(array.get(key)['data'])
 
         self.blit_rect(
