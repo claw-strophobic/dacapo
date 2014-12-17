@@ -17,30 +17,36 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 class Error():
-	@staticmethod 
-	def show():
-		import sys
-		import traceback
+    @staticmethod
+    def show():
+        import sys
+        import traceback
 
-		exc_type, exc_value, exc_traceback = sys.exc_info()
-		lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-		msgLines = ''.join(line + '\n' for line in lines)
-		print ''.join('!! ' + line for line in lines)  # Log it or whatever here
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        msgLines = ''.join(line + '\n' for line in lines)
+        print ''.join('!! ' + line for line in lines)  # Log it or whatever here
 
-		import platform
-		if platform.system() == 'Windows':
-			import win32ui
-			import win32con
-			win32ui.MessageBox(msgLines, "Error", win32con.MB_OK)
-		else :
-			import gtk
-			dlg = gtk.MessageDialog(None, 
-				type=gtk.MESSAGE_ERROR,
-				buttons=gtk.BUTTONS_OK,
-				message_format=msgLines
-			)
-			dlg.run()
-			dlg.destroy()
+        import platform
+        if platform.system() == 'Windows':
+            try:
+                import win32ui
+                import win32con
+                win32ui.MessageBox(msgLines, "Error", win32con.MB_OK)
+            except:
+                pass
+        else :
+            try:
+                import gtk
+                dlg = gtk.MessageDialog(None,
+                    type=gtk.MESSAGE_ERROR,
+                    buttons=gtk.BUTTONS_OK,
+                    message_format=msgLines
+                )
+                dlg.run()
+                dlg.destroy()
+            except:
+                pass
 
-		return
+        return
 
