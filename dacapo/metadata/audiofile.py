@@ -95,6 +95,9 @@ class AudioFile(object):
             if (cond.get(key1)['operator'] == 'ne') and \
                     (len(operand) > 0):
                 test = True
+            if (cond.get(key1)['operator'] == 'empty') and \
+                    (len(operand) <= 0):
+                test = True
 
             if test == True:
                 if self.debug : logging.debug("Replace  %s " % (
