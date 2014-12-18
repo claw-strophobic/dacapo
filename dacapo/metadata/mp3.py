@@ -5,12 +5,15 @@
 import sys
 from dacapo import errorhandling
 try:
+    import pygame
+except:
+    pass
+try:
 	from dacapo.metadata import audiofile
 	import logging
 	import traceback
 	from mutagen.id3 import ID3
 	from mutagen.mp3 import MP3
-	import pygame
 	import logging
 	import traceback
 	import copy

@@ -4,13 +4,15 @@
 """Dieses Modul enthält eine Klasse um Audiodateien zu verarbeiten (momentan FLAC und MP3). """
 import sys
 from dacapo import errorhandling
-
+try:
+    import pygame
+except:
+    pass
 try:
     from dacapo.metadata import audiofile
     import logging
     import traceback
     from mutagen.flac import FLAC
-    import pygame
     import logging
     import traceback
 

@@ -17,6 +17,9 @@ import sys
 import os
 try:
     import pygame
+except:
+    pass
+try:
     import random
     import logging
     import codecs      # utf8 support

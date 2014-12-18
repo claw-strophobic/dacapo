@@ -6,6 +6,10 @@ import sys
 import os
 from dacapo import errorhandling
 try:
+    import pygame
+except:
+    pass
+try:
 	from dacapo.metadata import audiofile
 	import logging
 	import traceback
@@ -13,7 +17,6 @@ try:
 	from mutagen.flac import Picture
 	import string
 	import mutagen
-	import pygame
 	import logging
 	import traceback
 	import codecs      # utf8 support

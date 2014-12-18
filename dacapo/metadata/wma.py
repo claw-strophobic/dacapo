@@ -6,13 +6,16 @@ import sys
 import os
 from dacapo import errorhandling
 try:
+    import pygame
+except:
+    pass
+try:
 	from dacapo.metadata import audiofile
 	import logging
 	import traceback
 	import mutagen.asf
 	import string
 	import mutagen
-	import pygame
 	import random
 	import logging
 	import traceback
