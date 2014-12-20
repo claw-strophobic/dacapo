@@ -304,9 +304,11 @@ class MetaFonts(object):
 
         return self.__metaFields
 
-    def get_rendered_multiline(self, array, key):
+    def get_rendered_maxwidth(self, array, key):
+        maxwidth = array.get(key)['max-width']
         if self._debug:
-            logging.debug('Rendere Metadaten: %s: %s -> %s' % (
+            logging.debug('Rendere Metadaten mit Max-Width: %s %s: %s -> %s' % (
+                maxwidth,
                 key,
                 array.get(key)['value'],
                 array.get(key)['data']
@@ -315,14 +317,33 @@ class MetaFonts(object):
         w = 0
         h = 0
         lineH = 0
+        lineTest = ''
+        lineSave = None
+        counter = 0
         for s in array.get(key)['data']:
+            counter += 1
+            if len(lineTest) > 0:
+                lineTest = lineTest + ' ' + s
+            else:
+                lineTest = s
             rData = array.get(key)['sysFont'].render(
-                        s,
+                        lineTest,
                         True,
                         array.get(key)['fontColor']
                     )
-            rList.append(rData)
             wT,hT = rData.get_size()
+            if self._debug:
+                logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
+            if wT < maxwidth and counter < len(array.get(key)['data']):
+                lineSave = rData
+                continue
+            if lineSave == None:
+                lineSave = rData
+            if self._debug:
+                logging.debug('List-Append Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
+            rList.append(rData)
+            lineTest = ''
+            lineSave = None
             if wT > w: w = wT
             h += hT
             lineH = hT
@@ -347,6 +368,11 @@ class MetaFonts(object):
 
         return image
 
+    def get_rendered_multiline(self, array, key):
+        if not self.__metaFields.get(key).has_key('max-width'):
+            self.__metaFields.get(key)['max-width'] = 0
+        return self.get_rendered_maxwidth(array, key)
+        
 
     def getRenderedActTime(self):                
         """
