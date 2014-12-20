@@ -36,6 +36,7 @@ class AudioFile(object):
 
     def __init__(self, filename):
         self.fileOpen = False
+        self.syncLyricFile = None
         self.config = readconfig.getConfigObject()
         self.guiPlayer = self.config.getConfig('TEMP', Key='PLAYER') 
         self.LEERCD = HOMEDIR + '/.dacapo/' + self.config.getConfig('gui', 'misc', 'picNoCover')
@@ -125,6 +126,7 @@ class AudioFile(object):
         """
         syncedTag = self.config.getConfig('gui', 'syncLyrics', 'tag')
         syncedDir = self.config.getConfig('gui', 'syncLyrics', 'dir')
+        self.syncLyricFile = None
         # Ersatzvariablen auflösen
         while True :
             text = self.find_between(syncedDir, '%', '%')
@@ -156,13 +158,15 @@ class AudioFile(object):
                 if self.debug : logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
                 if os.path.isfile(testFile) :
                     f = codecs.open(testFile, 'r', 'utf-8')
+                    self.syncLyricFile = testFile
                     try: text = f.read()
                     except: 
                         logging.error("Konnte Datei %s nicht lesen" % (testFile) )
                         f.close()
                         f = open(testFile, 'r')
                         try: text = f.read()
-                        except: 
+                        except:
+                            self.syncLyricFile = None
                             logging.error("Konnte Datei %s nicht lesen" % (testFile) )
                     finally: f.close()
             except: 
@@ -174,13 +178,15 @@ class AudioFile(object):
             if self.debug : logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
             if os.path.isfile(testFile) :
                 f = codecs.open(testFile, 'r', 'utf-8')
+                self.syncLyricFile = testFile
                 try: text = f.read()
                 except: 
                     logging.error("Konnte Datei %s nicht lesen" % (testFile) )
                     f.close()
                     f = open(testFile, 'r')
                     try: text = f.read()
-                    except: 
+                    except:
+                        self.syncLyricFile = None
                         logging.error("Konnte Datei %s nicht lesen" % (testFile) )
                 finally: f.close()
 
