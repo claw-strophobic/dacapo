@@ -503,6 +503,10 @@ class Ui_Dialog(QtGui.QMainWindow):
             self.titelText.setText(' '.join(self.audioFile.getMetaData('title')))
             self.albumText.setText(' '.join(self.audioFile.getMetaData('album')))
             self.last_filename = self.filename
+            self.textFilename = self.audioFile.syncLyricFile
+            if (self.textFilename <> None) :
+                self.openFile()
+                self.textEdit.setFocus()
         self.textEdit.setFocus()
         return
 
