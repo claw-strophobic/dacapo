@@ -507,10 +507,10 @@ class Ui_Dialog(QtGui.QMainWindow):
         return
 
     def on_textInputButton_clicked(self) :
-        if (self.textFilename <> '') :
-            path = os.path.dirname(self.textFilename)
+        if (len(self.textFilename) > 0) :
+            path = os.path.dirname(str(self.textFilename))
         else :
-            path = os.path.dirname(self.last_textFilename)
+            path = os.path.dirname(str(self.last_textFilename))
         if not (len(path) > 0):
             if (len(self.filename) > 0) :
                 path = os.path.dirname(self.filename)
