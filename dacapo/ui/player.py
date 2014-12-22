@@ -826,16 +826,18 @@ class playerGUI():
             if isinstance(array.get(key)['data'], list):
                 text = ' '.join(array.get(key)['data'])
 
-        self.blit_rect(
-            image,
-            Rect(
-                array.get(key)['blitPos'],
-                array.get(key)['renderedSize']
-            ),
-            text="clear_rect: " + text,
-            update=True
-
-        )
+        try:
+            self.blit_rect(
+                image,
+                Rect(
+                    array.get(key)['blitPos'],
+                    array.get(key)['renderedSize']
+                ),
+                text="clear_rect: " + text,
+                update=True
+            )
+        except:
+            pass
         return
 
     def clearUpdateRect(self, array, key):
@@ -858,12 +860,15 @@ class playerGUI():
             if isinstance(array.get(key)['data'], list):
                 text = ' '.join(array.get(key)['data'])
 
-        self.blit_rect(
-            tmp,
-            picRect,
-            text="clear picture area",
-            update=False
-        )
+        try:
+            self.blit_rect(
+                tmp,
+                picRect,
+                text="clear picture area",
+                update=False
+            )
+        except:
+            pass
         return
 
 
