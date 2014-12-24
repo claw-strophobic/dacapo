@@ -93,7 +93,7 @@ class AudioFile(object):
                 ))
             test = False
             operand = self.getMetaData(cond.get(key1)['operand'])
-            if (cond.get(key1)['operator'] == 'ne') and \
+            if (cond.get(key1)['operator'] == 'notempty') and \
                     (len(operand) > 0):
                 test = True
             if (cond.get(key1)['operator'] == 'empty') and \
