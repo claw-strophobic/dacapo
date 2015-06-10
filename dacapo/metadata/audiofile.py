@@ -67,6 +67,10 @@ class AudioFile(object):
     def replaceTags(self, s):
         while True :
             text = self.find_between(s, '%', '%')
+            if not isinstance(text, basestring):
+                break
+            if not isinstance(s, basestring):
+                break
 
             if text == '' : break
             if (text == 'time') or (text == 'duration') :
@@ -78,7 +82,13 @@ class AudioFile(object):
                 if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
             else:
                 t = res
-            s = s.replace('%' + text + '%', t)
+
+            if not isinstance(t, basestring):
+                t = ''
+            try:
+                s = s.replace('%' + text + '%', t)
+            except:
+                pass
             ## s = s.replace('#NEWLINE#', '\\n')
         return s
 
