@@ -402,16 +402,18 @@ class playerGUI():
 
         self.pos = newPos
         self._metaFields = self.metaFontsObject.getRenderedActTime()
-
-        self.blit_rect(
-            self._metaFields.get(key1)['renderedData'],
-            Rect(
-                self._metaFields.get(key1)['blitPos'],
-                self._metaFields.get(key1)['renderedSize']
-            ),
-            text=self._metaFields.get(key1)['data'],
-            update=True
-        )
+        try:
+            self.blit_rect(
+                self._metaFields.get(key1)['renderedData'],
+                Rect(
+                    self._metaFields.get(key1)['blitPos'],
+                    self._metaFields.get(key1)['renderedSize']
+                ),
+                text=self._metaFields.get(key1)['data'],
+                update=True
+            )
+        except:
+            pass
 
         return
 
@@ -473,16 +475,19 @@ class playerGUI():
             self._metaFields[key1]['renderedSize'] = (txtW, txtH)
             self._metaFields[key1]['blitPos'] = (w, h)
 
-            self.clearRect(self._metaFields, key1)
-            self.blit_rect(
-                self._metaFields.get(key1)['renderedData'],
-                Rect(
-                    self._metaFields.get(key1)['blitPos'],
-                    self._metaFields.get(key1)['renderedSize']
-                ),
-                text=self._metaFields.get(key1)['data'],
-                update=True
-            )
+            try:
+                self.clearRect(self._metaFields, key1)
+                self.blit_rect(
+                    self._metaFields.get(key1)['renderedData'],
+                    Rect(
+                        self._metaFields.get(key1)['blitPos'],
+                        self._metaFields.get(key1)['renderedSize']
+                    ),
+                    text=self._metaFields.get(key1)['data'],
+                    update=True
+                )
+            except:
+                pass
         return
 
 
