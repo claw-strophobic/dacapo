@@ -79,17 +79,17 @@ class MetaFonts(object):
             self._config.getConfig(
                     'gui', 
                     self._winState,
-                    'lyricFont')
+                    'font')
                     
         self.__metaFields.get('lyricFont')['fontSize'] = \
                 self._config.getConfig(
                     'gui', 
                     self._winState,
-                    'lyricFontSize')
+                    'fontSize')
                 
         if self._debug : logging.debug('LyricFontColor initialisieren. ')
         self.__metaFields.get('lyricFont')['fontColor'] = \
-            self._config.getConfig('gui', self._winState, 'lyricFontColor')
+            self._config.getConfig('gui', self._winState, 'fontColor')
         
         fontName = self._config.getConfig(
                         'gui', 
