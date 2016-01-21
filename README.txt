@@ -6,10 +6,8 @@ Note
 ====
 I'd really appreciate any feedback. 
 Send an E-Mail (german or english) to claw <dot> strophobic <at> gmx <dot> de or
-visit the project-homepage at http://sourceforge.net/projects/dacapo-player
-where you can open a ticket (if you found a bug) or write a review or open open a discussion.
-Also, I'd welcome any translator, anybody who would create RPM- or DEB-Packages, 
-as well as Windows-Installer.
+visit the project-homepage at https://github.com/claw-strophobic/dacapo
+Also, I'd welcome every deveolper who wants to contribute as well as translators.
 
 Introduction
 ============
@@ -66,7 +64,7 @@ Thus, dacapo has now the following features:
  - Runs on Linux
  - Runs on "small" computers (800 MHz with 1 GB RAM)
  - Is freely configurable
- - Plays (currently) FLAC, Ogg-Vorbis, WMA and MP3 (other formats are in preparation)
+ - Plays (currently) FLAC, Ogg-Vorbis, WMA and MP3
  - Multilingual (Translator welcome)
 
 
@@ -110,9 +108,6 @@ This should be located in the user directory:
 Linux example:
   /home/claw/.dacapo/dacapo.conf
 
-Windows example:
-  C:\Dokumente und Einstellungen\Claw\.dacapo\dacapo.conf
-
 There should also be an dacapo.conf.sample.eng with the documentation
 of the config-file.
 
@@ -126,7 +121,7 @@ Program start
 =============
 
 The scripts dacapo and dacapoui should have been copied during installation
-in the directory */usr/local/bin* or on Windows in the python subdirectory *Scripts*.
+in the directory */usr/local/bin*.
 
 **dacapo**
 =============
@@ -180,4 +175,4 @@ Both require pyQt4, QtFlac2Mp3 also requires rgain.
 Copyright
 =========
 
-Copyright (c) 2013-2014 Thomas Korell <claw.strophobic@gmx.de>
+Copyright (c) 2013-2016 Thomas Korell <claw.strophobic@gmx.de>
