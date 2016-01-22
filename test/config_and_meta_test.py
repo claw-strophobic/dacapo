@@ -102,23 +102,6 @@ class  MetaTestCase(unittest.TestCase):
         print "\n " + sys._getframe().f_code.co_name + " Test passed"
 
 
-    def test_can_retrieve_section_cond_from_config_object(self):
-        textMetaData = self.configObject.getConfig('cond', '')
-        self.assertTrue(textMetaData, "Konnte Conditions nicht abrufen")
-        self.assertIsInstance(
-            textMetaData,
-            dict,
-            "Conditions sind kein Dictionary"
-            )
-        for key1 in textMetaData.iterkeys() :
-            if isinstance(textMetaData.get(key1), dict):
-                print "Condition:  %s Wert: %s Klasse %s" % (
-                    key1,
-                    textMetaData.get(key1),
-                    textMetaData.get(key1).__class__
-                    )
-        print "\n " + sys._getframe().f_code.co_name + " Test passed"
-
     def test_can_retrieve_fullscreen_fields_from_config_object(self):
         ## MetaTestCase.__configObject = readconfig.getConfigObject()
         textMetaData = self.configObject.getConfig('gui', 'fullscreen', 'fields')
