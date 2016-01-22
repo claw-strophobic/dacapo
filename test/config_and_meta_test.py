@@ -12,6 +12,7 @@
 import unittest
 import mock
 import sys
+import traceback
 try:
     from dacapo.metadata import *
     from dacapo.config import readconfig
