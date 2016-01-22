@@ -10,7 +10,7 @@
 
 
 import unittest
-import mock
+from mock import MagicMock
 import sys
 import traceback
 try:
@@ -33,7 +33,7 @@ class  MetaTestCase(unittest.TestCase):
 
     def setUp(self):
         self.configObject = readconfig.getConfigObject()
-        playerGUI = mock.MagicMock()
+        playerGUI = MagicMock()
         playerGUI.winState = 'fullscreen'
         playerGUI.diaMode = 5
         self.configObject.setConfig('TEMP', Key='PLAYER', Value=playerGUI)
