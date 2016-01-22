@@ -156,7 +156,7 @@ class  MetaTestCase(unittest.TestCase):
         ## MetaTestCase.__configObject = readconfig.getConfigObject()
         textMetaData = self.configObject.getConfig('gui', 'fullscreen', 'pictures')
         # print "Metadata: " + str(textMetaData)
-        self.assertTrue(textMetaData, "Konnte Metadaten-Fields nicht abrufen")
+        self.assertTrue(textMetaData, "Konnte Pictures nicht abrufen")
         print "\n " + sys._getframe().f_code.co_name + " Test passed"
 
     def test_can_retrieve_pictures_from_flac_object(self):
