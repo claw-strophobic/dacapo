@@ -135,11 +135,11 @@ class Ui_Dialog(QtGui.QMainWindow):
                 self.textEdit.setPlainText('')
 
         logging.debug('LyricFont initialisieren. ')
+        lyricFont = self.oDacapoConfig.getConfig('gui', 'fullscreen', 'lyricFont')
         self.lyricFont = pygame.font.SysFont( \
-            self.oDacapoConfig.getConfig('gui', 'fullscreen', 'lyricFont'), \
-            self.oDacapoConfig.getConfig('gui', 'fullscreen', 'lyricFontSize'))
-        self.lyricFontColor = self.oDacapoConfig.getConfig( \
-            'gui', 'fullscreen', 'lyricFontColor')
+            lyricFont['font'], \
+            lyricFont['fontSize'])
+        self.lyricFontColor = lyricFont['fontColor']
         self.screenWidth = self.oDacapoConfig.getConfig('gui', 'fullscreen', 'width')
         self.textEdit.setFocus()
 

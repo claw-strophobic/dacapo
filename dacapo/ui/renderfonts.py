@@ -57,15 +57,19 @@ class MetaFonts(object):
                 self._winState,
                 'lyricFont'
                 )
+        print(self.__lyricFont['font'])
+        print(self.__lyricFont['fontSize'])
+        print(self.__lyricFont['fontColor'])
+        if self._debug : logging.debug("LyricFont: %s" %(self.__lyricFont))
 
         if self._debug : logging.debug('LyricFont initialisieren. ')
-        self.__metaFields['lyricFont'] = {}
+        self.__metaFields['lyricFont'] = self.__lyricFont
         self.__metaFields.get('lyricFont')['value'] = None
-        self.__metaFields.get('lyricFont')['font'] = self.__lyricFont['font']
-        self.__metaFields.get('lyricFont')['fontSize'] = self.__lyricFont['fontSize']
-                
-        if self._debug : logging.debug('LyricFontColor initialisieren. ')
-        self.__metaFields.get('lyricFont')['fontColor'] = self.__lyricFont['fontColor']
+        if self._debug : logging.debug("LyricFont: %s Fontsize: %s FontColor: %s" % (
+                self.__lyricFont['font'],
+                self.__lyricFont['fontSize'],
+                self.__lyricFont['fontColor']
+        ))
 
         for key1 in self.__metaFields.iterkeys() :
             if self._debug : logging.debug("%s Font: %s Fontsize: = %s"
