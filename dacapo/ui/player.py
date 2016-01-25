@@ -441,9 +441,6 @@ class playerGUI():
         if self._debug: logging.debug("Soll Text darstellen: %s" % \
                                       (self.audioFile.syncText[self.audioFile.syncCount]))
         width, height = self.resolution
-        # if self._config.getConfig('gui', 'syncLyrics', 'position').upper()  == "BOTTOM" :
-        # Fenstergröße holen (h = Fensterschriftgröße)
-        # 	h = (self.txtTitleH - self.lyricFontRealHeight )
 
         # versuchen, alten Text zu löschen
         self.clearRect(self._metaFields, key1)
@@ -467,10 +464,10 @@ class playerGUI():
         if not self._metaFields[key1]['renderedData'] == None:
             txtW, txtH = self._metaFields[key1]['renderedData'].get_size()
             w = 0
-            h = self._config.getConfig('gui', self.winState, 'lyricFontPos')
-            if self._config.getConfig('gui', 'syncLyrics', 'style').upper() == "CENTER":
+            h = self._metaFields.get('lyricFont')['posV']
+            if self._metaFields.get('lyricFont')['alignH'].upper() == "CENTER":
                 w = (width - txtW) / 2
-            if self._config.getConfig('gui', 'syncLyrics', 'style').upper() == "RIGHT":
+            if self._metaFields.get('lyricFont')['alignH'] == "RIGHT":
                 w = (width - txtW)
             self._metaFields[key1]['renderedSize'] = (txtW, txtH)
             self._metaFields[key1]['blitPos'] = (w, h)

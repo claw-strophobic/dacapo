@@ -52,88 +52,26 @@ class MetaFonts(object):
                 self._winState,
                 'fields'
                 )
-
-        if self._debug : logging.debug('Font initialisieren. Modus: %s ' % (self._winState))
-        self.__metaFields['standardFont'] = {}
-        self.__metaFields.get('standardFont')['value'] = None
-        self.__metaFields.get('standardFont')['font'] = \
-            self._config.getConfig(
-                    'gui', 
-                    self._winState, 'font'
+        self.__lyricFont = self._config.getConfig(
+                'gui',
+                self._winState,
+                'lyricFont'
                 )
-        self.__metaFields.get('standardFont')['fontSize'] = \
-                self._config.getConfig(
-                    'gui', 
-                    self._winState,
-                    'fontSize'
-                )
-        if self._debug : logging.debug('Fontcolor initialisieren. ')
-        self.__metaFields.get('standardFont')['fontColor'] = \
-            self._config.getConfig('gui', self._winState, 'fontColor')
-        
+        print(self.__lyricFont['font'])
+        print(self.__lyricFont['fontSize'])
+        print(self.__lyricFont['fontColor'])
+        if self._debug : logging.debug("LyricFont: %s" %(self.__lyricFont))
 
         if self._debug : logging.debug('LyricFont initialisieren. ')
-        self.__metaFields['lyricFont'] = {}
+        self.__metaFields['lyricFont'] = self.__lyricFont
         self.__metaFields.get('lyricFont')['value'] = None
-        self.__metaFields.get('lyricFont')['font'] = \
-            self._config.getConfig(
-                    'gui', 
-                    self._winState,
-                    'font')
-                    
-        self.__metaFields.get('lyricFont')['fontSize'] = \
-                self._config.getConfig(
-                    'gui', 
-                    self._winState,
-                    'fontSize')
-                
-        if self._debug : logging.debug('LyricFontColor initialisieren. ')
-        self.__metaFields.get('lyricFont')['fontColor'] = \
-            self._config.getConfig('gui', self._winState, 'fontColor')
-        
-        fontName = self._config.getConfig(
-                        'gui', 
-                        self._winState,
-                        'font'
-                        )
-        fontSize = self._config.getConfig(
-                        'gui', 
-                        self._winState,
-                        'fontSize'
-                        )
-        fontColor = self.__metaFields.get('standardFont')['fontColor']
-
-        ### Abwärtskompatibilität
-        ### Ggf noch die alten Varianten einlesen
-        self.__metaFields['topLeft'] = {}
-        self.__metaFields['topRight'] = {}
-        self.__metaFields['bottomLeft'] = {}
-        self.__metaFields['bottomRight'] = {}
-        self.__metaFields.get('topLeft')['top'] = 0
-        self.__metaFields.get('topLeft')['left'] = 0
-        self.__metaFields.get('topLeft')['value'] = \
-            self._config.getConfig('gui', 'metaData', 'topLeft')
-        self.__metaFields.get('topRight')['top'] = 0
-        self.__metaFields.get('topRight')['right'] = 0
-        self.__metaFields.get('topRight')['value'] = \
-            self._config.getConfig('gui', 'metaData', 'topRight')
-        self.__metaFields.get('bottomLeft')['bottom'] = 0
-        self.__metaFields.get('bottomLeft')['left'] = 0
-        self.__metaFields.get('bottomLeft')['value'] = \
-            self._config.getConfig('gui', 'metaData', 'bottomLeft')
-        self.__metaFields.get('bottomRight')['bottom'] = 0
-        self.__metaFields.get('bottomRight')['right'] = 0
-        self.__metaFields.get('bottomRight')['value'] = \
-            self._config.getConfig('gui', 'metaData', 'bottomRight')
+        if self._debug : logging.debug("LyricFont: %s Fontsize: %s FontColor: %s" % (
+                self.__lyricFont['font'],
+                self.__lyricFont['fontSize'],
+                self.__lyricFont['fontColor']
+        ))
 
         for key1 in self.__metaFields.iterkeys() :
-            if not self.__metaFields.get(key1).has_key('font') :
-                self.__metaFields.get(key1)['font'] = fontName
-            if not self.__metaFields.get(key1).has_key('fontColor') :
-                self.__metaFields.get(key1)['fontColor'] = fontColor
-            if not self.__metaFields.get(key1).has_key('fontSize') :
-                self.__metaFields.get(key1)['fontSize'] = fontSize
-
             if self._debug : logging.debug("%s Font: %s Fontsize: = %s"
                 % (key1, 
                 self.__metaFields.get(key1)['font'],
