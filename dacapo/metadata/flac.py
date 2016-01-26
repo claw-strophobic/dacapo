@@ -96,6 +96,7 @@ class FlacFile(audiofile.AudioFile):
         pics = self.audio.pictures
         if self.debug: logging.debug('Insgesamt %s Bilder' % (len(pics)))
         datei = None
+        logo = None
         if len(pics) > 0:
             # Versuchen ein Frontcover laut Deklaration zu finden
             # oder, wenn es nur ein Bild gibt, dieses nehmen
@@ -114,6 +115,23 @@ class FlacFile(audiofile.AudioFile):
             self.setCover(pygame.image.load(datei))
         else:
             self.setCover(pygame.image.load(self.LEERCD))
+        return
+
+    def loadLogo(self):
+        pics = self.audio.pictures
+        if self.debug: logging.debug('Insgesamt %s Bilder' % (len(pics)))
+        logo = None
+        if len(pics) > 0:
+            # try to fetch a logo-pic
+            if self.debug: logging.debug('Try to fetch bandlogo from %s pics ' % (len(pics)))
+            for p in pics:
+                if p.type == 19:
+                    if self.debug: logging.debug('Bandlogo found! ')
+                    logo = self.getTempPic(p.data)
+                    break
+
+        if logo:
+            self.setLogo(pygame.image.load(logo))
         return
 
 

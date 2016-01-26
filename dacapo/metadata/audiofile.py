@@ -42,6 +42,12 @@ class AudioFile(object):
         self.LEERCD = HOMEDIR + '/.dacapo/' + self.config.getConfig('gui', 'misc', 'picNoCover')
         self.debug = self.config.getConfig('debug', ' ', 'debugM')
         self.mp3Tags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
+        self._winState = self.config.getConfig('TEMP', 'gui', 'winState')
+        self.__metaFields = self.config.getConfig(
+                'gui',
+                self._winState,
+                'fields'
+                )
         self.fileOpen = False
         self.filename = filename
         self.clearTags()
@@ -73,8 +79,9 @@ class AudioFile(object):
                 break
 
             if text == '' : break
-            if (text == 'time') or (text == 'duration') :
+            if (text == 'time') or (text == 'duration') or (text == 'bandlogo') :
                     s = s.replace('%' + text + '%', '#' + text + '#')
+                    if self.debug : logging.debug(u'FIXDATEN zurück (%s) = %s' % (s, type(s)))
             res = self.getMetaData(text)
             if self.debug : logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
             if isinstance(res, list) :
@@ -392,6 +399,37 @@ class AudioFile(object):
         return scaledPics
 ## --------------- Getter -----------------------------------
 
+    def preBlitLogo(self, key):
+        self.loadLogo()
+        if self.debug : logging.debug("Try to blit bandlogo ")
+        logo = self.getLogo()
+        picPlace = self.__metaFields[key]
+        self.guiPlayer.logoPic = None
+
+        if (logo == None or not picPlace.has_key('maxWidth')):
+            if self.debug :
+                tmp = 'Logo'
+                if not picPlace.has_key('maxWidth'): tmp = 'maxWidth'
+                logging.debug("Bandlogo skalieren: " \
+                "Kein: %s " % (tmp))
+            return None
+
+        winWidth = picPlace['maxWidth']
+        winHeight = picPlace['maxHeight']
+        picW, picH = logo.get_size()
+        if picW == 0 : picW = 1
+        proz = (winWidth * 100.0) / (picW)
+        h = int(round( (picH * proz) / 100.0))
+        w = int(round(winWidth))
+        if h > winHeight :
+            proz = (winHeight * 100.0) / (h)
+            w = int(round( (w * proz) / 100.0 ))
+            h = int(round( (h * proz) / 100.0))
+        if self.debug : logging.debug("Bandlogo skalieren: " \
+            "Originalbreite: %s Hoehe: %s PROZENT: %s " \
+            "-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
+        return pygame.transform.scale(logo, (w, h))
+
     def getTempPic(self, data):
         datei = StringIO.StringIO()
         datei.write(data)
@@ -400,6 +438,10 @@ class AudioFile(object):
 
     def getCover(self):
         return self.cover 
+
+    def getLogo(self):
+        if self.debug: logging.debug('Returning bandlogo! ')
+        return self.__logo
 
     def getMiscPic(self):
         random.seed()
@@ -470,6 +512,11 @@ class AudioFile(object):
         else :
             self._MiscPictures.append(cover)
 
+    def setLogo(self, logo = None ):
+        if not logo == None:
+            if self.debug: logging.debug('Setting bandlogo! ')
+        self.__logo = logo
+
     def setTitle(self, title = None):
         if title == None :
             self.songtitle = "???"
@@ -533,6 +580,7 @@ class AudioFile(object):
         self.setCover()
         self.setBackcover()
         self.setMiscPic()
+        self.setLogo()
         self.setTitle()
         self.setArtist()
         self.setAlbum()
