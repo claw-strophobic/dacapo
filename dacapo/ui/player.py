@@ -321,8 +321,8 @@ class playerGUI():
         picPlace = self._config.getConfig('gui', self.winState, 'pictures')
         width = picPlace['width']
         height = picPlace['height']
-        w = picPlace['left']
-        h = picPlace['top']
+        w = picPlace['posH']
+        h = picPlace['posV']
         picRect = Rect(w, h, width, height)
         wWidth, wHeight = self.resolution
         clearRect = Rect(0, 0, wWidth, wHeight)
