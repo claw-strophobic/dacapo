@@ -243,7 +243,7 @@ class MetaFonts(object):
         return self.__metaFields
 
     def get_rendered_maxwidth(self, array, key):
-        maxwidth = array.get(key)['max-width']
+        maxwidth = array.get(key)['maxWidth']
         if self._debug:
             logging.debug('Rendere Metadaten mit Max-Width: %s %s: %s -> %s' % (
                 maxwidth,
@@ -307,8 +307,8 @@ class MetaFonts(object):
         return image
 
     def get_rendered_multiline(self, array, key):
-        if not self.__metaFields.get(key).has_key('max-width'):
-            self.__metaFields.get(key)['max-width'] = 0
+        if not self.__metaFields.get(key).has_key('maxWidth'):
+            self.__metaFields.get(key)['maxWidth'] = 0
         return self.get_rendered_maxwidth(array, key)
         
 
