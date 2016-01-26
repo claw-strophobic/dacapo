@@ -207,10 +207,14 @@ class MetaFonts(object):
                                     self.__metaFields.get(key1)['value'],
                                     self.__metaFields.get(key1)['data']
                                     ))
-                                self.__metaFields.get(key1)['renderedData'] = self._audioFile.preBlitLogo(key1)
-                                self.__metaFields.get(key1)['renderedSize'] = \
-                                      self.__metaFields.get(key1)['renderedData'].get_size()
-                                continue
+                                logo = self._audioFile.preBlitLogo(key1)
+                                if logo == None:
+                                    pass
+                                else:
+                                    self.__metaFields.get(key1)['renderedData'] = logo
+                                    self.__metaFields.get(key1)['renderedSize'] = \
+                                          self.__metaFields.get(key1)['renderedData'].get_size()
+                                    continue
                             self.__metaFields.get(key1)['renderedData'] = \
                                 self.__metaFields.get(key1)['sysFont'].render(
                                     self.__metaFields.get(key1)['data'] ,
