@@ -110,11 +110,14 @@ class AudioFile(object):
                 ))
             test = False
             operand = self.getMetaData(cond.get(key1)['operand'])
-            if (cond.get(key1)['operator'] == 'notempty') and \
-                    (len(operand) > 0):
+            if self.debug : logging.debug("Condition:  Operand is Type: %s " % (type(operand)))
+            if (cond.get(key1)['operator'] == 'notempty') \
+                    and (operand <> None) and (operand):
                 test = True
-            if (cond.get(key1)['operator'] == 'empty') and \
-                    (len(operand) <= 0):
+            elif (cond.get(key1)['operator'] == 'empty') and (operand == None):
+                test = True
+            elif (cond.get(key1)['operator'] == 'empty') \
+                    and (operand <> None) and (not operand):
                 test = True
 
             if test == True:
@@ -257,6 +260,9 @@ class AudioFile(object):
             if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrackTotal(), type(self.getTrackTotal())))
             return self.getTrackTotal()
         if "comment" in key : return self.getComments()
+        if key == "bandlogo" :
+            if self.debug : logging.debug("Angeforderter Key %s = %s" % (key, type(self.getLogo())))
+            return self.getLogo()
         value = ""
         valueList = list()
         bFirst = True
@@ -439,8 +445,16 @@ class AudioFile(object):
     def getCover(self):
         return self.cover 
 
+    def loadLogo(self):
+        return None
+
     def getLogo(self):
-        if self.debug: logging.debug('Returning bandlogo! ')
+        if self.__logo == None:
+            self.loadLogo()
+        if self.__logo == None:
+            if self.debug: logging.debug('Returning no bandlogo :-( ')
+        else:
+            if self.debug: logging.debug('Returning bandlogo! :-) ')
         return self.__logo
 
     def getMiscPic(self):
