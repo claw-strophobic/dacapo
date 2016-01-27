@@ -192,6 +192,21 @@ class MetaFonts(object):
                     s = s.replace('#time#', self._gstPlayer.getDuration())
                     s = s.replace('#duration#', self._gstPlayer.getDuration())
 
+                    if '#bandlogo#' in s:
+                        logging.debug('Try to get Bandlogo: %s: %s -> %s' % (
+                            key1,
+                            self.__metaFields.get(key1)['value'],
+                            self.__metaFields.get(key1)['data']
+                            ))
+                        logo = self._audioFile.preBlitLogo(key1)
+                        if logo == None:
+                            pass
+                        else:
+                            self.__metaFields.get(key1)['renderedData'] = logo
+                            self.__metaFields.get(key1)['renderedSize'] = \
+                                  self.__metaFields.get(key1)['renderedData'].get_size()
+                            continue
+
                     if multi == False:
                         if (s != ''):
                             self.__metaFields.get(key1)['data'] =  s
@@ -201,20 +216,6 @@ class MetaFonts(object):
                                     self.__metaFields.get(key1)['value'],
                                     self.__metaFields.get(key1)['data']
                                     ))
-                            if '#bandlogo#' in s:
-                                logging.debug('Try to get Bandlogo: %s: %s -> %s' % (
-                                    key1,
-                                    self.__metaFields.get(key1)['value'],
-                                    self.__metaFields.get(key1)['data']
-                                    ))
-                                logo = self._audioFile.preBlitLogo(key1)
-                                if logo == None:
-                                    pass
-                                else:
-                                    self.__metaFields.get(key1)['renderedData'] = logo
-                                    self.__metaFields.get(key1)['renderedSize'] = \
-                                          self.__metaFields.get(key1)['renderedData'].get_size()
-                                    continue
                             self.__metaFields.get(key1)['renderedData'] = \
                                 self.__metaFields.get(key1)['sysFont'].render(
                                     self.__metaFields.get(key1)['data'] ,
