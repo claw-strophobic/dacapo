@@ -57,9 +57,6 @@ class MetaFonts(object):
                 self._winState,
                 'lyricFont'
                 )
-        print(self.__lyricFont['font'])
-        print(self.__lyricFont['fontSize'])
-        print(self.__lyricFont['fontColor'])
         if self._debug : logging.debug("LyricFont: %s" %(self.__lyricFont))
 
         if self._debug : logging.debug('LyricFont initialisieren. ')
