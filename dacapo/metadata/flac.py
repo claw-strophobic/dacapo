@@ -150,7 +150,7 @@ class FlacFile(audiofile.AudioFile):
         foundBackcover = False
         for p in pics:
             if self.debug: logging.debug('Bild gefunden. Typ {0}: {1}'.format(p.type, p.desc.encode('UTF-8')))
-            if not p.type == 3:
+            if not p.type == 3 and not p.type == 19:
                 if (diaMode == 3 or diaMode == 5) or (p.type > 3 and p.type < 7):
                     datei = self.getTempPic(p.data)
                     if p.type == 4 and not foundBackcover and diaMode > 3:
