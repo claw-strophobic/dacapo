@@ -71,6 +71,7 @@ class AudioFile(object):
         self.syncTime, self.syncText = self.loadSyncLyrics()
 
     def replaceTags(self, s):
+        s = s.lower()
         while True :
             text = self.find_between(s, '%', '%')
             if not isinstance(text, basestring):
