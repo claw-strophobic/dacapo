@@ -69,6 +69,8 @@ class MetaFonts(object):
         ))
 
         for key1 in self.__metaFields.iterkeys() :
+            if (not self.__metaFields[key1].has_key('font')):
+                continue
             if self._debug : logging.debug("%s Font: %s Fontsize: = %s"
                 % (key1, 
                 self.__metaFields.get(key1)['font'],
