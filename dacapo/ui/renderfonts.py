@@ -47,6 +47,7 @@ class MetaFonts(object):
         
         ## Ein Dictionary anlegen mit den anzuzeigenen Feldern
         ## und den Schritfattributen dazu
+        self._winState = self._config.getConfig('TEMP', 'gui', 'winState')
         self.__metaFields = self._config.getConfig(
                 'gui', 
                 self._winState,
