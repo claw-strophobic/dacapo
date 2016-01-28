@@ -42,12 +42,6 @@ class AudioFile(object):
         self.LEERCD = HOMEDIR + '/.dacapo/' + self.config.getConfig('gui', 'misc', 'picNoCover')
         self.debug = self.config.getConfig('debug', ' ', 'debugM')
         self.mp3Tags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
-        self._winState = self.config.getConfig('TEMP', 'gui', 'winState')
-        self.__metaFields = self.config.getConfig(
-                'gui',
-                self._winState,
-                'fields'
-                )
         self.fileOpen = False
         self.filename = filename
         self.clearTags()
@@ -407,18 +401,29 @@ class AudioFile(object):
 ## --------------- Getter -----------------------------------
 
     def preBlitLogo(self, key):
+        self._winState = self.config.getConfig('TEMP', 'gui', 'winState')
+        self.__metaFields = self.config.getConfig(
+                'gui',
+                self._winState,
+                'fields'
+                )
         self.loadLogo()
         if self.debug : logging.debug("Try to blit bandlogo ")
         logo = self.getLogo()
+        if (logo == None):
+            if self.debug: logging.debug("Bandlogo skalieren: Kein: Logo gefunden ")
+            return None
+        if (not self.__metaFields.has_key(key)):
+            if self.debug: logging.debug("Bandlogo skalieren: self.__metaFields hat kein Key: %s " % (key))
+            return None
         picPlace = self.__metaFields[key]
         self.guiPlayer.logoPic = None
 
-        if (logo == None or not picPlace.has_key('maxWidth')):
-            if self.debug :
-                tmp = 'Logo'
-                if not picPlace.has_key('maxWidth'): tmp = 'maxWidth'
-                logging.debug("Bandlogo skalieren: " \
-                "Kein: %s " % (tmp))
+        if (not picPlace.has_key('maxWidth')):
+            if self.debug: logging.debug("Bandlogo skalieren: picPlace hat kein Key: maxWidth ")
+            return None
+        if (not picPlace.has_key('maxHeight')):
+            if self.debug: logging.debug("Bandlogo skalieren: picPlace hat kein Key: maxHeight ")
             return None
 
         winWidth = picPlace['maxWidth']
