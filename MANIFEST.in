@@ -4,4 +4,5 @@ include INSTALL_UBUNTU.txt
 include MANIFEST.in
 recursive-include man *
 recursive-include dacapo/locale *
+recursive-include dacapo/ql-plugins *
 
