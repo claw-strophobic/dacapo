@@ -23,14 +23,19 @@ class dacapo_install(install):
 	user_options= install.user_options[:]
 	user_options.extend([('manprefix=', None, 
 		'MAN Prefix Path if not /usr/local/share/>')])
+	user_options.extend([('qlprefix=', None,
+		'QuodLibet plugin Path if not ~/.quodlibet/plugins/')])
 
 	def initialize_options(self):
 		self.manprefix = None
+		self.qlprefix = None
 		install.initialize_options(self)
 
 	def finalize_options(self):
 		if self.manprefix is None :
 			self.manprefix = "/usr/local/share/"
+		if self.qlprefix is None :
+			self.qlprefix = os.path.expanduser('~') + "/.quodlibet/plugins/"
 		install.finalize_options(self)
 
 	def install_manpages(self):
@@ -47,7 +52,19 @@ class dacapo_install(install):
 						os.makedirs(man_root) 					
 					print("copy %s -> %s " % (src_file, dest_file))
 					shutil.copy(src_file, dest_file)
-			
+
+	def install_qlplugins(self):
+		import string, shutil
+		print "copy QuodLibet-Plugins"
+		for root, dirs, files in os.walk('./dacapo/ql-plugins/'):
+			for filename in files:
+				src_file = os.path.join(root, filename)
+				dest_file = os.path.join(self.qlprefix, filename)
+				if not os.path.exists(self.qlprefix):
+					os.makedirs(self.qlprefix)
+				print("copy %s -> %s " % (src_file, dest_file))
+				shutil.copy(src_file, dest_file)
+
 	def run(self):
 		install.run(self)
 		# Custom stuff here
@@ -58,6 +75,7 @@ class dacapo_install(install):
 			print "installiere config"
 			import dacapo.config.createconfig
 			self.install_manpages()
+			self.install_qlplugins()
 		
 
 setup(
@@ -106,7 +124,6 @@ setup(
 	# cmdclass={'setconfig': my_install},
 	classifiers=[
           'Development Status :: 4 - Beta',
-          'Environment :: Win32 (MS Windows)',
           'Environment :: X11 Applications',
           'Intended Audience :: End Users/Desktop',
           'Intended Audience :: Developers',
