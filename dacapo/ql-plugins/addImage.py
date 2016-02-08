@@ -56,24 +56,24 @@ class AddImageFileChooser(FileChooser):
 		for key in self.TYPE:
 			type_store.append([key, self.TYPE[key]])
 		vbox = self.get_content_area()
-		name_combo = Gtk.ComboBox.new_with_model_and_entry(type_store)
+		name_combo = Gtk.ComboBox.new_with_model(type_store)
+		renderer = Gtk.CellRendererText()
+		name_combo.set_active(3)
+		name_combo.pack_start(renderer, True)
+		name_combo.add_attribute(renderer, 'text', 1)
 		name_combo.connect("changed", self.on_name_combo_changed)
 		name_combo.set_entry_text_column(1)
 		vbox.add(name_combo)
 		self.show_all()
 		## Set default type
-		self.imgType = 0
+		self.imgType = 3
 
 	def on_name_combo_changed(self, combo):
-		tree_iter = combo.get_active_iter()
-		if tree_iter != None:
+		combo_iter = combo.get_active_iter()
+		if combo_iter:
 			model = combo.get_model()
-			row_id, name = model[tree_iter][:2]
+			row_id = model.get_value(combo_iter, 0)
 			self.imgType = row_id
-			print("Selected: ID=%d, name=%s" % (row_id, name))
-		else:
-			entry = combo.get_child()
-			print("Entered: %s" % entry.get_text())
 
 class AddImage(SongsMenuPlugin):
 	PLUGIN_ID = "AddImage"
