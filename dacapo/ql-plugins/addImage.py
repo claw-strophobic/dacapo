@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-#	Wird mit Songs aus QuodLibet aufgerufen.
-#	Es wird anhand der Dacapo-Config-Einstellungen versucht eine *.lrc zu ermitteln.
-#	Falls dies gelingt, wird das LyricFlag gesetzt.
+# Copyright 2016 Thomas Korell
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation
 #
 
 from gi.repository import Gtk
@@ -17,15 +19,61 @@ import traceback, sys
 
 
 class AddImageFileChooser(FileChooser):
+	TYPE = {
+		0: "Other",
+		1: "32x32 pixels 'file icon' (PNG only)",
+		2: "Other file icon",
+		3: "Cover (front)",
+		4: "Cover (back)",
+		5: "Leaflet page",
+		6: "Media (e.g. label side of CD)",
+		7: "Lead artist/lead performer/soloist",
+		8: "Artist/performer",
+		9: "Conductor",
+		10: "Band/Orchestra",
+		11: "Composer",
+		12: "Lyricist/text writer",
+		13: "Recording Location",
+		14: "During recording",
+		15: "During performance",
+		16: "Movie/video screen capture",
+		17: "A bright coloured fish",
+		18: "Illustration",
+		19: "Band/artist logotype",
+		20: "Publisher/Studio logotype"
+	}
 
 	def __init__(self, parent):
 		super(AddImageFileChooser, self).__init__(parent, _("Select Image File"))
+		## Create Filter
 		filter = Gtk.FileFilter()
 		filter.set_name("Image files")
 		filter.add_mime_type("image/jpeg")
 		filter.add_mime_type("image/png")
 		self.add_filter(filter)
+		## Create ComboBox
+		type_store = Gtk.ListStore(int, str)
+		for key in self.TYPE:
+			type_store.append([key, self.TYPE[key]])
+		vbox = self.get_content_area()
+		name_combo = Gtk.ComboBox.new_with_model_and_entry(type_store)
+		name_combo.connect("changed", self.on_name_combo_changed)
+		name_combo.set_entry_text_column(1)
+		vbox.add(name_combo)
+		self.show_all()
+		## Set default type
+		self.imgType = 0
 
+	def on_name_combo_changed(self, combo):
+		tree_iter = combo.get_active_iter()
+		if tree_iter != None:
+			model = combo.get_model()
+			row_id, name = model[tree_iter][:2]
+			self.imgType = row_id
+			print("Selected: ID=%d, name=%s" % (row_id, name))
+		else:
+			entry = combo.get_child()
+			print("Entered: %s" % entry.get_text())
 
 class AddImage(SongsMenuPlugin):
 	PLUGIN_ID = "AddImage"
@@ -55,15 +103,17 @@ class AddImage(SongsMenuPlugin):
 	def plugin_songs(self, songs):
 		if not qltk.ConfirmAction(self.plugin_window,
 			_(self.PLUGIN_NAME),
-			_("{!s} {!s}".format(self.counter, "Dateien verarbeiten?"))
+			_("Update {!s} Files?".format(self.counter))
 								  ).run():
 			return True
 
-		###choose = FileChooser(self.plugin_window, _("Select Image File"))
 		choose = AddImageFileChooser(self.plugin_window)
 		files = choose.run()
 		choose.destroy()
-		print(files)
+
+		if (files == None) or (len(files) <= 0):
+			return True
+
 		for file in files:
 			contentType = mimetypes.guess_type(file) # get Mimetype
 			mimeType = contentType[0]
@@ -71,8 +121,8 @@ class AddImage(SongsMenuPlugin):
 				imgdata = open(file).read()
 				img = Picture()
 				img.mime = mimeType
-				img.type = 3
-				img.desc = u'Albumcover'
+				img.type = choose.imgType
+				img.desc = choose.TYPE[choose.imgType]
 				img.data = imgdata
 				self.imgFiles.append(img)
 
@@ -86,10 +136,7 @@ class AddImage(SongsMenuPlugin):
 					self.setImage(song)
 				except:
 					win.destroy()
-					exc_type, exc_value, exc_traceback = sys.exc_info()
-					lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-					for line in lines:
-						print(line)
+					self.printError()
 					return False
 			if win.step():
 				break
@@ -97,23 +144,22 @@ class AddImage(SongsMenuPlugin):
 
 
 	def setImage(self, song):
-		self.loadStoredPictures(song)
-		return False
-
-	def loadStoredPictures(self, song):
 		audio = FLAC(song.get("~filename", ""))
-
-		if len(self.imgFiles) <= 1:
+		if len(self.imgFiles) <= 0:
 			return
 
-		print('Insgesamt %s Bilder' % (len(self.imgFiles)))
 		for p in self.imgFiles:
-			print('Bild gefunden. Typ {0}: {1}'.format(p.type, p.desc.encode('UTF-8')))
 			try:
 				audio.add_picture(p)
-				audio.save()
-				print(u'Bild hinzugefügt')
-
 			except:
-				print(u'FEHLER beim Speichern des Bildes:')
+				self.printError()
+				return False
+		audio.save()
 		return
+
+	def printError(self):
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+		for line in lines:
+			print(line)
+
