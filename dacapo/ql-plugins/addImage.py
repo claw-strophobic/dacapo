@@ -101,11 +101,6 @@ class AddImage(SongsMenuPlugin):
 		return result
 
 	def plugin_songs(self, songs):
-		if not qltk.ConfirmAction(self.plugin_window,
-			_(self.PLUGIN_NAME),
-			_("Update {!s} Files?".format(self.counter))
-								  ).run():
-			return True
 
 		choose = AddImageFileChooser(self.plugin_window)
 		files = choose.run()
@@ -125,6 +120,13 @@ class AddImage(SongsMenuPlugin):
 				img.desc = choose.TYPE[choose.imgType]
 				img.data = imgdata
 				self.imgFiles.append(img)
+
+		if not qltk.ConfirmAction(self.plugin_window,
+			_(self.PLUGIN_NAME),
+			_("Add {!s} images as type \n\n<b>&gt;&gt; {!s} &lt;&lt;</b>\n\nto {!s} files?".format(
+					len(files), choose.TYPE[choose.imgType], self.counter))
+								  ).run():
+			return True
 
 		win = WaitLoadWindow(
 			self.plugin_window, len(songs),
