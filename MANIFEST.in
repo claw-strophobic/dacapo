@@ -5,4 +5,5 @@ include MANIFEST.in
 recursive-include man *
 recursive-include dacapo/locale *
 recursive-include dacapo/ql-plugins *
+include po/*.po
 

@@ -1,0 +1,30 @@
+# German translation of dacapo 2.0
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: dacapo 2.0.\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-03 11:30+0200\n"
+"PO-Revision-Date: 2014-01-05 18:16+0100\n"
+"Last-Translator: Rüdiger Arp <ruediger@gmx.net>\n"
+"Language-Team: GERMAN <LL@li.org>\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: /home/rarp/Downloads/0_src/quodlibet/quodlibet\n"
+
+#: ../ql-plugins/setCoverAsFirst.py
+msgid ""
+"Set the front coverart as first image in the audiofile (if it is not already the first)."
+msgstr ""
+"Sortiert die Bilder in der Audiodatei so um, dass das Frontcover an erster stelle steht (falls es das nicht schon tut)."
+
+
