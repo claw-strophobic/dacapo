@@ -1,5 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
+# German translation of dacapo 2.0
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
@@ -86,3 +87,4 @@ msgstr ""
 "Suche nach Synchronisierten Texten.\n"
 "\n"
 "%(current)d/%(total)d Songs verarbeitet."
+
