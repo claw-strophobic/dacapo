@@ -16,7 +16,9 @@ from quodlibet.plugins.songsmenu import SongsMenuPlugin
 from mutagen.flac import FLAC, Picture
 import mimetypes
 import traceback, sys
-
+import gettext
+t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
+_ = t.ugettext
 
 class SetFrontCoverAsFirst(SongsMenuPlugin):
 	PLUGIN_ID = "SetFrontCoverAsFirstImage"

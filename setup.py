@@ -4,6 +4,7 @@
 from distutils.core import setup
 from distutils.command.install import install
 import sys, os
+import shutil
 
 with open('README.txt') as file:
     long_description = file.read()
@@ -11,8 +12,7 @@ with open('README.txt') as file:
 print("Setup-Mode: %s" % (sys.argv[1]) )
 if sys.argv[1] == "sdist" or \
 	sys.argv[1] == "bdist" :    
-	import shutil
-	src_file = "./dacapo/data/VERSION" 
+	src_file = "./dacapo/data/VERSION"
 	dest_file = "./VERSION" 
 	# shutil.copy(src_file, dest_file)
 
@@ -25,10 +25,13 @@ class dacapo_install(install):
 		'MAN Prefix Path if not /usr/local/share/>')])
 	user_options.extend([('qlprefix=', None,
 		'QuodLibet plugin Path if not ~/.quodlibet/plugins/')])
+	user_options.extend([('localprefix=', None,
+		'Localization Path if not /usr/local/share/')])
 
 	def initialize_options(self):
 		self.manprefix = None
 		self.qlprefix = None
+		self.localprefix = None
 		install.initialize_options(self)
 
 	def finalize_options(self):
@@ -36,25 +39,24 @@ class dacapo_install(install):
 			self.manprefix = "/usr/local/share/"
 		if self.qlprefix is None :
 			self.qlprefix = os.path.expanduser('~') + "/.quodlibet/plugins/"
+		if self.localprefix is None :
+			self.localprefix = "/usr/share/locale/"
 		install.finalize_options(self)
 
 	def install_manpages(self):
-		import platform, string, shutil
-		if platform.system() <> 'Windows':
-			print "copy manpages..."
-			for root, dirs, files in os.walk('./man/'):
-				for filename in files:
-					src_file = os.path.join(root, filename) 
-					man_root = os.path.join(self.manprefix, \
-						string.lstrip(root, './'))
-					dest_file = os.path.join(man_root, filename)
-					if not os.path.exists(man_root):
-						os.makedirs(man_root) 					
-					print("copy %s -> %s " % (src_file, dest_file))
-					shutil.copy(src_file, dest_file)
+		print "copy manpages..."
+		for root, dirs, files in os.walk('./man/'):
+			for filename in files:
+				src_file = os.path.join(root, filename)
+				man_root = os.path.join(self.manprefix, \
+					root.replace('./', ''))
+				dest_file = os.path.join(man_root, filename)
+				if not os.path.exists(man_root):
+					os.makedirs(man_root)
+				print("copy %s -> %s " % (src_file, dest_file))
+				shutil.copy(src_file, dest_file)
 
 	def install_qlplugins(self):
-		import string, shutil
 		print "copy QuodLibet-Plugins"
 		for root, dirs, files in os.walk('./dacapo/ql-plugins/'):
 			for filename in files:
@@ -62,6 +64,20 @@ class dacapo_install(install):
 				dest_file = os.path.join(self.qlprefix, filename)
 				if not os.path.exists(self.qlprefix):
 					os.makedirs(self.qlprefix)
+				print("copy %s -> %s " % (src_file, dest_file))
+				shutil.copy(src_file, dest_file)
+
+	def install_translations(self):
+		print "copy translations"
+		for root, dirs, files in os.walk('./dacapo/locale/'):
+			for filename in files:
+				src_file = os.path.join(root, filename)
+				print("root: %s filename: %s STRIPPED: %s" % (root, filename, root.replace('./dacapo/locale/', '')))
+				man_root = os.path.join(self.localprefix, \
+					root.replace('./dacapo/locale/', ''))
+				dest_file = os.path.join(man_root, filename)
+				if not os.path.exists(man_root):
+					os.makedirs(man_root)
 				print("copy %s -> %s " % (src_file, dest_file))
 				shutil.copy(src_file, dest_file)
 
@@ -76,6 +92,7 @@ class dacapo_install(install):
 			import dacapo.config.createconfig
 			self.install_manpages()
 			self.install_qlplugins()
+			self.install_translations()
 		
 
 setup(
