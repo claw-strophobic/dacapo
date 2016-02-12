@@ -72,7 +72,6 @@ class dacapo_install(install):
 		for root, dirs, files in os.walk('./dacapo/locale/'):
 			for filename in files:
 				src_file = os.path.join(root, filename)
-				print("root: %s filename: %s STRIPPED: %s" % (root, filename, root.replace('./dacapo/locale/', '')))
 				man_root = os.path.join(self.localprefix, \
 					root.replace('./dacapo/locale/', ''))
 				dest_file = os.path.join(man_root, filename)

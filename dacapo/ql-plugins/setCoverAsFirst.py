@@ -46,7 +46,7 @@ class SetFrontCoverAsFirst(SongsMenuPlugin):
 
 		if not qltk.ConfirmAction(self.plugin_window,
 			_(self.PLUGIN_NAME),
-			_("Check {!s} files?".format(len(songs)))
+			_("Check {!s} files?").format(len(songs))
 								  ).run():
 			return True
 

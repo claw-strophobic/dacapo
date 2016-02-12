@@ -61,7 +61,7 @@ class SetDacapoLyricFlag(SongsMenuPlugin):
 	def plugin_songs(self, songs):
 		if not qltk.ConfirmAction(self.plugin_window,
 			_('Set dacapo Lyric Flag'),
-			_("{!s} {!s}".format(self.counter, "Dateien verarbeiten?"))
+			_("Check {!s} files?").format(self.counter)
 								  ).run():
 			logging.debug("Verarbeitung abgebrochen!")
 			return True

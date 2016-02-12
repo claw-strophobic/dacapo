@@ -18,7 +18,7 @@ import mimetypes
 import traceback, sys
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
-_ = t.ugettext
+t.install()
 
 class AddImageFileChooser(FileChooser):
 	TYPE = {
@@ -125,8 +125,8 @@ class AddImage(SongsMenuPlugin):
 
 		if not qltk.ConfirmAction(self.plugin_window,
 			_(self.PLUGIN_NAME),
-			_("Add {!s} images as type \n\n<b>&gt;&gt; {!s} &lt;&lt;</b>\n\nto {!s} files?".format(
-					len(files), choose.TYPE[choose.imgType], self.counter))
+			_("Add {!s} images as type \n\n<b>&gt;&gt; {!s} &lt;&lt;</b>\n\nto {!s} files?").format(
+					len(files), choose.TYPE[choose.imgType], self.counter)
 								  ).run():
 			return True
 
