@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-15 11:19+0100\n"
-"PO-Revision-Date: 2016-02-15 11:22+0100\n"
+"POT-Creation-Date: 2016-02-12 15:02+0100\n"
+"PO-Revision-Date: 2016-02-15 14:29+0100\n"
 "Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
 "Language-Team: de <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -23,10 +23,12 @@ msgid "Select Image File"
 msgstr "Bilddatei auswählen"
 
 #: dacapo/ql-plugins/addImage.py:82 dacapo/ql-plugins/addImage.py:103
+#: dacapo/ql-plugins/addImage.py:100
 msgid "Add Image To Audiofile"
 msgstr "Bilddatei zu Audiodatei hinzufügen"
 
 #: dacapo/ql-plugins/addImage.py:83 dacapo/ql-plugins/addImage.py:104
+#: dacapo/ql-plugins/addImage.py:101
 msgid "Add an Image to the audio file with selected image type."
 msgstr "Bilddatei(en) der Audiodatei(en) mit einem Bildtypen hinzufügen."
 
@@ -133,6 +135,33 @@ msgstr ""
 msgid "Image files"
 msgstr "Bilddateien"
 
-#: dacapo/ql-plugins/addImage.py:64
+#: dacapo/ql-plugins/addImage.py:64 dacapo/ql-plugins/removeImage.py:60
 msgid "Description"
 msgstr "Beschreibung"
+
+#: dacapo/ql-plugins/removeImage.py:70
+msgid "Type"
+msgstr "Typ"
+
+#: dacapo/ql-plugins/removeImage.py:106
+msgid "Remove Image from Audiofile"
+msgstr "Entferne Bild aus Audiodatei"
+
+#: dacapo/ql-plugins/removeImage.py:107
+msgid "Remove an Image from the audio file with selected image type."
+msgstr "Entferne ein bestimmtes Bild aus der Audiodatei"
+
+#: dacapo/ql-plugins/removeImage.py:131
+msgid "Which image should be removed?"
+msgstr "Welches Bild soll entfernt werden?"
+
+#: dacapo/ql-plugins/removeImage.py:140
+#, python-format
+msgid ""
+"Removing Image.\n"
+"\n"
+"%(current)d/%(total)d Songs done."
+msgstr ""
+"Entferne Bild.\n"
+"\n"
+"%(current)d/%(total)d Songs geschafft."
