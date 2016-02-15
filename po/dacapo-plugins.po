@@ -3,33 +3,34 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-12 15:59+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2016-02-15 11:19+0100\n"
+"PO-Revision-Date: 2016-02-15 11:22+0100\n"
+"Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
+"Language-Team: de <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: de\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
 #: dacapo/ql-plugins/addImage.py:49
 msgid "Select Image File"
 msgstr "Bilddatei auswählen"
 
-#: dacapo/ql-plugins/addImage.py:82
+#: dacapo/ql-plugins/addImage.py:82 dacapo/ql-plugins/addImage.py:103
 msgid "Add Image To Audiofile"
 msgstr "Bilddatei zu Audiodatei hinzufügen"
 
-#: dacapo/ql-plugins/addImage.py:83
+#: dacapo/ql-plugins/addImage.py:83 dacapo/ql-plugins/addImage.py:104
 msgid "Add an Image to the audio file with selected image type."
 msgstr "Bilddatei(en) der Audiodatei(en) mit einem Bildtypen hinzufügen."
 
-#: dacapo/ql-plugins/addImage.py:128
+#: dacapo/ql-plugins/addImage.py:128 dacapo/ql-plugins/addImage.py:150
 msgid ""
 "Add {!s} images as type \n"
 "\n"
@@ -43,7 +44,7 @@ msgstr ""
 "\n"
 "in {!s} Audiodatei ein?"
 
-#: dacapo/ql-plugins/addImage.py:135
+#: dacapo/ql-plugins/addImage.py:135 dacapo/ql-plugins/addImage.py:157
 #, python-format
 msgid ""
 "Adding Image.\n"
@@ -127,3 +128,11 @@ msgstr ""
 "<b>&gt;&gt; %s &lt;&lt;</b>\n"
 "\n"
 "in %s Audiodatei ein?"
+
+#: dacapo/ql-plugins/addImage.py:52
+msgid "Image files"
+msgstr "Bilddateien"
+
+#: dacapo/ql-plugins/addImage.py:64
+msgid "Description"
+msgstr "Beschreibung"

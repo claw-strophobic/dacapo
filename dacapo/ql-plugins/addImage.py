@@ -15,7 +15,7 @@ from quodlibet.qltk.chooser import FileChooser
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
 from mutagen.flac import FLAC, Picture
 import mimetypes
-import traceback, sys
+import traceback, sys, ntpath
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
 t.install()
@@ -49,7 +49,7 @@ class AddImageFileChooser(FileChooser):
 		super(AddImageFileChooser, self).__init__(parent, _("Select Image File"))
 		## Create Filter
 		filter = Gtk.FileFilter()
-		filter.set_name("Image files")
+		filter.set_name(_("Image files"))
 		filter.add_mime_type("image/jpeg")
 		filter.add_mime_type("image/png")
 		self.add_filter(filter)
@@ -57,7 +57,20 @@ class AddImageFileChooser(FileChooser):
 		type_store = Gtk.ListStore(int, str)
 		for key in self.TYPE:
 			type_store.append([key, self.TYPE[key]])
-		vbox = self.get_content_area()
+		area = self.get_content_area()
+		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+		self.add(vbox)
+		label = Gtk.Label()
+		label.set_text(_("Description"))
+		label.set_justify(Gtk.Justification.LEFT)
+		label.set_halign(Gtk.Align.START)
+		vbox.pack_start(label, True, True, 0)
+		hbox = Gtk.Box(spacing=6)
+		vbox.pack_start(hbox, True, True, 0)
+
+		self.entry = Gtk.Entry()
+		hbox.pack_start(self.entry, True, True, 0)
+
 		name_combo = Gtk.ComboBox.new_with_model(type_store)
 		renderer = Gtk.CellRendererText()
 		name_combo.set_active(3)
@@ -65,7 +78,8 @@ class AddImageFileChooser(FileChooser):
 		name_combo.add_attribute(renderer, 'text', 1)
 		name_combo.connect("changed", self.on_name_combo_changed)
 		name_combo.set_entry_text_column(1)
-		vbox.add(name_combo)
+		hbox.add(name_combo)
+		area.add(vbox)
 		self.show_all()
 		## Set default type
 		self.imgType = 3
@@ -76,6 +90,10 @@ class AddImageFileChooser(FileChooser):
 			model = combo.get_model()
 			row_id = model.get_value(combo_iter, 0)
 			self.imgType = row_id
+
+	def get_description(self):
+		result = self.entry.get_text()
+		return result
 
 class AddImage(SongsMenuPlugin):
 	PLUGIN_ID = "AddImage"
@@ -106,6 +124,7 @@ class AddImage(SongsMenuPlugin):
 
 		choose = AddImageFileChooser(self.plugin_window)
 		files = choose.run()
+		desc = choose.get_description()
 		choose.destroy()
 
 		if (files == None) or (len(files) <= 0):
@@ -119,7 +138,10 @@ class AddImage(SongsMenuPlugin):
 				img = Picture()
 				img.mime = mimeType
 				img.type = choose.imgType
-				img.desc = choose.TYPE[choose.imgType]
+				if (len(desc) <= 0):
+					img.desc = ntpath.basename(file)
+				else:
+					img.desc = desc
 				img.data = imgdata
 				self.imgFiles.append(img)
 
