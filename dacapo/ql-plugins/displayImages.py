@@ -31,6 +31,30 @@ t.install()
 
 class AlbumArtWindow(qltk.Window):
 	"""The main window including the search list"""
+	TYPE = {
+		0: "Other",
+		1: "32x32 pixels 'file icon' (PNG only)",
+		2: "Other file icon",
+		3: "Cover (front)",
+		4: "Cover (back)",
+		5: "Leaflet page",
+		6: "Media (e.g. label side of CD)",
+		7: "Lead artist/lead performer/soloist",
+		8: "Artist/performer",
+		9: "Conductor",
+		10: "Band/Orchestra",
+		11: "Composer",
+		12: "Lyricist/text writer",
+		13: "Recording Location",
+		14: "During recording",
+		15: "During performance",
+		16: "Movie/video screen capture",
+		17: "A bright coloured fish",
+		18: "Illustration",
+		19: "Band/artist logotype",
+		20: "Publisher/Studio logotype"
+	}
+
 
 	def __init__(self, songs):
 		super(AlbumArtWindow, self).__init__()
@@ -40,16 +64,18 @@ class AlbumArtWindow(qltk.Window):
 		self.search_lock = False
 		self.songs = songs
 
-		self.set_title(_('Album Art Downloader'))
+		self.set_title(_('Album Images'))
 		self.set_icon_name(Gtk.STOCK_FIND)
 		self.set_default_size(800, 550)
-
-		## image = CoverArea(self, songs[0])
 
 		self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, object)
 		self.treeview = treeview = AllTreeView(self.liststore)
 		self.treeview.set_headers_visible(False)
 		self.treeview.set_rules_hint(True)
+		self.type_store = Gtk.ListStore(int, str)
+		for key in self.TYPE:
+			self.type_store.append([key, self.TYPE[key]])
+
 
 		targets = [("text/uri-list", 0, 0)]
 		targets = [Gtk.TargetEntry.new(*t) for t in targets]
@@ -87,7 +113,15 @@ class AlbumArtWindow(qltk.Window):
 			esc = escape_data
 
 			txt = '<b><i>%s</i></b>' % esc(cover.desc)
+			txt += _('\nType: <i>{!s}</i>').format(self.TYPE[cover.type])
 			txt += _('\nResolution: <i>{!s} x {!s}</i>').format(cover.width, cover.height)
+			name_combo = Gtk.CellRendererCombo()
+			name_combo.set_property("model", self.liststore)
+			name_combo.set_property("text-column", 1)
+			name_combo.connect("changed", self.on_name_combo_changed)
+			column_combo = Gtk.TreeViewColumn("Combo", name_combo, text=1)
+			## treeview.append_column(column_combo)
+			## column_combo.set_active(cover.type)
 
 			cell.markup = txt
 			cell.set_property('markup', cell.markup)
@@ -104,21 +138,9 @@ class AlbumArtWindow(qltk.Window):
 		sw_list.set_shadow_type(Gtk.ShadowType.IN)
 		sw_list.add(treeview)
 
-		self.search_field = Gtk.Entry()
-		self.search_button = Gtk.Button(stock=Gtk.STOCK_FIND)
-		self.search_button.connect('clicked', self.start_search)
-		self.search_field.connect('activate', self.start_search)
-
 		widget_space = 5
 
-		search_hbox = Gtk.HBox(False, widget_space)
-		search_hbox.pack_start(self.search_field, True, True, 0)
-		search_hbox.pack_start(self.search_button, False, True, 0)
-
-		self.progress = Gtk.ProgressBar()
-
 		left_vbox = Gtk.VBox(False, widget_space)
-		left_vbox.pack_start(search_hbox, False, True, 0)
 		left_vbox.pack_start(sw_list, True, True, 0)
 
 		hpaned = Gtk.HPaned()
@@ -131,16 +153,14 @@ class AlbumArtWindow(qltk.Window):
 
 		self.show_all()
 
-		left_vbox.pack_start(self.progress, False, True, 0)
-
-		if songs[0]('albumartist'):
-			text = songs[0]('albumartist')
-		else:
-			text = songs[0]('artist')
-
-		text += ' - ' + songs[0]('album')
-
 		self.start_search()
+
+	def on_name_combo_changed(self, combo):
+		combo_iter = combo.get_active_iter()
+		if combo_iter:
+			model = combo.get_model()
+			row_id = model.get_value(combo_iter, 0)
+			self.imgType = row_id
 
 	def start_search(self, *data):
 		audio = FLAC(self.songs[0].get("~filename", ""))
