@@ -23,7 +23,6 @@ from quodlibet.qltk.views import AllTreeView
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
 
 from mutagen.flac import FLAC, Picture
-import mimetypes
 import traceback, sys
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
@@ -58,11 +57,13 @@ class AlbumArtWindow(qltk.Window):
 
 	def __init__(self, songs):
 		super(AlbumArtWindow, self).__init__()
-
+		self.connect("delete-event", self.on_delete)
 		self.image_cache = []
 		self.image_cache_size = 10
 		self.search_lock = False
 		self.songs = songs
+		self.song = self.songs[0]
+		self.coverlist = []
 
 		self.set_title(_('Album Images'))
 		self.set_icon_name(Gtk.STOCK_FIND)
@@ -101,6 +102,12 @@ class AlbumArtWindow(qltk.Window):
 		rend_pix.set_property('width', 56)
 		rend_pix.set_property('height', 56)
 
+		# Allow drag and drop reordering of rows
+		self.treeview.set_reorderable(True)
+		# when a row is selected, it emits a signal
+		treeselection.connect("changed", self.on_changed)
+
+
 		def escape_data(data):
 			for rep in ('\n', '\t', '\r', '\v'):
 				data = data.replace(rep, ' ')
@@ -115,13 +122,7 @@ class AlbumArtWindow(qltk.Window):
 			txt = '<b><i>%s</i></b>' % esc(cover.desc)
 			txt += _('\nType: <i>{!s}</i>').format(self.TYPE[cover.type])
 			txt += _('\nResolution: <i>{!s} x {!s}</i>').format(cover.width, cover.height)
-			name_combo = Gtk.CellRendererCombo()
-			name_combo.set_property("model", self.liststore)
-			name_combo.set_property("text-column", 1)
-			name_combo.connect("changed", self.on_name_combo_changed)
-			column_combo = Gtk.TreeViewColumn("Combo", name_combo, text=1)
-			## treeview.append_column(column_combo)
-			## column_combo.set_active(cover.type)
+			## type_col.set_active(cover.type)
 
 			cell.markup = txt
 			cell.set_property('markup', cell.markup)
@@ -155,15 +156,8 @@ class AlbumArtWindow(qltk.Window):
 
 		self.start_search()
 
-	def on_name_combo_changed(self, combo):
-		combo_iter = combo.get_active_iter()
-		if combo_iter:
-			model = combo.get_model()
-			row_id = model.get_value(combo_iter, 0)
-			self.imgType = row_id
-
 	def start_search(self, *data):
-		audio = FLAC(self.songs[0].get("~filename", ""))
+		audio = FLAC(self.song.get("~filename", ""))
 		## if file has no images -> leave
 		if (audio.pictures is None) or (len(audio.pictures) <= 0):
 			return
@@ -192,8 +186,55 @@ class AlbumArtWindow(qltk.Window):
 			def append(data):
 				self.liststore.append(data)
 			GLib.idle_add(append, [thumb, cover])
+			self.coverlist.append(cover)
 
+	def on_changed(self, selection):
+		# get the model and the iterator that points at the data in the model
+		(model, iter) = selection.get_selected()
+		# set the label to a new value depending on the selection
+		cover = model[iter][1]
+		## print('\nAusgewählt: {!s} {!s}').format(cover.desc, self.TYPE[cover.type])
+		return True
 
+	def on_save(self):
+		audio = FLAC(self.song.get("~filename", ""))
+		## if file has no images -> leave
+		if (audio.pictures is None) or (len(audio.pictures) <= 0):
+			return
+		## first,clear all pictures, then add the images in order
+		try:
+			audio.clear_pictures()
+		except:
+			self.printError()
+			return False
+		for row in self.liststore:
+			img = row[1]
+			try:
+				audio.add_picture(img)
+			except:
+				self.printError()
+				return False
+		audio.save()
+		app.window.emit("artwork-changed", [self.song])
+		return True
+
+	def on_delete(self, widget, event):
+		file_changed = False
+		print('\n')
+		i = 0
+		for row in self.liststore:
+			cover = row[1]
+			if (self.coverlist[i] != cover):
+				file_changed = True
+				print('UNGLEICH')
+			i += 1
+			print('{!s}: {!s} {!s}').format(i, cover.desc, self.TYPE[cover.type])
+
+		if file_changed == True and qltk.ConfirmAction(None,
+				_('Images changed'), _('The images in file <b>%s</b> were changed.'
+				'\n\nOverwrite?') % util.escape(self.song.get("~filename", ""))).run():
+			self.on_save()
+		return
 
 class DisplayImages(SongsMenuPlugin):
 	PLUGIN_ID = "DisplayImages"
