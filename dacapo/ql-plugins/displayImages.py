@@ -47,14 +47,13 @@ class AlbumArtWindow(qltk.Window):
 	}
 
 
-	def __init__(self, songs):
+	def __init__(self, song):
 		super(AlbumArtWindow, self).__init__()
 		self.connect("delete-event", self.on_delete)
 		self.image_cache = []
 		self.image_cache_size = 10
 		self.search_lock = False
-		self.songs = songs
-		self.song = self.songs[0]
+		self.song = song
 		self.coverlist = []
 
 		self.set_title(_('Album Images'))
@@ -252,7 +251,8 @@ class DisplayImages(SongsMenuPlugin):
 		if (songs is None) or (len(songs) <= 0):
 			return True
 
-		AlbumArtWindow(songs)
+		for song in songs:
+			AlbumArtWindow(song)
 
 
 
