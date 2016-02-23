@@ -8,21 +8,13 @@
 # published by the Free Software Foundation
 #
 
-from gi.repository import Gtk
-from quodlibet import qltk
-from quodlibet.qltk.wlw import WaitLoadWindow
-from quodlibet.qltk.chooser import FileChooser
-from quodlibet.plugins.songsmenu import SongsMenuPlugin
 from gi.repository import Gtk, Pango, GLib, Gdk, GdkPixbuf
-from quodlibet.util import format_size, print_exc
-from quodlibet.util.dprint import print_d
 
-from quodlibet import util, qltk, print_w, app
-from quodlibet.qltk.x import Button
+from quodlibet import util, qltk, app
 from quodlibet.qltk.views import AllTreeView
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
 
-from mutagen.flac import FLAC, Picture
+from mutagen.flac import FLAC
 import traceback, sys
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
