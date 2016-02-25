@@ -226,7 +226,7 @@ class AlbumArtWindow(qltk.Window):
 
 		self.set_title(_('Album Images'))
 		self.set_icon_name(Gtk.STOCK_FIND)
-		self.set_default_size(800, 550)
+		self.set_default_size(820, 550)
 
 		self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, object)
 		self.treeview = treeview = AllTreeView(self.liststore)
