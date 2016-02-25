@@ -398,9 +398,9 @@ class AlbumArtWindow(qltk.Window):
 		return
 
 class DisplayImages(SongsMenuPlugin):
-	PLUGIN_ID = "DisplayImages"
-	PLUGIN_NAME = _('Display images')
-	PLUGIN_DESC = _("Display images that are stored in the audiofile.")
+	PLUGIN_ID = "DisplayChangeImages"
+	PLUGIN_NAME = _('Display & change images')
+	PLUGIN_DESC = _("Display and change images that are stored in the audiofile.")
 	PLUGIN_ICON = Gtk.STOCK_EXECUTE
 	PLUGIN_VERSION = '1.0.0'
 
