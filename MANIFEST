@@ -68,6 +68,7 @@ dacapo/data/save.png
 dacapo/data/saveas.png
 dacapo/data/treble_clef.png
 dacapo/errorhandling/__init__.py
+dacapo/locale/de/LC_MESSAGES/dacapo-plugins.mo
 dacapo/locale/de/LC_MESSAGES/qtflac2mp3.mo
 dacapo/locale/de/LC_MESSAGES/qtflac2mp3.pot
 dacapo/metadata/__init__.py
@@ -79,6 +80,11 @@ dacapo/metadata/ogg.py
 dacapo/metadata/wma.py
 dacapo/playlist/__init__.py
 dacapo/playlist/generate.py
+dacapo/ql-plugins/addImage.py
+dacapo/ql-plugins/displayImages.py
+dacapo/ql-plugins/removeImage.py
+dacapo/ql-plugins/setCoverAsFirst.py
+dacapo/ql-plugins/setLyricFlag.py
 dacapo/qtflac2mp3/QtConverter.py
 dacapo/qtflac2mp3/QtPrintTags.py
 dacapo/qtflac2mp3/__init__.py
@@ -91,3 +97,5 @@ man/de/man1/dacapo.1.gz
 man/de/man5/dacapo.conf.5.gz
 man/man1/dacapo.1.gz
 man/man5/dacapo.conf.5.gz
+po/BACKUP-dacapo-plugins.po
+po/dacapo-plugins.po

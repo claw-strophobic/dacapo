@@ -9,12 +9,13 @@
 #
 
 from gi.repository import Gtk
-from quodlibet import qltk
+from quodlibet import qltk, app
 from quodlibet.qltk.wlw import WaitLoadWindow
 from quodlibet.qltk.chooser import FileChooser
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
 from mutagen.flac import FLAC, Picture
 import mimetypes
+import imghdr, struct
 import traceback, sys, ntpath
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
@@ -134,15 +135,13 @@ class AddImage(SongsMenuPlugin):
 			contentType = mimetypes.guess_type(file) # get Mimetype
 			mimeType = contentType[0]
 			if (mimeType in self.JPG_MIMES) or (mimeType in self.PNG_MIMES):
-				imgdata = open(file).read()
-				img = Picture()
+				img = get_image_size(file)
 				img.mime = mimeType
 				img.type = choose.imgType
 				if (len(desc) <= 0):
 					img.desc = ntpath.basename(file)
 				else:
 					img.desc = desc
-				img.data = imgdata
 				self.imgFiles.append(img)
 
 		if not qltk.ConfirmAction(self.plugin_window,
@@ -162,7 +161,7 @@ class AddImage(SongsMenuPlugin):
 					self.setImage(song)
 				except:
 					win.destroy()
-					self.printError()
+					printError()
 					return False
 			if win.step():
 				break
@@ -178,14 +177,72 @@ class AddImage(SongsMenuPlugin):
 			try:
 				audio.add_picture(p)
 			except:
-				self.printError()
+				printError()
 				return False
 		audio.save()
+		## and now count the images
+		count = "0"
+		## if file has no images -> set to 0
+		if (audio.pictures is None) or (len(audio.pictures) <= 0):
+			pass
+		else:
+			count = str(len(audio.pictures))
+
+		if not "pictures" in song:
+			song["pictures"] = count
+
+		if song["pictures"] <> count:
+			song["pictures"] = count
+		app.window.emit("artwork-changed", [song])
 		return
 
-	def printError(self):
-		exc_type, exc_value, exc_traceback = sys.exc_info()
-		lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-		for line in lines:
-			print(line)
+def printError():
+	exc_type, exc_value, exc_traceback = sys.exc_info()
+	lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+	for line in lines:
+		print(line)
+	qltk.ErrorMessage(None, _('Error occured'),
+                _('%s.') % lines).run()
 
+def get_image_size(fname):
+	'''Determine the image type of fhandle and return its size.
+	from draco'''
+	with open(fname, 'rb') as fhandle:
+		head = fhandle.read(24)
+		if len(head) != 24:
+			return
+		if imghdr.what(fname) == 'png':
+			check = struct.unpack('>i', head[4:8])[0]
+			if check != 0x0d0a1a0a:
+				return
+			width, height = struct.unpack('>ii', head[16:24])
+		elif imghdr.what(fname) == 'gif':
+			width, height = struct.unpack('<HH', head[6:10])
+		elif imghdr.what(fname) == 'jpeg':
+			try:
+				fhandle.seek(0) # Read 0xff next
+				size = 2
+				ftype = 0
+				while not 0xc0 <= ftype <= 0xcf:
+					fhandle.seek(size, 1)
+					byte = fhandle.read(1)
+					while ord(byte) == 0xff:
+						byte = fhandle.read(1)
+					ftype = ord(byte)
+					size = struct.unpack('>H', fhandle.read(2))[0] - 2
+				# We are at a SOFn block
+				fhandle.seek(1, 1)  # Skip `precision' byte.
+				height, width = struct.unpack('>HH', fhandle.read(4))
+			except Exception: #IGNORE:W0703
+				printError()
+				return
+		else:
+			return
+		fhandle.seek(0)
+		imgdata = fhandle.read()
+		img = Picture()
+		img.data = imgdata
+		img.width = width
+		img.height = height
+
+        return img
