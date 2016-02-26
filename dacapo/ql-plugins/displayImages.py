@@ -59,7 +59,7 @@ class ImageArea(Gtk.VBox):
 		self.save_button.connect('clicked', self.on_save)
 
 		close_button = Gtk.Button(stock=Gtk.STOCK_CLOSE)
-		close_button.connect('clicked', lambda x: self.main_win.destroy())
+		close_button.connect('clicked', lambda x: self.main_win.close())
 		self.type_store = Gtk.ListStore(int, str)
 		for key in TYPE:
 			self.type_store.append([key, TYPE[key]])
@@ -404,7 +404,7 @@ class DisplayImages(SongsMenuPlugin):
 	PLUGIN_NAME = _('Display & change images')
 	PLUGIN_DESC = _("Display and change images that are stored in the audiofile.")
 	PLUGIN_ICON = Gtk.STOCK_EXECUTE
-	PLUGIN_VERSION = '1.0.0'
+	PLUGIN_VERSION = '1.0.1'
 
 	def __init__(self, *args, **kwargs):
 		self.counter = 0
