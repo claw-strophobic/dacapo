@@ -387,7 +387,9 @@ class AlbumArtWindow(qltk.Window):
 		i = 0
 		for row in self.liststore:
 			cover = row[1]
-			if (self.coverlist[i] != cover):
+			if (self.coverlist[i].data != cover.data) \
+				or (self.coverlist[i].desc != cover.desc)  \
+				or (self.coverlist[i].type != cover.type) :
 				file_changed = True
 			i += 1
 
