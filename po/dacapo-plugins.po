@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 15:45+0100\n"
-"PO-Revision-Date: 2016-02-25 15:54+0100\n"
+"PO-Revision-Date: 2016-02-26 15:28+0100\n"
 "Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
 "Language-Team: LANGUAGE <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -70,7 +70,7 @@ msgstr ""
 "stelle steht (falls es das nicht schon tut)."
 
 #: dacapo/ql-plugins/setCoverAsFirst.py:49
-#: dacapo/ql-plugins/setLyricFlag.py:64
+#: dacapo/ql-plugins/setLyricFlag.py:64 dacapo/ql-plugins/countImages.py:48
 msgid "Check {!s} files?"
 msgstr "Prüfe {!s} Dateien?"
 
@@ -233,3 +233,26 @@ msgstr "Bilder anzeigen & ändern"
 #: dacapo/ql-plugins/displayImages.py:403
 msgid "Display and change images that are stored in the audiofile."
 msgstr "Bilder aus der Audiodatei anzeigen und ändern."
+
+#: dacapo/ql-plugins/countImages.py:24
+msgid "Count Pictures in Audiofile"
+msgstr "Zähle Bilder aus Audiodatei"
+
+#: dacapo/ql-plugins/countImages.py:25
+msgid ""
+"Counts the pictures in an audio file and stores the result in the tag "
+"PICTURES, so that you can use it in Quod Libet."
+msgstr ""
+"Zählt die Bilder in einer Audiodatei und speichert das Ergebnis im Tag "
+"PICTURES, sodass es in Quod Libet zur Auswertung zur Verfügung steht."
+
+#: dacapo/ql-plugins/countImages.py:54
+#, python-format
+msgid ""
+"Counting pictures.\n"
+"\n"
+"%(current)d/%(total)d Songs done."
+msgstr ""
+"Zähle Bilder.\n"
+"\n"
+"%(current)d/%(total)d Songs geschafft."
