@@ -9,7 +9,7 @@
 #
 
 from gi.repository import Gtk
-from quodlibet import qltk
+from quodlibet import qltk, app
 from quodlibet.qltk.wlw import WaitLoadWindow
 from quodlibet.qltk.chooser import FileChooser
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
@@ -106,6 +106,7 @@ class SetFrontCoverAsFirst(SongsMenuPlugin):
 				self.printError()
 				return False
 		audio.save()
+		app.window.emit("artwork-changed", [song])
 		return
 
 	def printError(self):
