@@ -9,7 +9,7 @@
 #
 
 from gi.repository import Gtk
-from quodlibet import qltk
+from quodlibet import qltk, app
 from quodlibet.qltk.wlw import WaitLoadWindow
 from quodlibet.qltk.chooser import FileChooser
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
@@ -181,6 +181,20 @@ class RemoveImage(SongsMenuPlugin):
 					self.printError()
 					return False
 			audio.save()
+			## and now count the images
+			count = "0"
+			## if file has no images -> set to 0
+			if (audio.pictures is None) or (len(audio.pictures) <= 0):
+				pass
+			else:
+				count = str(len(audio.pictures))
+
+			if not "pictures" in song:
+				song["pictures"] = count
+
+			if song["pictures"] <> count:
+				song["pictures"] = count
+			app.window.emit("artwork-changed", [song])
 		return
 
 	def printError(self):
