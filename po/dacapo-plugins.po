@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 15:45+0100\n"
-"PO-Revision-Date: 2016-02-26 15:28+0100\n"
-"Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
+"PO-Revision-Date: 2016-02-27 16:36+0100\n"
+"Last-Translator: Claw Strophobic <Claw.Strophobic@gmx.de>\n"
 "Language-Team: LANGUAGE <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,21 +18,22 @@ msgstr ""
 "Language: de\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: dacapo/ql-plugins/addImage.py:49
+#: dacapo/ql-plugins/addImage.py:49 dacapo/ql-plugins/addImage.py:50
 msgid "Select Image File"
 msgstr "Bilddatei auswählen"
 
 #: dacapo/ql-plugins/addImage.py:82 dacapo/ql-plugins/addImage.py:103
-#: dacapo/ql-plugins/addImage.py:100
+#: dacapo/ql-plugins/addImage.py:100 dacapo/ql-plugins/addImage.py:101
 msgid "Add Image To Audiofile"
 msgstr "Bilddatei zu Audiodatei hinzufügen"
 
 #: dacapo/ql-plugins/addImage.py:83 dacapo/ql-plugins/addImage.py:104
-#: dacapo/ql-plugins/addImage.py:101
+#: dacapo/ql-plugins/addImage.py:101 dacapo/ql-plugins/addImage.py:102
 msgid "Add an Image to the audio file with selected image type."
 msgstr "Bilddatei(en) der Audiodatei(en) mit einem Bildtypen hinzufügen."
 
 #: dacapo/ql-plugins/addImage.py:128 dacapo/ql-plugins/addImage.py:150
+#: dacapo/ql-plugins/addImage.py:149
 msgid ""
 "Add {!s} images as type \n"
 "\n"
@@ -47,6 +48,7 @@ msgstr ""
 "in {!s} Audiodatei ein?"
 
 #: dacapo/ql-plugins/addImage.py:135 dacapo/ql-plugins/addImage.py:157
+#: dacapo/ql-plugins/addImage.py:156
 #, python-format
 msgid ""
 "Adding Image.\n"
@@ -131,11 +133,12 @@ msgstr ""
 "\n"
 "in %s Audiodatei ein?"
 
-#: dacapo/ql-plugins/addImage.py:52
+#: dacapo/ql-plugins/addImage.py:52 dacapo/ql-plugins/addImage.py:53
 msgid "Image files"
 msgstr "Bilddateien"
 
 #: dacapo/ql-plugins/addImage.py:64 dacapo/ql-plugins/removeImage.py:60
+#: dacapo/ql-plugins/addImage.py:65
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -166,19 +169,21 @@ msgstr ""
 "\n"
 "%(current)d/%(total)d Songs geschafft."
 
-#: dacapo/ql-plugins/displayImages.py:79
+#: dacapo/ql-plugins/displayImages.py:79 dacapo/ql-plugins/displayImages.py:71
 msgid "Description:"
 msgstr "Beschreibung:"
 
-#: dacapo/ql-plugins/displayImages.py:84
+#: dacapo/ql-plugins/displayImages.py:84 dacapo/ql-plugins/displayImages.py:76
 msgid "Type:"
 msgstr "Typ:"
 
 #: dacapo/ql-plugins/displayImages.py:227
+#: dacapo/ql-plugins/displayImages.py:275
 msgid "Album Images"
 msgstr "Album Bilder"
 
 #: dacapo/ql-plugins/displayImages.py:279
+#: dacapo/ql-plugins/displayImages.py:321
 msgid ""
 "\n"
 "Type: <i>{!s}</i>"
@@ -187,6 +192,7 @@ msgstr ""
 "Typ: <i>{!s}</i>"
 
 #: dacapo/ql-plugins/displayImages.py:280
+#: dacapo/ql-plugins/displayImages.py:322
 msgid ""
 "\n"
 "Resolution: <i>{!s} x {!s}</i>"
@@ -195,10 +201,12 @@ msgstr ""
 "Auflösung: <i>{!s} x {!s}</i>"
 
 #: dacapo/ql-plugins/displayImages.py:395
+#: dacapo/ql-plugins/displayImages.py:452
 msgid "Images changed"
 msgstr "Bilder geändert"
 
 #: dacapo/ql-plugins/displayImages.py:395
+#: dacapo/ql-plugins/displayImages.py:452
 #, python-format
 msgid ""
 "The images in file <b>%s</b> were changed.\n"
@@ -217,20 +225,24 @@ msgstr "Bilder anzeigen"
 msgid "Display images that are stored in the audiofile."
 msgstr "Bilder aus einer Audiodatei anzeigen"
 
-#: dacapo/ql-plugins/displayImages.py:434
+#: dacapo/ql-plugins/displayImages.py:434 dacapo/ql-plugins/addImage.py:204
+#: dacapo/ql-plugins/displayImages.py:494
 msgid "Error occured"
 msgstr "Fehler aufgetreten"
 
-#: dacapo/ql-plugins/displayImages.py:435
+#: dacapo/ql-plugins/displayImages.py:435 dacapo/ql-plugins/addImage.py:205
+#: dacapo/ql-plugins/displayImages.py:495
 #, python-format
 msgid "%s."
 msgstr "%s."
 
 #: dacapo/ql-plugins/displayImages.py:402
+#: dacapo/ql-plugins/displayImages.py:459
 msgid "Display & change images"
 msgstr "Bilder anzeigen & ändern"
 
 #: dacapo/ql-plugins/displayImages.py:403
+#: dacapo/ql-plugins/displayImages.py:460
 msgid "Display and change images that are stored in the audiofile."
 msgstr "Bilder aus der Audiodatei anzeigen und ändern."
 
@@ -256,3 +268,35 @@ msgstr ""
 "Zähle Bilder.\n"
 "\n"
 "%(current)d/%(total)d Songs geschafft."
+
+#: dacapo/ql-plugins/displayImages.py:155
+msgid "Error"
+msgstr "Fehler"
+
+#: dacapo/ql-plugins/displayImages.py:156
+msgid "No image selected"
+msgstr "Kein Bild ausgewählt"
+
+#: dacapo/ql-plugins/displayImages.py:159
+msgid "Remove {!s}"
+msgstr "Entferne {!s}"
+
+#: dacapo/ql-plugins/displayImages.py:160
+msgid ""
+"\n"
+"Type: {!s}"
+msgstr ""
+"\n"
+"Typ: {!s}"
+
+#: dacapo/ql-plugins/displayImages.py:161
+msgid ""
+"\n"
+"Resolution: {!s} x {!s}"
+msgstr ""
+"\n"
+"Auflösung: {!s} x {!s}"
+
+#: dacapo/ql-plugins/displayImages.py:164
+msgid "Remove Image"
+msgstr "Entferne Bild"
