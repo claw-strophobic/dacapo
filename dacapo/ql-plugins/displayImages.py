@@ -13,36 +13,21 @@ from gi.repository import Gtk, Pango, GLib, Gdk, GdkPixbuf
 from quodlibet import util, qltk, app
 from quodlibet.qltk.views import AllTreeView
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
-
+import addImage
+import mimetypes
 from mutagen.flac import FLAC
-import traceback, sys, copy
+import traceback, sys, copy, ntpath
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
 t.install()
 
-TYPE = {
-	0: "Other",
-	1: "32x32 pixels 'file icon' (PNG only)",
-	2: "Other file icon",
-	3: "Cover (front)",
-	4: "Cover (back)",
-	5: "Leaflet page",
-	6: "Media (e.g. label side of CD)",
-	7: "Lead artist/lead performer/soloist",
-	8: "Artist/performer",
-	9: "Conductor",
-	10: "Band/Orchestra",
-	11: "Composer",
-	12: "Lyricist/text writer",
-	13: "Recording Location",
-	14: "During recording",
-	15: "During performance",
-	16: "Movie/video screen capture",
-	17: "A bright coloured fish",
-	18: "Illustration",
-	19: "Band/artist logotype",
-	20: "Publisher/Studio logotype"
-}
+TYPE = addImage.AddImageFileChooser.TYPE
+
+def escape_data(data):
+	for rep in ('\n', '\t', '\r', '\v'):
+		data = data.replace(rep, ' ')
+
+	return util.escape(' '.join(data.split()))
 
 class ImageArea(Gtk.VBox):
 	"""The image display and saving part."""
@@ -60,6 +45,13 @@ class ImageArea(Gtk.VBox):
 
 		close_button = Gtk.Button(stock=Gtk.STOCK_CLOSE)
 		close_button.connect('clicked', lambda x: self.main_win.close())
+
+		self.add_button = Gtk.Button(stock=Gtk.STOCK_ADD)
+		self.add_button.connect('clicked', self.on_add_clicked)
+		self.sub_button = Gtk.Button(stock=Gtk.STOCK_REMOVE)
+		self.sub_button.set_sensitive(False)
+		self.sub_button.connect('clicked', self.on_sub_clicked)
+
 		self.type_store = Gtk.ListStore(int, str)
 		for key in TYPE:
 			self.type_store.append([key, TYPE[key]])
@@ -103,19 +95,25 @@ class ImageArea(Gtk.VBox):
 		self.scrolled.set_policy(Gtk.PolicyType.AUTOMATIC,
 								 Gtk.PolicyType.AUTOMATIC)
 
+		hButtonbox = Gtk.HBox()
+
 		bbox = Gtk.VButtonBox()
 		bbox.set_spacing(6)
 		bbox.set_layout(Gtk.ButtonBoxStyle.END)
 		bbox.pack_start(self.save_button, True, True, 0)
 		bbox.pack_start(close_button, True, True, 0)
+		hButtonbox.pack_start(bbox, True, True, 0)
 
-		bb_align = Gtk.Alignment.new(0, 1, 1, 0)
-		bb_align.set_property('right-padding', 6)
-		bb_align.add(bbox)
+		p_bbox = Gtk.VButtonBox()
+		p_bbox.set_spacing(6)
+		p_bbox.set_layout(Gtk.ButtonBoxStyle.END)
+		p_bbox.pack_start(self.add_button, True, True, 0)
+		p_bbox.pack_start(self.sub_button, True, True, 0)
+		hButtonbox.pack_start(p_bbox, True, True, 0)
 
 		main_hbox = Gtk.HBox()
 		main_hbox.pack_start(table, False, True, 6)
-		main_hbox.pack_start(bb_align, True, True, 0)
+		main_hbox.pack_start(hButtonbox, True, True, 0)
 
 		main_vbox = Gtk.VBox()
 		main_vbox.pack_start(main_hbox, True, True, 0)
@@ -126,6 +124,54 @@ class ImageArea(Gtk.VBox):
 	def on_save(self, *data):
 		self.main_win.on_save()
 		self.save_button.set_sensitive(False)
+
+	def on_add_clicked(self, *data):
+		JPG_MIMES = ["image/jpeg"]
+		PNG_MIMES = ["image/png"]
+		choose = addImage.AddImageFileChooser(self.main_win)
+		files = choose.run()
+		desc = choose.get_description()
+		choose.destroy()
+		if (files == None) or (len(files) <= 0):
+			return True
+
+		for file in files:
+			contentType = mimetypes.guess_type(file) # get Mimetype
+			mimeType = contentType[0]
+			if (mimeType in JPG_MIMES) or (mimeType in PNG_MIMES):
+				img = addImage.get_image_size(file)
+				img.mime = mimeType
+				img.type = choose.imgType
+				if (len(desc) <= 0):
+					img.desc = ntpath.basename(file)
+				else:
+					img.desc = desc
+				self.main_win.add_cover_to_list(img)
+
+		self.save_button.set_sensitive(True)
+
+	def on_sub_clicked(self, *data):
+		if (self.cover == None):
+			qltk.ErrorMessage(None, _('Error'),
+                _("No image selected")).run()
+			return
+		esc = escape_data
+		txt = _('Remove {!s}').format(esc(self.cover.desc))
+		txt += _('\nType: {!s}').format(TYPE[self.cover.type])
+		txt += _('\nResolution: {!s} x {!s}').format(self.cover.width, self.cover.height)
+		print(txt)
+		if not qltk.ConfirmAction(self.main_win,
+			_('Remove Image'),
+			txt
+								  ).run():
+			return True
+		for row in self.main_win.liststore:
+			cover = row[1]
+			if cover == self.cover:
+				self.main_win.liststore.remove(row.iter)
+				break
+
+		self.save_button.set_sensitive(True)
 
 	def on_type_combo_changed(self, combo):
 		combo_iter = combo.get_active_iter()
@@ -144,6 +190,7 @@ class ImageArea(Gtk.VBox):
 
 	def set_cover(self, cover):
 		self.cover = cover
+		self.sub_button.set_sensitive(True)
 		self.desc.set_text(cover.desc)
 		self.type_combo.set_active(cover.type)
 		try:
@@ -218,10 +265,11 @@ class ImageArea(Gtk.VBox):
 class AlbumArtWindow(qltk.Window):
 	"""The main window including the search list"""
 
-	def __init__(self, song):
+	def __init__(self, song, parent):
 		super(AlbumArtWindow, self).__init__()
 		self.connect("delete-event", self.on_delete)
 		self.song = song
+		self.parent = parent
 		self.coverlist = []
 
 		self.set_title(_('Album Images'))
@@ -263,12 +311,6 @@ class AlbumArtWindow(qltk.Window):
 		# Allow drag and drop reordering of rows
 		self.treeview.set_reorderable(True)
 
-
-		def escape_data(data):
-			for rep in ('\n', '\t', '\r', '\v'):
-				data = data.replace(rep, ' ')
-
-			return util.escape(' '.join(data.split()))
 
 		def cell_data(column, cell, model, iter, data):
 			cover = model[iter][1]
@@ -317,10 +359,10 @@ class AlbumArtWindow(qltk.Window):
 		if (audio.pictures is None) or (len(audio.pictures) <= 0):
 			return
 		for img in audio.pictures:
-			self.__add_cover_to_list(img)
+			self.add_cover_to_list(img)
 		return True
 
-	def __add_cover_to_list(self, cover):
+	def add_cover_to_list(self, cover):
 		try:
 			pbloader = GdkPixbuf.PixbufLoader()
 			pbloader.write(cover.data)
@@ -379,12 +421,25 @@ class AlbumArtWindow(qltk.Window):
 				self.printError()
 				return False
 		audio.save()
+		count = 0
+		if (audio.pictures is None) or (len(audio.pictures) <= 0):
+			pass
+		else:
+			count = str(len(audio.pictures))
+
+		self.song["pictures"] = count
 		app.window.emit("artwork-changed", [self.song])
+		del self.coverlist[:]
+		self.liststore.clear()
+		self.start_search()
 		return True
 
 	def on_delete(self, widget, event):
 		file_changed = False
 		i = 0
+		if len(self.liststore) <> len(self.coverlist):
+			file_changed = True
+
 		for row in self.liststore:
 			cover = row[1]
 			if (self.coverlist[i].data != cover.data) \
@@ -408,6 +463,9 @@ class DisplayImages(SongsMenuPlugin):
 
 	def __init__(self, *args, **kwargs):
 		self.counter = 0
+		mimetypes.add_type('image/jpeg', '.jpeg')
+		mimetypes.add_type('image/jpeg', '.jpg')
+		mimetypes.add_type('image/png', '.png')
 		super(DisplayImages, self).__init__(*args, **kwargs)
 
 	def plugin_handles(self, songs):
@@ -424,7 +482,7 @@ class DisplayImages(SongsMenuPlugin):
 			return True
 
 		for song in songs:
-			AlbumArtWindow(song)
+			AlbumArtWindow(song, self)
 
 
 
