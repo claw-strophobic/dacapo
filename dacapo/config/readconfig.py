@@ -11,6 +11,7 @@
 """Dieses Modul enthält eine Klasse um die Konfiguration aus einer XML-Datei zu verarbeiten. """
 
 from dacapo import errorhandling
+from dacapo.ui import condition
 try:
     import pkg_resources
     import sys, os
@@ -87,12 +88,12 @@ class Config(object):
                 neuesDict = self.readChild(child)
                 d[child.tag]  = neuesDict
             elif elementTyp == "cond" :
+                mf = condition.Condition()
+                mf.grabXMLData(child)
+                mf.printValues()
                 if self.debug :
                     print " COND   ->  ", child.tag, child.text
-                self.__dCond[child.tag] = {}
-                self.__dCond[child.tag]["operator"] = child.get("operator", "ne")
-                self.__dCond[child.tag]["operand"] = child.get("operand", " ")
-                self.__dCond[child.tag]["value"] = child.text
+                self.__dCond[child.tag] = mf
             else :
                 d[child.tag] = child.text
         return d

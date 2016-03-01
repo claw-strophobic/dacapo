@@ -95,36 +95,37 @@ class AudioFile(object):
         return s
 
     def addConditions(self):
-        cond = self.config.getConfig('cond', '')
-        for key1 in cond.iterkeys() :
+        conditions = self.config.getConfig('cond', '')
+        for key in conditions.iterkeys() :
+            cond = conditions[key]
             if self.debug : logging.debug("Condition:  %s Operator: %s Operand: %s Value: %s" % (
-                key1,
-                cond.get(key1)['operator'],
-                cond.get(key1)['operand'],
-                cond.get(key1)['value']
+                cond.name,
+                cond.operator,
+                cond.operand,
+                cond.content
                 ))
             test = False
-            operand = self.getMetaData(cond.get(key1)['operand'])
+            operand = self.getMetaData(cond.operand)
             if self.debug : logging.debug("Condition:  Operand is Type: %s " % (type(operand)))
-            if (cond.get(key1)['operator'] == 'notempty') \
+            if (cond.operator == 'notempty') \
                     and (operand <> None) and (operand):
                 test = True
-            elif (cond.get(key1)['operator'] == 'empty') and (operand == None):
+            elif (cond.operator == 'empty') and (operand == None):
                 test = True
-            elif (cond.get(key1)['operator'] == 'empty') \
+            elif (cond.operator == 'empty') \
                     and (operand <> None) and (not operand):
                 test = True
 
             if test == True:
                 if self.debug : logging.debug("Replace  %s " % (
-                    cond.get(key1)['value']
+                    cond.content
                 ))
-                s = self.replaceTags(cond.get(key1)['value'])
+                s = self.replaceTags(cond.content)
                 if self.debug : logging.debug("Adding:  %s zu den Tags mit Wert: %s" % (
-                    key1,
+                    cond.name,
                     s
                 ))
-                self.tags[key1] = [s]
+                self.tags[cond.name] = [s]
         del cond
         if self.debug : logging.debug("TAGS:  %s " % (self.tags))
         return
