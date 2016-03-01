@@ -104,19 +104,10 @@ class AudioFile(object):
                 cond.operand,
                 cond.content
                 ))
-            test = False
             operand = self.getMetaData(cond.operand)
             if self.debug : logging.debug("Condition:  Operand is Type: %s " % (type(operand)))
-            if (cond.operator == 'notempty') \
-                    and (operand <> None) and (operand):
-                test = True
-            elif (cond.operator == 'empty') and (operand == None):
-                test = True
-            elif (cond.operator == 'empty') \
-                    and (operand <> None) and (not operand):
-                test = True
 
-            if test == True:
+            if cond.checkOperand(operand) == True:
                 if self.debug : logging.debug("Replace  %s " % (
                     cond.content
                 ))

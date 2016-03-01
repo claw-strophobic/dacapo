@@ -26,5 +26,18 @@ class Condition(object):
 		self.operand = xml.get("operand", " ")
 		self.content = xml.text
 
+	def checkOperand(self, operand):
+		test = False
+		if (self.operator == 'notempty') \
+			and (operand <> None) and (operand):
+			test = True
+		elif (self.operator == 'empty') and (operand == None):
+			test = True
+		elif (self.operator == 'empty') \
+				and (operand <> None) and (not operand):
+			test = True
+		return test
+
+
 	def printValues(self):
 		print('\nCondition: {!s} {!s} {!s} {!s}'.format(self.name, self.content, self.operator, self.operand))
