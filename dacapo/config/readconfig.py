@@ -12,6 +12,7 @@
 
 from dacapo import errorhandling
 from dacapo.ui import condition
+from dacapo.ui import gui as MetaGUI
 try:
     import pkg_resources
     import sys, os
@@ -90,7 +91,6 @@ class Config(object):
             elif elementTyp == "cond" :
                 mf = condition.Condition()
                 mf.grabXMLData(child)
-                mf.printValues()
                 if self.debug :
                     print " COND   ->  ", child.tag, child.text
                 self.__dCond[child.tag] = mf
@@ -108,6 +108,7 @@ class Config(object):
         self.__dDebug = {}
         self.__dCond = {}
         self.__dTEMP = {}
+        self.gui = {}
 
         try:
             tree = ET.parse(self.XML)
@@ -127,6 +128,10 @@ class Config(object):
 
         gui = root.find('gui')
         for child in gui :
+            if ((child.tag == 'window') or (child.tag == 'fullscreen')):
+                self.gui[child.tag] = MetaGUI.Gui(child.tag)
+                self.gui[child.tag].grabXMLData(child)
+                self.gui[child.tag].printValues()
             if self.debug : print child.tag, child.attrib
             d = self.readChild(child)
             self.__dConfigGUI[child.tag] = d
@@ -245,7 +250,7 @@ def quit():
 
 def main(cmdline):
     global CONFIG, CONFIG_DIR, XML_CONFIG
-    CONFIG = Config(True, CONFIG_DIR + XML_CONFIG)
+    CONFIG = Config(False, CONFIG_DIR + XML_CONFIG)
     return
 
 if __name__ == '__main__':

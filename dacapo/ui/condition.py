@@ -40,4 +40,4 @@ class Condition(object):
 
 
 	def printValues(self):
-		print('\nCondition: {!s} {!s} {!s} {!s}'.format(self.name, self.content, self.operator, self.operand))
+		print('Condition: {!s} {!s} {!s} {!s}'.format(self.name, self.content, self.operator, self.operand))
