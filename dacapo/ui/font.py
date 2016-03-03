@@ -20,9 +20,8 @@ class Font(dacapo.ui.configelement.ConfigElement):
 		super(Font, self).__init__()
 
 	def grabXMLData(self, xml):
+		super(Font, self).grabXMLData(xml)
 		self.fontName = xml.find('font').text
-		self.fontSize = int(xml.find('fontSize').text)
-		self.fontColor = xml.find('fontColor').text
 
 	def printValues(self):
 		print('\nFont: {!s} Größe: {!s} Farbe: {!s}'.format(self.fontName, self.fontSize, self.fontColor))

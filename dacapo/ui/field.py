@@ -27,21 +27,10 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.font = dacapo.ui.font.Font()
 
 	def grabXMLData(self, xml):
+		super(Field, self).grabXMLData(xml)
 		self.font.grabXMLData(xml)
 		self.pos.grabXMLData(xml)
-		try: self.content = xml.find('value').text
-		except: pass
-		try: self.zIndex = int(xml.find('zIndex').text)
-		except: pass
-		try: self.comments = xml.find('comments').text
-		except: pass
-		try: self.overlay = self.checkBool(xml.find('overlay').text)
-		except: pass
-		try: self.splitSpaces = self.checkBool(xml.find('splitSpaces').text)
-		except: pass
-		try: self.multiLine = self.checkBool(xml.find('multiLine').text)
-		except: pass
-
+		self.content = xml.find('value').text
 
 	def printValues(self):
 		print('Field: {!s} Pos: {!s}x{!s} Font: {!s}'.format(self.name, self.pos.posH, self.pos.posV, self.font.fontName))

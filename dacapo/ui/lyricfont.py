@@ -17,10 +17,5 @@ class LyricFont(dacapo.ui.font.Font):
 	def __init__(self):
 		super(LyricFont, self).__init__()
 
-	def grabXMLData(self, xml):
-		super(LyricFont, self).grabXMLData(xml)
-		self.posV = int(xml.find('posV').text)
-		self.alignH = xml.find('alignH').text
-
 	def printValues(self):
 		print('\nLyricFont: {!s} Größe: {!s} Farbe: {!s} posV: {!s} alignH: {!s}'.format(self.fontName, self.fontSize, self.fontColor, self.posV, self.alignH))
