@@ -11,19 +11,19 @@
 import dacapo.ui.configelement
 
 class Position(dacapo.ui.configelement.ConfigElement):
-	# Horizontal
-	alignH = ''
-	posH = 0
-	posRefH = ''
-	maxWidth = 0
-	# Vertical
-	alignV = ''
-	posV = 0
-	posRefV = ''
-	maxHeight = 0
 
 	def __init__(self):
 		super(Position, self).__init__()
+		# Horizontal
+		self.alignH = ''
+		self.posH = 0
+		self.posRefH = ''
+		self.maxWidth = 0
+		# Vertical
+		self.alignV = ''
+		self.posV = 0
+		self.posRefV = ''
+		self.maxHeight = 0
 
 	def grabXMLData(self, xml):
 		# Horizontal

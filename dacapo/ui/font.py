@@ -12,12 +12,11 @@ import dacapo.ui.configelement
 
 class Font(dacapo.ui.configelement.ConfigElement):
 
-	fontName = ''
-	fontSize = 0
-	fontColor = ''
-
 	def __init__(self):
 		super(Font, self).__init__()
+		self.fontName = ''
+		self.fontSize = 0
+		self.fontColor = ''
 
 	def grabXMLData(self, xml):
 		super(Font, self).grabXMLData(xml)

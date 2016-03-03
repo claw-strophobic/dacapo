@@ -14,18 +14,15 @@ import dacapo.ui.position
 
 class Gui(dacapo.ui.configelement.ConfigElement):
 
-	name = ''
-	height = 0
-	width = 0
-	backgroundColor = None
-	mouseVisible = False
-	fields = {}
-	lyricFont = None
-	pictureArea = None
-
-
 	def __init__(self, name):
 		super(Gui, self).__init__()
+		self.height = 0
+		self.width = 0
+		self.backgroundColor = None
+		self.mouseVisible = False
+		self.fields = {}
+		self.lyricFont = None
+		self.pictureArea = None
 		self.name = name
 		self.lyricFont = dacapo.ui.lyricfont.LyricFont()
 		self.pictureArea = dacapo.ui.position.Position()

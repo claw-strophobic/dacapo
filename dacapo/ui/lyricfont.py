@@ -11,11 +11,10 @@ import dacapo.ui.font
 
 class LyricFont(dacapo.ui.font.Font):
 
-	posV = 0
-	alignH = None
-
 	def __init__(self):
 		super(LyricFont, self).__init__()
+		self.posV = 0
+		self.alignH = None
 
 	def printValues(self):
 		print('\nLyricFont: {!s} Größe: {!s} Farbe: {!s} posV: {!s} alignH: {!s}'.format(self.fontName, self.fontSize, self.fontColor, self.posV, self.alignH))

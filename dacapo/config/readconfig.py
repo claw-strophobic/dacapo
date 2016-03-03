@@ -129,9 +129,9 @@ class Config(object):
         gui = root.find('gui')
         for child in gui :
             if ((child.tag == 'window') or (child.tag == 'fullscreen')):
-                self.gui[child.tag] = MetaGUI.Gui(child.tag)
-                self.gui[child.tag].grabXMLData(child)
-                self.gui[child.tag].printValues()
+                g = MetaGUI.Gui(child.tag)
+                g.grabXMLData(child)
+                self.gui[child.tag] = g
             if self.debug : print child.tag, child.attrib
             d = self.readChild(child)
             self.__dConfigGUI[child.tag] = d
