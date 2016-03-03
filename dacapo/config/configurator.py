@@ -12,8 +12,12 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import pygame
 import gettext
+from dacapo.config import readconfig
+
 t = gettext.translation('dacapo', "/usr/share/locale/")
 t.install()
+
+CONFIG = readconfig.getConfigObject()
 
 class MyFontChooserWidget(Gtk.FontChooserWidget):
 
@@ -22,11 +26,12 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 
 		# a font chooser
 		# self.font_chooser = Gtk.FontChooserWidget()
-		# a default font
+		# a default fontfield.font.fontSize
 		# self.font_chooser.set_font("Sans")
 		# a text to preview the font
 		#self.font_chooser.set_preview_text(
 		#	"This is an example of preview text!")
+		self.set_show_preview_entry(False)
 
 		# connect signal from the font chooser to the callback function
 		self.connect("notify::font", self.font_cb)
@@ -46,23 +51,35 @@ class Configurator(Gtk.Window):
 		Gtk.Window.__init__(self, title=_("dacapo configurator"))
 		pygame.init()
 		fonts = pygame.font.get_fonts()
-		for font in fonts:
-			print font
 		self.set_border_width(3)
-		self.font_chooser = MyFontChooserWidget()
 
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
 
 		self.page_window = Gtk.Box()
+		vbox = Gtk.VBox()
 		self.page_window.set_border_width(10)
-		self.page_window.add(Gtk.Label('Window-Settings!'))
-		self.page_window.add(self.font_chooser)
+		vbox.add(Gtk.Label(_('Window-Settings')))
+		## add fields
+		font_chooser = MyFontChooserWidget()
+		self.window_fields = self.get_field_combo('window', font_chooser)
+		vbox.add(self.window_fields)
+		vbox.add(font_chooser)
+		self.page_window.add(vbox)
 		self.notebook.append_page(self.page_window, Gtk.Label(_("GUI Window")))
+
 		self.page_fullscreen = Gtk.Box()
+		vbox = Gtk.VBox()
 		self.page_fullscreen.set_border_width(10)
-		self.page_fullscreen.add(Gtk.Label('Fullscreen-Settings!'))
+		vbox.add(Gtk.Label(_('Fullscreen-Settings')))
+		## add fields
+		font_chooser = MyFontChooserWidget()
+		self.fullscreen_fields = self.get_field_combo('fullscreen', font_chooser)
+		vbox.add(self.fullscreen_fields)
+		vbox.add(font_chooser)
+		self.page_fullscreen.add(vbox)
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
+
 		self.page_metadata = Gtk.Box()
 		self.page_metadata.set_border_width(10)
 		self.page_metadata.add(Gtk.Label('Metadata-Settings!'))
@@ -83,6 +100,37 @@ class Configurator(Gtk.Window):
 				Gtk.IconSize.MENU
 			)
 		)
+
+	def get_field_combo(self, type, font_chooser):
+		type_store = Gtk.ListStore(str, object)
+		g = CONFIG.gui[type]
+		for key in g.fields:
+			type_store.append([key, g.fields[key]])
+		field_combo = Gtk.ComboBox.new_with_model(type_store)
+		field_combo.type = type
+		field_combo.font_chooser = font_chooser
+		renderer = Gtk.CellRendererText()
+		field_combo.pack_start(renderer, True)
+		field_combo.add_attribute(renderer, 'text', 0)
+		field_combo.connect("changed", self.on_field_combo_changed)
+		field_combo.set_entry_text_column(0)
+		return field_combo
+
+	def on_field_combo_changed(self, combo):
+		combo_iter = combo.get_active_iter()
+		if not combo_iter:
+			return
+		model = combo.get_model()
+		fieldName = model.get_value(combo_iter, 0)
+		print("You chose the field " + fieldName)
+		field = model.get_value(combo_iter, 1)
+		font_chooser = combo.font_chooser
+		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
+		print("Field-Font " + font)
+		font_chooser.set_font(font)
+
+
+
 win = Configurator()
 win.connect("delete-event", Gtk.main_quit)
 win.show_all()
