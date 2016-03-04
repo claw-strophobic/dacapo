@@ -19,9 +19,18 @@ t.install()
 
 CONFIG = readconfig.getConfigObject()
 
+def hex_to_rgb(value):
+	value = value.lstrip('#')
+	lv = len(value)
+	return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+def rgb_to_hex(rgb):
+	return '#%02x%02x%02x' % rgb
+
+
 class MyFontChooserWidget(Gtk.FontChooserWidget):
 
-    def __init__(self):
+	def __init__(self):
 		super(MyFontChooserWidget, self).__init__()
 
 		# a font chooser
@@ -31,18 +40,40 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		# a text to preview the font
 		#self.font_chooser.set_preview_text(
 		#	"This is an example of preview text!")
-		self.set_show_preview_entry(False)
+		self.set_show_preview_entry(True)
+		self.grid = None
+		for attr in self:
+			self.grid = attr
+			break
+		if self.grid <> None:
+			pass
+
+		## print(dir(Gtk.FontChooserWidget))
+		box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+		colorchooser = Gtk.ColorChooserWidget(show_editor=True)
+		box.add(colorchooser)
+		self.add(box)
+
+		##self.entry_desc.connect("changed", self.on_entry_desc_changed)
+		##vbox.pack_start(self.entry_desc, True, True, 0)
 
 		# connect signal from the font chooser to the callback function
 		self.connect("notify::font", self.font_cb)
+		self.printValues()
 
 		# add the font chooser to the window
 		# self.add(self.font_chooser)
 
-    # callback function:
-    def font_cb(self, event, user_data):
+
+	# callback function:
+	def font_cb(self, event, user_data):
 		# print in the terminal
-        print("You chose the font " + self.get_font())
+		print("You chose the font " + self.get_font())
+
+	def printValues(self):
+		print("Los gehts...")
+		for attr in self:
+			print('Field: {!s}'.format(attr))
 
 
 class Configurator(Gtk.Window):
@@ -73,10 +104,10 @@ class Configurator(Gtk.Window):
 		self.page_fullscreen.set_border_width(10)
 		vbox.add(Gtk.Label(_('Fullscreen-Settings')))
 		## add fields
-		font_chooser = MyFontChooserWidget()
+		##font_chooser = MyFontChooserWidget()
 		self.fullscreen_fields = self.get_field_combo('fullscreen', font_chooser)
 		vbox.add(self.fullscreen_fields)
-		vbox.add(font_chooser)
+		##vbox.add(font_chooser)
 		self.page_fullscreen.add(vbox)
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
 
