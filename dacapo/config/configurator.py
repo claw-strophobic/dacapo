@@ -50,8 +50,8 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 
 		## print(dir(Gtk.FontChooserWidget))
 		box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-		colorchooser = Gtk.ColorChooserWidget(show_editor=True)
-		box.add(colorchooser)
+		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
+		box.add(self.colorchooser)
 		self.add(box)
 
 		##self.entry_desc.connect("changed", self.on_entry_desc_changed)
@@ -104,10 +104,10 @@ class Configurator(Gtk.Window):
 		self.page_fullscreen.set_border_width(10)
 		vbox.add(Gtk.Label(_('Fullscreen-Settings')))
 		## add fields
-		##font_chooser = MyFontChooserWidget()
+		font_chooser = MyFontChooserWidget()
 		self.fullscreen_fields = self.get_field_combo('fullscreen', font_chooser)
 		vbox.add(self.fullscreen_fields)
-		##vbox.add(font_chooser)
+		vbox.add(font_chooser)
 		self.page_fullscreen.add(vbox)
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
 
@@ -157,8 +157,10 @@ class Configurator(Gtk.Window):
 		field = model.get_value(combo_iter, 1)
 		font_chooser = combo.font_chooser
 		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
-		print("Field-Font " + font)
+		print("Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
 		font_chooser.set_font(font)
+		font_chooser.colorchooser.set_rgba(field.font.getRGBAColor())
+		font_chooser.colorchooser.set_property("show-editor", True)
 
 
 
