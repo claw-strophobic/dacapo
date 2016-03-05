@@ -14,7 +14,7 @@ class LyricFont(dacapo.ui.font.Font):
 	def __init__(self):
 		super(LyricFont, self).__init__()
 		self.posV = 0
-		self.alignH = None
+		self.alignH = 'center'
 
 	def printValues(self):
 		print('\nLyricFont: {!s} Größe: {!s} Farbe: {!s} posV: {!s} alignH: {!s}'.format(self.fontName, self.fontSize, self.fontColor, self.posV, self.alignH))
