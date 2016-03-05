@@ -81,9 +81,9 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		self.entry.override_background_color(Gtk.StateFlags.NORMAL, g.getRGBABackgroundColor())
 		return
 
-	def setFGcolor(self, field):
-		self.colorchooser.set_rgba(field.font.getRGBAColor())
-		self.entry.override_color(Gtk.StateFlags.NORMAL, field.font.getRGBAColor())
+	def setFGcolor(self, color):
+		self.colorchooser.set_rgba(color)
+		self.entry.override_color(Gtk.StateFlags.NORMAL, color)
 		self.colorchooser.set_property("show-editor", True)
 		return
 
@@ -205,7 +205,7 @@ class Configurator(Gtk.Window):
 		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
 		print("Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
 		font_chooser.set_font(field.font.fontName, field.font.fontSize)
-		font_chooser.setFGcolor(field)
+		font_chooser.setFGcolor(field.font.getRGBAColor())
 
 
 win = Configurator()
