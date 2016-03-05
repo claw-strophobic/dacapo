@@ -27,13 +27,6 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
 			Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-		# a font chooser
-		# self.font_chooser = Gtk.FontChooserWidget()
-		# a default fontfield.font.fontSize
-		# self.font_chooser.set_font("Sans")
-		# a text to preview the font
-		#self.font_chooser.set_preview_text(
-		#	"This is an example of preview text!")
 		self.set_show_preview_entry(True)
 		self.grid = None
 		self.entry = None
@@ -47,21 +40,13 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 				if type(attr).__name__ == "Entry":
 					self.entry = attr
 
-		## print(dir(Gtk.FontChooserWidget))
 		box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
 		box.add(self.colorchooser)
 		self.add(box)
-
-		##self.entry_desc.connect("changed", self.on_entry_desc_changed)
-		##vbox.pack_start(self.entry_desc, True, True, 0)
-
 		# connect signal from the font chooser to the callback function
 		self.connect("notify::font", self.font_cb)
 		# self.printValues()
-
-		# add the font chooser to the window
-		# self.add(self.font_chooser)
 
 
 	# callback function:
