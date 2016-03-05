@@ -109,29 +109,52 @@ class Configurator(Gtk.Window):
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
 
+		# 1st tab -> Window settings
 		self.page_window = Gtk.Box()
 		vbox = Gtk.VBox()
 		self.page_window.set_border_width(10)
 		vbox.add(Gtk.Label(_('Window-Settings')))
+		font_chooser = MyFontChooserWidget()
+		vbox.add(font_chooser)
+		self.page_window.add(vbox)
+		self.notebook.append_page(self.page_window, Gtk.Label(_("GUI Window")))
+
+
+		# 2nd tab -> Window-Fields
+		self.page_fields_window = Gtk.Box()
+		vbox = Gtk.VBox()
+		self.page_fields_window.set_border_width(10)
+		vbox.add(Gtk.Label(_('Window-Fields-Settings')))
 		## add fields
 		font_chooser = MyFontChooserWidget()
 		self.window_fields = self.get_field_combo('window', font_chooser)
 		vbox.add(self.window_fields)
 		vbox.add(font_chooser)
-		self.page_window.add(vbox)
-		self.notebook.append_page(self.page_window, Gtk.Label(_("GUI Window")))
+		self.page_fields_window.add(vbox)
+		self.notebook.append_page(self.page_fields_window, Gtk.Label(_("Window fields")))
 
+		# 3rd tab -> Fullscreen settings
 		self.page_fullscreen = Gtk.Box()
 		vbox = Gtk.VBox()
 		self.page_fullscreen.set_border_width(10)
 		vbox.add(Gtk.Label(_('Fullscreen-Settings')))
+		font_chooser = MyFontChooserWidget()
+		vbox.add(font_chooser)
+		self.page_fullscreen.add(vbox)
+		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
+
+		# 3rd tab -> Fullscreen settings
+		self.page_fields_fullscreen = Gtk.Box()
+		vbox = Gtk.VBox()
+		self.page_fields_fullscreen.set_border_width(10)
+		vbox.add(Gtk.Label(_('Fullscreen-Fields-Settings')))
 		## add fields
 		font_chooser = MyFontChooserWidget()
 		self.fullscreen_fields = self.get_field_combo('fullscreen', font_chooser)
 		vbox.add(self.fullscreen_fields)
 		vbox.add(font_chooser)
-		self.page_fullscreen.add(vbox)
-		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
+		self.page_fields_fullscreen.add(vbox)
+		self.notebook.append_page(self.page_fields_fullscreen, Gtk.Label(_("Fullscreen fields")))
 
 		self.page_metadata = Gtk.Box()
 		self.page_metadata.set_border_width(10)
