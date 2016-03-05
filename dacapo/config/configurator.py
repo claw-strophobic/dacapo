@@ -17,6 +17,11 @@ t = gettext.translation('dacapo', "/usr/share/locale/")
 t.install()
 
 CONFIG = readconfig.getConfigObject()
+ALIGNH = {
+		"center": _("center"),
+		"left": _("left"),
+		"right": _("right"),
+	}
 
 class MyFontChooserWidget(Gtk.FontChooserWidget):
 
@@ -84,6 +89,70 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 			print('Field: {!s}'.format(type(attr).__dict__))
 		return
 
+class BackgroundTab(Gtk.Box):
+
+	def __init__(self, type):
+		Gtk.Box.__init__(self)
+		g = CONFIG.gui[type]
+		self.set_border_width(10)
+		vbox = Gtk.VBox()
+		vbox.add(Gtk.Label(_('Pictures- & Background-Settings!')))
+		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
+		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
+		self.colorchooser.set_property("show-editor", True)
+		vbox.add(self.colorchooser)
+		self.add(vbox)
+
+
+class LyricfontTab(Gtk.Box):
+
+	def __init__(self, type):
+		Gtk.Box.__init__(self)
+		g = CONFIG.gui[type]
+		self.set_border_width(10)
+		grid = Gtk.Grid()
+		grid.set_column_homogeneous(False)
+		grid.set_column_spacing(6)
+		vbox = Gtk.VBox()
+		vbox.add(Gtk.Label(_('Lyric-Font-Settings!')))
+		labelPos = Gtk.Label(_('Lyric position (vertical)'))
+		grid.add(labelPos)
+		adjustment = Gtk.Adjustment(int(g.lyricFont.posV), 0, int(g.height), 1, 10, 0)
+		self.pos_spinbutton = Gtk.SpinButton()
+		self.pos_spinbutton.set_adjustment(adjustment)
+		self.pos_spinbutton.set_value(int(g.lyricFont.posV))
+		grid.attach_next_to(self.pos_spinbutton,labelPos, Gtk.PositionType.RIGHT, 1, 1)
+		print("height: {!s} posV: {!s}".format(g.height, self.pos_spinbutton.get_value()))
+
+		labelAlign = Gtk.Label(_('Lyric align (horizontal)'))
+		grid.attach_next_to(labelAlign, labelPos, Gtk.PositionType.BOTTOM, 1, 1)
+		type_store = Gtk.ListStore(str, str)
+		for key in ALIGNH:
+			type_store.append([key, ALIGNH[key]])
+		align_combo = Gtk.ComboBox.new_with_model(type_store)
+		renderer = Gtk.CellRendererText()
+		i = 0
+		for row in type_store:
+			if (row[0] == g.lyricFont.alignH):
+				align_combo.set_active(i)
+			i += 1
+
+		# align_combo.set_active(type_store.get_iter(g.lyricFont.alignH))
+		align_combo.pack_start(renderer, True)
+		align_combo.add_attribute(renderer, 'text', 1)
+		## align_combo.connect("changed", self.on_name_combo_changed)
+		align_combo.set_entry_text_column(1)
+		grid.attach_next_to(align_combo, labelAlign, Gtk.PositionType.RIGHT, 1, 1)
+
+		font_chooser = MyFontChooserWidget()
+		font_chooser.setBGcolor(type)
+		font_chooser.setFGcolor(g.lyricFont.getRGBAColor())
+		font_chooser.set_font(g.lyricFont.fontName, g.lyricFont.fontSize)
+		vbox.add(grid)
+
+		vbox.add(font_chooser)
+		self.add(vbox)
+
 
 class GuiTab(Gtk.Box):
 
@@ -91,32 +160,13 @@ class GuiTab(Gtk.Box):
 		Gtk.Box.__init__(self)
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
-		g = CONFIG.gui[type]
 
 		# 1st tab -> Background settings
-		self.page_background = Gtk.Box()
-		self.page_background.set_border_width(10)
-		vbox = Gtk.VBox()
-		vbox.add(Gtk.Label(_('Pictures- & Background-Settings!')))
-		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
-		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
-		self.colorchooser.set_property("show-editor", True)
-		vbox.add(self.colorchooser)
-		self.page_background.add(vbox)
+		self.page_background = BackgroundTab(type)
 		self.notebook.append_page(self.page_background, Gtk.Label(_("Pictures & Background")))
 
 		# 2nd tab -> Lyricfont settings
-		self.page_font = Gtk.Box()
-		self.page_font.set_border_width(10)
-		vbox = Gtk.VBox()
-		vbox.add(Gtk.Label(_('Lyric-Font-Settings!')))
-		font_chooser = MyFontChooserWidget()
-		font_chooser.setBGcolor(type)
-		font_chooser.setFGcolor(g.lyricFont.getRGBAColor())
-		font_chooser.set_font(g.lyricFont.fontName, g.lyricFont.fontSize)
-
-		vbox.add(font_chooser)
-		self.page_font.add(vbox)
+		self.page_font = LyricfontTab(type)
 		self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
 
 
