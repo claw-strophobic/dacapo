@@ -100,6 +100,41 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		return
 
 
+class GuiTab(Gtk.Box):
+
+	def __init__(self, type):
+		Gtk.Box.__init__(self)
+		self.notebook = Gtk.Notebook()
+		self.add(self.notebook)
+		g = CONFIG.gui[type]
+
+		# 1st tab -> Background settings
+		self.page_background = Gtk.Box()
+		self.page_background.set_border_width(10)
+		vbox = Gtk.VBox()
+		vbox.add(Gtk.Label(_('Pictures- & Background-Settings!')))
+		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
+		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
+		self.colorchooser.set_property("show-editor", True)
+		vbox.add(self.colorchooser)
+		self.page_background.add(vbox)
+		self.notebook.append_page(self.page_background, Gtk.Label(_("Pictures & Background")))
+
+		# 2nd tab -> Lyricfont settings
+		self.page_font = Gtk.Box()
+		self.page_font.set_border_width(10)
+		vbox = Gtk.VBox()
+		vbox.add(Gtk.Label(_('Lyric-Font-Settings!')))
+		font_chooser = MyFontChooserWidget()
+		font_chooser.setBGcolor(type)
+		font_chooser.setFGcolor(g.lyricFont.getRGBAColor())
+		font_chooser.set_font(g.lyricFont.fontName, g.lyricFont.fontSize)
+
+		vbox.add(font_chooser)
+		self.page_font.add(vbox)
+		self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
+
+
 class Configurator(Gtk.Window):
 
 	def __init__(self):
@@ -110,13 +145,7 @@ class Configurator(Gtk.Window):
 		self.add(self.notebook)
 
 		# 1st tab -> Window settings
-		self.page_window = Gtk.Box()
-		vbox = Gtk.VBox()
-		self.page_window.set_border_width(10)
-		vbox.add(Gtk.Label(_('Window-Settings')))
-		font_chooser = MyFontChooserWidget()
-		vbox.add(font_chooser)
-		self.page_window.add(vbox)
+		self.page_window = GuiTab('window')
 		self.notebook.append_page(self.page_window, Gtk.Label(_("GUI Window")))
 
 
@@ -134,13 +163,7 @@ class Configurator(Gtk.Window):
 		self.notebook.append_page(self.page_fields_window, Gtk.Label(_("Window fields")))
 
 		# 3rd tab -> Fullscreen settings
-		self.page_fullscreen = Gtk.Box()
-		vbox = Gtk.VBox()
-		self.page_fullscreen.set_border_width(10)
-		vbox.add(Gtk.Label(_('Fullscreen-Settings')))
-		font_chooser = MyFontChooserWidget()
-		vbox.add(font_chooser)
-		self.page_fullscreen.add(vbox)
+		self.page_fullscreen = GuiTab('fullscreen')
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
 
 		# 3rd tab -> Fullscreen settings
@@ -158,11 +181,11 @@ class Configurator(Gtk.Window):
 
 		self.page_metadata = Gtk.Box()
 		self.page_metadata.set_border_width(10)
-		self.page_metadata.add(Gtk.Label('Metadata-Settings!'))
+		self.page_metadata.add(Gtk.Label(_('Metadata-Settings!')))
 		self.notebook.append_page(self.page_metadata, Gtk.Label(_("Metadata")))
 		self.page_debug = Gtk.Box()
 		self.page_debug.set_border_width(10)
-		self.page_debug.add(Gtk.Label('Audio & Debug-Settings!'))
+		self.page_debug.add(Gtk.Label(_('Audio & Debug-Settings!')))
 		self.notebook.append_page(self.page_debug, Gtk.Label(_("Audio & Debug")))
 
 
