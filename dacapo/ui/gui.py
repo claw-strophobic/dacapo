@@ -11,6 +11,7 @@ import dacapo.ui.configelement
 import dacapo.ui.lyricfont
 import dacapo.ui.field
 import dacapo.ui.position
+from gi.repository import Gdk
 
 class Gui(dacapo.ui.configelement.ConfigElement):
 
@@ -41,3 +42,12 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		self.lyricFont.printValues()
 		for k,f in self.fields.iteritems():
 			f.printValues()
+
+	def getRGBABackgroundColor(self):
+		color = Gdk.RGBA()
+		colorRGB = []
+		for c in self.backgroundColor:
+			colorRGB.append(str(c))
+		parseThis = 'rgb(' + ','.join(colorRGB) + ')'
+		color.parse(parseThis)
+		return color
