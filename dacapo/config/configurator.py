@@ -11,6 +11,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import gettext
+import pygame
 from dacapo.config import readconfig
 
 t = gettext.translation('dacapo', "/usr/share/locale/")
@@ -152,6 +153,7 @@ class LyricfontTab(Gtk.Box):
 
 		vbox.add(font_chooser)
 		self.add(vbox)
+		pygame.init()
 
 
 class GuiTab(Gtk.Box):
@@ -160,6 +162,16 @@ class GuiTab(Gtk.Box):
 		Gtk.Box.__init__(self)
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
+		g = CONFIG.gui[type]
+		self.resolution = (g.height, g.width)
+		try:
+			if type == "fullscreen":
+				self.screen = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN)
+			else:
+				self.screen = pygame.display.set_mode(self.resolution)
+		except:
+			print(pygame.get_error())
+
 
 		# 1st tab -> Background settings
 		self.page_background = BackgroundTab(type)
