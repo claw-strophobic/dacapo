@@ -12,6 +12,7 @@ import dacapo.ui.interface_blitobject
 import dacapo.ui.blitobject
 import pygame
 
+find_between = dacapo.ui.interface_blitobject.find_between
 
 class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -40,6 +41,15 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		if self.EXAMPLES.has_key(key):
 			res = self.EXAMPLES[key]
 		return res
+
+	def getReplacedContent(self):
+		text = s = self.content
+		while True :
+			text = find_between(s, '%', '%')
+			if text == '' : break
+			s = s.replace('%' + text + '%', self.getExampleData(text))
+		return s
+
 
 	def getBlitObject( self ):
 		if (self.renderedData is None) or (self.renderedSize is None):
