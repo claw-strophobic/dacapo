@@ -8,6 +8,11 @@
 # published by the Free Software Foundation
 #
 import gi
+
+from dacapo.ui.field import Field
+import dacapo.ui.interface_blitobject
+import dacapo.ui.blitobject
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import gettext
@@ -90,6 +95,49 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 			print('Field: {!s}'.format(type(attr).__dict__))
 		return
 
+
+class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
+
+	def __init__(self, type):
+		Gtk.Box.__init__(self)
+		self.type = type
+		self.screen = None
+
+	def on_preview(self, *data):
+		g = CONFIG.gui[self.type]
+		resolution = (g.width, g.height)
+		FPS = 30
+		fpsClock = pygame.time.Clock()
+		fpsClock.tick(FPS)
+		try:
+			if type == "fullscreen":
+				self.screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
+			else:
+				self.screen = pygame.display.set_mode(resolution)
+		except:
+			print(pygame.get_error())
+			return
+
+		try: self.doFillBackground(self.screen, g.backgroundColor, True)
+		except:
+			print(pygame.get_error())
+			return
+		obj = self.getBlitObject()
+		self.doBlitObject(self.screen, obj, True)
+		while True:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					return
+				elif event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+						pygame.quit()
+						return
+				else:
+					pass
+
+
+
 class BackgroundTab(Gtk.Box):
 
 	def __init__(self, type):
@@ -104,6 +152,69 @@ class BackgroundTab(Gtk.Box):
 		vbox.add(self.colorchooser)
 		self.add(vbox)
 
+
+class FieldTab(PreviewTab):
+
+	def __init__(self, type):
+		super(FieldTab, self).__init__(type)
+		self.field = None
+		g = CONFIG.gui[type]
+		self.set_border_width(10)
+		vbox = Gtk.VBox()
+		self.set_border_width(10)
+		vbox.add(Gtk.Label(_('Window-Fields-Settings')))
+		## add fields
+		font_chooser = MyFontChooserWidget()
+		hbox = Gtk.HBox()
+		self.fields = self.get_field_combo(type, font_chooser)
+		hbox.add(self.fields)
+		self.prev_button = Gtk.Button(_("Preview"))
+		self.prev_button.set_sensitive(False)
+		self.prev_button.connect('clicked', self.on_preview)
+		hbox.add(self.prev_button)
+		vbox.add(hbox)
+		vbox.add(font_chooser)
+		self.add(vbox)
+
+	def get_field_combo(self, type, font_chooser):
+		type_store = Gtk.ListStore(str, object)
+		g = CONFIG.gui[type]
+		for key in g.fields:
+			type_store.append([key, g.fields[key]])
+		field_combo = Gtk.ComboBox.new_with_model(type_store)
+		field_combo.type = type
+		field_combo.font_chooser = font_chooser
+		renderer = Gtk.CellRendererText()
+		field_combo.pack_start(renderer, True)
+		field_combo.add_attribute(renderer, 'text', 0)
+		field_combo.connect("changed", self.on_field_combo_changed)
+		field_combo.set_entry_text_column(0)
+		return field_combo
+
+	def on_field_combo_changed(self, combo):
+		combo_iter = combo.get_active_iter()
+		if not combo_iter:
+			return
+		model = combo.get_model()
+		fieldName = model.get_value(combo_iter, 0)
+		print("You chose the field " + fieldName)
+		field = model.get_value(combo_iter, 1)
+		font_chooser = combo.font_chooser
+		font_chooser.setBGcolor(combo.type)
+		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
+		print("Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
+		font_chooser.set_font(field.font.fontName, field.font.fontSize)
+		font_chooser.setFGcolor(field.font.getRGBAColor())
+		self.field = field
+		self.prev_button.set_sensitive(True)
+
+	def getBlitObject( self ):
+		if self.field is None:
+			return None
+		else:
+			self.field.content = self.field.getExampleData(self.field.name)
+			print("Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
+			return self.field.getBlitObject()
 
 class LyricfontTab(Gtk.Box):
 
@@ -162,16 +273,6 @@ class GuiTab(Gtk.Box):
 		Gtk.Box.__init__(self)
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
-		g = CONFIG.gui[type]
-		self.resolution = (g.height, g.width)
-		try:
-			if type == "fullscreen":
-				self.screen = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN)
-			else:
-				self.screen = pygame.display.set_mode(self.resolution)
-		except:
-			print(pygame.get_error())
-
 
 		# 1st tab -> Background settings
 		self.page_background = BackgroundTab(type)
@@ -197,33 +298,15 @@ class Configurator(Gtk.Window):
 
 
 		# 2nd tab -> Window-Fields
-		self.page_fields_window = Gtk.Box()
-		vbox = Gtk.VBox()
-		self.page_fields_window.set_border_width(10)
-		vbox.add(Gtk.Label(_('Window-Fields-Settings')))
-		## add fields
-		font_chooser = MyFontChooserWidget()
-		self.window_fields = self.get_field_combo('window', font_chooser)
-		vbox.add(self.window_fields)
-		vbox.add(font_chooser)
-		self.page_fields_window.add(vbox)
+		self.page_fields_window = FieldTab('window')
 		self.notebook.append_page(self.page_fields_window, Gtk.Label(_("Window fields")))
 
 		# 3rd tab -> Fullscreen settings
 		self.page_fullscreen = GuiTab('fullscreen')
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
 
-		# 3rd tab -> Fullscreen settings
-		self.page_fields_fullscreen = Gtk.Box()
-		vbox = Gtk.VBox()
-		self.page_fields_fullscreen.set_border_width(10)
-		vbox.add(Gtk.Label(_('Fullscreen-Fields-Settings')))
-		## add fields
-		font_chooser = MyFontChooserWidget()
-		self.fullscreen_fields = self.get_field_combo('fullscreen', font_chooser)
-		vbox.add(self.fullscreen_fields)
-		vbox.add(font_chooser)
-		self.page_fields_fullscreen.add(vbox)
+		# 4th tab -> Fullscreen-Fields
+		self.page_fields_fullscreen = FieldTab('fullscreen')
 		self.notebook.append_page(self.page_fields_fullscreen, Gtk.Label(_("Fullscreen fields")))
 
 		self.page_metadata = Gtk.Box()
@@ -246,36 +329,6 @@ class Configurator(Gtk.Window):
 				Gtk.IconSize.MENU
 			)
 		)
-
-	def get_field_combo(self, type, font_chooser):
-		type_store = Gtk.ListStore(str, object)
-		g = CONFIG.gui[type]
-		for key in g.fields:
-			type_store.append([key, g.fields[key]])
-		field_combo = Gtk.ComboBox.new_with_model(type_store)
-		field_combo.type = type
-		field_combo.font_chooser = font_chooser
-		renderer = Gtk.CellRendererText()
-		field_combo.pack_start(renderer, True)
-		field_combo.add_attribute(renderer, 'text', 0)
-		field_combo.connect("changed", self.on_field_combo_changed)
-		field_combo.set_entry_text_column(0)
-		return field_combo
-
-	def on_field_combo_changed(self, combo):
-		combo_iter = combo.get_active_iter()
-		if not combo_iter:
-			return
-		model = combo.get_model()
-		fieldName = model.get_value(combo_iter, 0)
-		print("You chose the field " + fieldName)
-		field = model.get_value(combo_iter, 1)
-		font_chooser = combo.font_chooser
-		font_chooser.setBGcolor(combo.type)
-		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
-		print("Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
-		font_chooser.set_font(field.font.fontName, field.font.fontSize)
-		font_chooser.setFGcolor(field.font.getRGBAColor())
 
 
 win = Configurator()

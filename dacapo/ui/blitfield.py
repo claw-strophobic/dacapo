@@ -27,11 +27,12 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 	}
 
 	def __init__(self, name):
-		dacapo.ui.field.Field.__init__(name)
-		dacapo.ui.interface_blitobject.BlitObject.__init__()
-		pygame.init()
-		self.blitObj = dacapo.ui.blitobject.BlitObject(name)
-
+		super(BlitField, self).__init__(name)
+		self.renderedData = None
+		self.renderedSize = None
+		self.sysFont = None
+		## dacapo.ui.field.Field.__init__(name)
+		## dacapo.ui.interface_blitobject.BlitObject.__init__()
 
 	def getExampleData(self, key):
 		res = ""
@@ -40,19 +41,31 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		return res
 
 	def getBlitObject( self ):
+		if (self.renderedData is None) or (self.renderedSize is None):
+			print("renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
+			self.getRenderedData()
+		blitObj = dacapo.ui.blitobject.BlitObject(self.name)
 		renderedSize = self.renderedSize
 		blitPos = (self.pos.posV, self.pos.posH)
-		self.blitObj.setBlitRect(blitPos, renderedSize)
-		self.blitObj.renderedData = self.renderedData
-		return self.blitObj
+		blitObj.setBlitRect(blitPos, renderedSize)
+		blitObj.renderedData = self.renderedData
+		return blitObj
 
 	def getRenderedData(self):
-		if (self.sysFont == None):
+		if (self.sysFont is None):
+			if (not pygame.font.get_init()):
+				pygame.font.init()
 			try: self.sysFont = pygame.font.SysFont(self.font.fontName, self.font.fontSize)
-			except: return None
-		if (self.renderedData == None):
-			try: self.renderedData = self.sysFont.render(self.content, True,self.font.fontColor)
-			except: return None
+			except pygame.error, err:
+				print("Error at pygame.font.SysFont(%s, %s) . %s " % (
+						self.font.fontName, self.font.fontSize, err))
+				return None
+		if (self.renderedData is None):
+			try: self.renderedData = self.sysFont.render(self.content, True, self.font.fontColor)
+			except pygame.error, err:
+				print("Error at sysFont.render(%s, %s) . %s " % (
+						self.content, self.font.fontColor, err))
+				return None
 		self.renderedSize = self.renderedData.get_size()
 		return self.renderedData
 

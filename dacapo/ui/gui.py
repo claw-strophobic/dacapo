@@ -9,7 +9,7 @@
 #
 import dacapo.ui.configelement
 import dacapo.ui.lyricfont
-import dacapo.ui.field
+import dacapo.ui.blitfield
 import dacapo.ui.position
 from gi.repository import Gdk
 
@@ -33,7 +33,7 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		self.lyricFont.grabXMLData(xml.find('lyricFont'))
 		fields = xml.find('fields')
 		for child in fields:
-			f = dacapo.ui.field.Field(child.tag)
+			f = dacapo.ui.blitfield.BlitField(child.tag)
 			f.grabXMLData(child)
 			self.fields[child.tag] = f
 
