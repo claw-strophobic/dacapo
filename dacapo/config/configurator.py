@@ -48,8 +48,10 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 			for attr in self.grid:
 				if type(attr).__name__ == "SearchEntry":
 					self.searchEntry = attr
+					self.searchEntry.set_tooltip_text(_("Search here for a font name."))
 				if type(attr).__name__ == "Entry":
 					self.entry = attr
+					self.entry.set_tooltip_text(_("Change here the text of the preview."))
 
 		box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
@@ -163,16 +165,26 @@ class FieldTab(PreviewTab):
 		vbox = Gtk.VBox()
 		self.set_border_width(10)
 		vbox.add(Gtk.Label(_('Window-Fields-Settings')))
+		grid = Gtk.Grid()
+		grid.set_column_homogeneous(False)
+		grid.set_column_spacing(6)
+
 		## add fields
 		font_chooser = MyFontChooserWidget()
-		hbox = Gtk.HBox()
+
 		self.fields = self.get_field_combo(type, font_chooser)
-		hbox.add(self.fields)
+		self.fields.set_tooltip_text(_("Select an existing field here."))
+		labelField = Gtk.Label(_('Field:'))
+		grid.add(labelField)
+		grid.attach_next_to(self.fields, labelField, Gtk.PositionType.RIGHT, 1, 1)
 		self.prev_button = Gtk.Button(_("Preview"))
 		self.prev_button.set_sensitive(False)
 		self.prev_button.connect('clicked', self.on_preview)
-		hbox.add(self.prev_button)
-		vbox.add(hbox)
+		self.prev_button.set_tooltip_text(_("Click here to see a preview of this field."))
+
+		grid.attach_next_to(self.prev_button, self.fields, Gtk.PositionType.RIGHT, 1, 1)
+
+		vbox.add(grid)
 		vbox.add(font_chooser)
 		self.add(vbox)
 
@@ -197,12 +209,11 @@ class FieldTab(PreviewTab):
 			return
 		model = combo.get_model()
 		fieldName = model.get_value(combo_iter, 0)
-		print(u"You chose the field " + fieldName)
 		field = model.get_value(combo_iter, 1)
 		font_chooser = combo.font_chooser
 		font_chooser.setBGcolor(combo.type)
 		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
-		print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
+		## print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
 		font_chooser.set_font(field.font.fontName, field.font.fontSize)
 		font_chooser.setFGcolor(field.font.getRGBAColor())
 		self.field = field
@@ -212,7 +223,7 @@ class FieldTab(PreviewTab):
 		if self.field is None:
 			return None
 		else:
-			self.field.content = self.field.getExampleData(self.field.name)
+			self.field.content = self.field.getReplacedContent()
 			print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
 			return self.field.getBlitObject()
 
@@ -233,8 +244,9 @@ class LyricfontTab(Gtk.Box):
 		self.pos_spinbutton = Gtk.SpinButton()
 		self.pos_spinbutton.set_adjustment(adjustment)
 		self.pos_spinbutton.set_value(int(g.lyricFont.posV))
+		self.pos_spinbutton.set_tooltip_text(_("Set here the vertical position of the lyric."))
 		grid.attach_next_to(self.pos_spinbutton,labelPos, Gtk.PositionType.RIGHT, 1, 1)
-		print("height: {!s} posV: {!s}".format(g.height, self.pos_spinbutton.get_value()))
+		## print("height: {!s} posV: {!s}".format(g.height, self.pos_spinbutton.get_value()))
 
 		labelAlign = Gtk.Label(_('Lyric align (horizontal)'))
 		grid.attach_next_to(labelAlign, labelPos, Gtk.PositionType.BOTTOM, 1, 1)
@@ -242,6 +254,7 @@ class LyricfontTab(Gtk.Box):
 		for key in ALIGNH:
 			type_store.append([key, ALIGNH[key]])
 		align_combo = Gtk.ComboBox.new_with_model(type_store)
+		align_combo.set_tooltip_text(_("Set here the horizontal align of the lyric."))
 		renderer = Gtk.CellRendererText()
 		i = 0
 		for row in type_store:
