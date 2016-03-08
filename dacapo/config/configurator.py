@@ -197,12 +197,12 @@ class FieldTab(PreviewTab):
 			return
 		model = combo.get_model()
 		fieldName = model.get_value(combo_iter, 0)
-		print("You chose the field " + fieldName)
+		print(u"You chose the field " + fieldName)
 		field = model.get_value(combo_iter, 1)
 		font_chooser = combo.font_chooser
 		font_chooser.setBGcolor(combo.type)
 		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
-		print("Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
+		print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
 		font_chooser.set_font(field.font.fontName, field.font.fontSize)
 		font_chooser.setFGcolor(field.font.getRGBAColor())
 		self.field = field
@@ -213,7 +213,7 @@ class FieldTab(PreviewTab):
 			return None
 		else:
 			self.field.content = self.field.getExampleData(self.field.name)
-			print("Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
+			print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
 			return self.field.getBlitObject()
 
 class LyricfontTab(Gtk.Box):

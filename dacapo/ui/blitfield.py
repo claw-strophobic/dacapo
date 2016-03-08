@@ -24,6 +24,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		"discnumber" :"1/2",
 		"genre": "Post-Punk",
 		"tracknumber": "10/10",
+		"comments": u"Dies ist ein Kommentar.\nEr geht über zwei Zeilen.",
 	}
 
 	def __init__(self, name):
@@ -42,7 +43,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 	def getBlitObject( self ):
 		if (self.renderedData is None) or (self.renderedSize is None):
-			print("renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
+			print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
 			self.getRenderedData()
 		blitObj = dacapo.ui.blitobject.BlitObject(self.name)
 		renderedSize = self.renderedSize
@@ -57,13 +58,13 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				pygame.font.init()
 			try: self.sysFont = pygame.font.SysFont(self.font.fontName, self.font.fontSize)
 			except pygame.error, err:
-				print("Error at pygame.font.SysFont(%s, %s) . %s " % (
+				print(u"Error at pygame.font.SysFont(%s, %s) . %s " % (
 						self.font.fontName, self.font.fontSize, err))
 				return None
 		if (self.renderedData is None):
 			try: self.renderedData = self.sysFont.render(self.content, True, self.font.fontColor)
 			except pygame.error, err:
-				print("Error at sysFont.render(%s, %s) . %s " % (
+				print(u"Error at sysFont.render(%s, %s) . %s " % (
 						self.content, self.font.fontColor, err))
 				return None
 		self.renderedSize = self.renderedData.get_size()
