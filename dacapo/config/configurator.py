@@ -110,7 +110,7 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 		fpsClock = pygame.time.Clock()
 		fpsClock.tick(FPS)
 		try:
-			if type == "fullscreen":
+			if self.type == "fullscreen":
 				self.screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
 			else:
 				self.screen = pygame.display.set_mode(resolution)
