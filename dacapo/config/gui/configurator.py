@@ -7,14 +7,8 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation
 #
-from dacapo.config.gui import *
 from dacapo.config.gui.tabs import *
-
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf
-import gettext
-import pygame
-from dacapo.config import readconfig
+from dacapo.metadata import *
 
 UI_INFO = """
 <ui>
@@ -40,6 +34,12 @@ class Configurator(Gtk.Window):
 
 	def __init__(self):
 		Gtk.Window.__init__(self, title=_("dacapo configurator"))
+		self.audio = None
+		CONFIG.setConfig('TEMP', Key='AUDIOFILE', Value=None)
+		CONFIG.setConfig('TEMP', Key='PLAYER', Value=self)
+		self.gstPlayer = self
+		CONFIG.setConfig('TEMP', Key='PLAYLIST', Value=self)
+
 		self.set_border_width(3)
 		action_group = Gtk.ActionGroup("my_actions")
 
@@ -145,7 +145,8 @@ class Configurator(Gtk.Window):
 		response = dialog.run()
 		if response == Gtk.ResponseType.ACCEPT:
 			file = dialog.get_filename()
-			print("File ({!s}) was selected.".format(file))
+			self.audio = getAudioFile(file)
+			CONFIG.setConfig('TEMP', Key='AUDIOFILE', Value=self.audio)
 		dialog.destroy()
 		return
 
@@ -159,7 +160,7 @@ class Configurator(Gtk.Window):
 		response = dialog.run()
 		if response == Gtk.ResponseType.ACCEPT:
 			file = dialog.get_filename()
-			print("File ({!s}) was selected.".format(file))
+
 		dialog.destroy()
 		return
 
@@ -173,6 +174,18 @@ class Configurator(Gtk.Window):
 
 	def on_menu_others(self, widget):
 		print("Menu item " + widget.get_name() + " was selected")
+
+	def isPlaylist(self):
+		return True
+
+	def getDuration(self):
+		return "3:25"
+
+	def getActSong(self):
+		return 3
+
+	def getNumberOfSongs(self):
+		return 15
 
 win = Configurator()
 win.connect("delete-event", Gtk.main_quit)

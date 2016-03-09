@@ -129,10 +129,13 @@ class FieldTab(PreviewTab):
 		font_chooser.set_font(field.font.fontName, field.font.fontSize)
 		font_chooser.setFGcolor(field.font.getRGBAColor())
 		self.field = field
-		self.prev_button.set_sensitive(True)
+		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
+		if audio is not None:
+			self.prev_button.set_sensitive(True)
 
 	def getBlitObject( self ):
-		if self.field is None:
+		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
+		if audio is None or self.field is None:
 			return None
 		else:
 			self.field.content = self.field.getReplacedContent()

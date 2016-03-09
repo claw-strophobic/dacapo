@@ -24,7 +24,9 @@ from dacapo.ui.field import Field
 import dacapo.ui.interface_blitobject
 import dacapo.ui.blitobject
 import pygame
+import logging
 from dacapo.config import readconfig
+
 
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import gettext
@@ -37,3 +39,19 @@ ALIGNH = {
 		"left": _("left"),
 		"right": _("right"),
 	}
+
+levels = {'CRITICAL' : logging.CRITICAL,
+          'ERROR' : logging.ERROR,
+          'WARNING' : logging.WARNING,
+          'INFO' : logging.INFO,
+          'DEBUG' : logging.DEBUG
+}
+strLogLevel = levels[CONFIG.getConfig('debug', ' ', 'logLevel')]
+try:
+    logging.basicConfig(filename=CONFIG.getConfig('debug', ' ', 'logFile'),
+                        filemode='w',
+                        level=strLogLevel,
+                        format='%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+except :
+    print("Error initializing logfile")
