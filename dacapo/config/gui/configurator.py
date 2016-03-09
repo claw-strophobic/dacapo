@@ -103,9 +103,9 @@ class Configurator(Gtk.Window):
 			("FileSave", Gtk.STOCK_SAVE, None, None, None,
 			 self.on_menu_file_new_generic),
 			("FileSaveAs", Gtk.STOCK_SAVE_AS, None, None, None,
-			 self.on_menu_file_new_generic),
+			 self.on_menu_save_as),
 			("OpenAudio", None, _("Open Audiofile"), "<control>O", None,
-			 self.on_menu_file_new_generic),
+			 self.on_menu_open_audio),
 			("FileQuit", Gtk.STOCK_QUIT, None, None, None,
 			 self.on_menu_file_quit),
 		])
@@ -131,6 +131,39 @@ class Configurator(Gtk.Window):
 		accelgroup = uimanager.get_accel_group()
 		self.add_accel_group(accelgroup)
 		return uimanager
+
+	def on_menu_open_audio(self, widget):
+		dialog = Gtk.FileChooserDialog(_("Open Audiofile"),
+                                      self,
+                                      Gtk.FileChooserAction.OPEN,
+                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+										Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT))
+		filter = Gtk.FileFilter()
+		filter.set_name(_("Flac files"))
+		filter.add_mime_type("audio/flac")
+		dialog.add_filter(filter)
+		response = dialog.run()
+		if response == Gtk.ResponseType.ACCEPT:
+			file = dialog.get_filename()
+			print("File ({!s}) was selected.".format(file))
+		dialog.destroy()
+		return
+
+	def on_menu_save_as(self, widget):
+		dialog = Gtk.FileChooserDialog(_("Save Config File"),
+                                      self,
+                                      Gtk.FileChooserAction.SAVE,
+                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+										Gtk.STOCK_SAVE_AS, Gtk.ResponseType.ACCEPT))
+		dialog.set_show_hidden(True)
+		response = dialog.run()
+		if response == Gtk.ResponseType.ACCEPT:
+			file = dialog.get_filename()
+			print("File ({!s}) was selected.".format(file))
+		dialog.destroy()
+		return
+
+
 
 	def on_menu_file_new_generic(self, widget):
 		print("A File|New menu item ({!s}) was selected.".format(widget.get_name()))
