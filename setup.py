@@ -97,7 +97,7 @@ class dacapo_install(install):
 setup(
     name = "dacapo",
     version=VERSION,
-    packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.data', 
+    packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.config.gui','dacapo.data',
     'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist',
     'dacapo.qtflac2mp3'],
     scripts = ["bin/dacapo", "bin/dacapoui", "bin/QtSyncLyrics",
