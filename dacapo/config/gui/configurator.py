@@ -16,14 +16,47 @@ import gettext
 import pygame
 from dacapo.config import readconfig
 
+UI_INFO = """
+<ui>
+	<menubar name='MenuBar'>
+		<menu action='FileMenu'>
+			<menuitem action='FileSave' />
+			<menuitem action='FileSaveAs' />
+			<separator />
+			<menuitem action='OpenAudio' />
+			<separator />
+			<menuitem action='FileQuit' />
+		</menu>
+		<menu action='EditMenu'>
+			<menuitem action='EditCopy' />
+			<menuitem action='EditPaste' />
+			<menuitem action='EditSomething' />
+		</menu>
+	</menubar>
+</ui>
+"""
+
 class Configurator(Gtk.Window):
 
 	def __init__(self):
 		Gtk.Window.__init__(self, title=_("dacapo configurator"))
 		self.set_border_width(3)
+		action_group = Gtk.ActionGroup("my_actions")
+
+		self.add_file_menu_actions(action_group)
+		self.add_edit_menu_actions(action_group)
+
+		uimanager = self.create_ui_manager()
+		uimanager.insert_action_group(action_group)
+
+		menubar = uimanager.get_widget("/MenuBar")
+
+		vbox = Gtk.VBox()
+
+		vbox.add(menubar)
 
 		self.notebook = Gtk.Notebook()
-		self.add(self.notebook)
+		vbox.add(self.notebook)
 
 		# 1st tab -> Window settings
 		self.page_window = GuiTab('window')
@@ -62,7 +95,51 @@ class Configurator(Gtk.Window):
 				Gtk.IconSize.MENU
 			)
 		)
+		self.add(vbox)
 
+	def add_file_menu_actions(self, action_group):
+		action_group.add_actions([
+			("FileMenu", None, "File"),
+			("FileSave", Gtk.STOCK_SAVE, None, None, None,
+			 self.on_menu_file_new_generic),
+			("FileSaveAs", Gtk.STOCK_SAVE_AS, None, None, None,
+			 self.on_menu_file_new_generic),
+			("OpenAudio", None, _("Open Audiofile"), "<control>O", None,
+			 self.on_menu_file_new_generic),
+			("FileQuit", Gtk.STOCK_QUIT, None, None, None,
+			 self.on_menu_file_quit),
+		])
+
+	def add_edit_menu_actions(self, action_group):
+		action_group.add_actions([
+			("EditMenu", None, "Edit"),
+			("EditCopy", Gtk.STOCK_COPY, None, None, None,
+			 self.on_menu_others),
+			("EditPaste", Gtk.STOCK_PASTE, None, None, None,
+			 self.on_menu_others),
+			("EditSomething", None, "Something", "<control><alt>S", None,
+			 self.on_menu_others)
+		])
+
+	def create_ui_manager(self):
+		uimanager = Gtk.UIManager()
+
+		# Throws exception if something went wrong
+		uimanager.add_ui_from_string(UI_INFO)
+
+		# Add the accelerator group to the toplevel window
+		accelgroup = uimanager.get_accel_group()
+		self.add_accel_group(accelgroup)
+		return uimanager
+
+	def on_menu_file_new_generic(self, widget):
+		print("A File|New menu item ({!s}) was selected.".format(widget.get_name()))
+
+	def on_menu_file_quit(self, widget):
+		Gtk.main_quit()
+
+	def on_menu_others(self, widget):
+		print("Menu item " + widget.get_name() + " was selected")
 
 win = Configurator()
 win.connect("delete-event", Gtk.main_quit)
