@@ -18,7 +18,9 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 		self.screen = None
 
 	def on_preview(self, *data):
+		import types
 		g = CONFIG.gui[self.type]
+		CONFIG.setConfig('TEMP', 'gui', 'winState', self.type)
 		resolution = (g.width, g.height)
 		FPS = 30
 		fpsClock = pygame.time.Clock()
@@ -37,7 +39,12 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 			print(pygame.get_error())
 			return
 		obj = self.getBlitObject()
-		self.doBlitObject(self.screen, obj, True)
+		if isinstance(obj, types.ListType):
+			for o in obj:
+				self.doBlitObject(self.screen, o, True)
+		else:
+			print("doBlitObject: {!s}".format(type(obj)))
+			self.doBlitObject(self.screen, obj, True)
 		while True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -52,19 +59,35 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
 
 
-class BackgroundTab(Gtk.Box):
+class BackgroundTab(PreviewTab):
 
 	def __init__(self, type):
-		Gtk.Box.__init__(self)
+		super(BackgroundTab, self).__init__(type)
 		g = CONFIG.gui[type]
 		self.set_border_width(10)
 		vbox = Gtk.VBox()
 		vbox.add(Gtk.Label(_('Pictures- & Background-Settings!')))
+		self.prev_button = Gtk.Button(_("Preview"))
+		self.prev_button.set_sensitive(True)
+		self.prev_button.connect('clicked', self.on_preview)
+		self.prev_button.set_tooltip_text(_("Click here to see a preview of this field."))
+		vbox.add(self.prev_button)
 		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
 		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
 		self.colorchooser.set_property("show-editor", True)
 		vbox.add(self.colorchooser)
 		self.add(vbox)
+
+	def getBlitObject( self ):
+		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
+		if audio is None:
+			return None
+		else:
+			a = list()
+			g = CONFIG.gui[self.type]
+			for field in g.fields:
+				a.append(g.fields[field].getBlitObject())
+			return a
 
 
 class FieldTab(PreviewTab):
@@ -138,8 +161,8 @@ class FieldTab(PreviewTab):
 		if audio is None or self.field is None:
 			return None
 		else:
-			self.field.content = self.field.getReplacedContent()
-			print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
+			#self.field.content = self.field.getReplacedContent()
+			#print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
 			return self.field.getBlitObject()
 
 class LyricfontTab(Gtk.Box):
