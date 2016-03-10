@@ -10,10 +10,7 @@
 import dacapo.ui.field
 import dacapo.ui.interface_blitobject
 import dacapo.ui.blitobject
-import dacapo.config.gui
 import pygame
-
-CONFIG = dacapo.config.gui.CONFIG
 
 class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -26,6 +23,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		self._debug = True
 
 	def getReplacedContent(self):
+		from dacapo.config.gui import *
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 		if audio is None:
 			return ''
@@ -44,6 +42,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				- ['renderedData'] -> die gerenderten Daten
 		"""
 		# metadata holen und aufbereiten
+		from dacapo.config.gui import *
 		if (self.sysFont is None):
 			if (not pygame.font.get_init()):
 				pygame.font.init()
@@ -117,7 +116,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				s = audio.replaceTags(s)
 
 				if '#time#' in s :
-					posActTime = key1
+					posActTime = self.name
 					textActTime = s
 
 				s = s.replace('#time#', gstPlayer.getDuration())
@@ -125,11 +124,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 				if '#bandlogo#' in s:
 					logging.debug('Try to get Bandlogo: %s: %s -> %s' % (
-						key1,
+						self.name,
 						self.content,
 						self.data
 						))
-					logo = audio.preBlitLogo(key1)
+					logo = audio.preBlitLogo(self.name)
 					if logo == None:
 						pass
 					else:
@@ -142,17 +141,12 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 						self.data =  s
 						if self._debug:
 							logging.debug('Rendere Metadaten: %s: %s -> %s' % (
-								key1,
+								self.name,
 								self.content,
 								self.data
 								))
-						self.renderedData = self.sysFont.render(
-								self.data ,
-								True,
-								self.__metaFields.get(key1)['fontColor']
-							)
-						self.renderedSize = \
-							  self.renderedData.get_size()
+						self.renderedData = self.sysFont.render(self.data, True, self.font.fontColor)
+						self.renderedSize = self.renderedData.get_size()
 				else:
 					if self._debug:
 						logging.debug('Multiline: %s:' % (s))
@@ -168,9 +162,9 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 			except pygame.error, err:
 				print("Autsch! Konnte Metadaten %s nicht rendern: %s" % (
-					key1, self.data))
+					self.name, self.data))
 				logging.warning("konnte Metadaten nicht rendern: %s: %s -> %s" %
-					(key1,
+					(self.name,
 					self.content,
 					self.data))
 				logging.warning(err)
@@ -178,7 +172,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		return self.renderedData
 
 	def get_rendered_maxwidth(self):
+		from dacapo.config.gui import *
+		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		maxwidth = self.maxWidth
+		if maxwidth == 0:
+			maxwidth = CONFIG.getConfig('gui', winstate, 'width')
 		if self._debug:
 			logging.debug('Rendere Metadaten mit Max-Width: %s %s: %s -> %s' % (
 				maxwidth,
@@ -222,7 +220,6 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			lineH = hT
 
 		image = pygame.Surface([w, h])
-		winstate = self._config.getConfig('TEMP', 'gui', 'winState')
 		image.set_colorkey(CONFIG.getConfig('gui', winstate, 'backgroundColor'))
 		image.fill(CONFIG.getConfig('gui', winstate, 'backgroundColor'))
 		self.savedRect = image
@@ -230,9 +227,9 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		for r in rList:
 			mW = 0
 			wT,htT = r.get_size()
-			if self.alignH == 'right':
+			if self.pos.alignH == 'right':
 				mW = w - wT
-			elif self.alignH == 'center':
+			elif self.pos.alignH == 'center':
 				mW = (w - wT) / 2
 
 			image.blit(r, (mW, hT))
@@ -243,12 +240,53 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 
 	def getBlitObject( self ):
+		from dacapo.config.gui import *
 		if (self.renderedData is None) or (self.renderedSize is None):
 			print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
 			self.getRenderedData()
 		blitObj = dacapo.ui.blitobject.BlitObject(self.name)
+		if (self.renderedData is None) or (self.renderedSize is None):
+			return blitObj
 		renderedSize = self.renderedSize
-		blitPos = (self.pos.posV, self.pos.posH)
+		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+		width = CONFIG.getConfig('gui', winstate, 'width')
+		height = CONFIG.getConfig('gui', winstate, 'height')
+		g = CONFIG.gui[winstate]
+		mW = 0
+		mH = 0
+		textWidth, textHeight = renderedSize
+		# align relatively to another object
+		if (self.pos.posRefH != '') and (g.fields.has_key(self.pos.posRefH)):
+			posRefH = g.fields[self.pos.posRefH].getBlitObject()
+			refPosW, refPosH = posRefH.blitPos
+			refWidth, refHeight = posRefH.renderedSize
+			mW = refPosW + refWidth
+
+		if (self.pos.posRefV != '') and (g.fields.has_key(self.pos.posRefV)):
+			posRefV = g.fields[self.pos.posRefV].getBlitObject()
+			refPosW, refPosH = posRefV.blitPos
+			refWidth, refHeight = posRefV.renderedSize
+			mH = refPosH + refHeight
+
+		## align left or right or center
+		if self.pos.alignH == 'left':
+			mW += self.pos.posH
+		elif self.pos.alignH == 'right':
+			mW += self.pos.posH + textWidth
+			mW = width - mW
+		elif self.pos.alignH == 'center':
+			mW = (width - textWidth) / 2
+
+		## align top or bottom or middle
+		if self.pos.alignV == 'top':
+			mH += self.pos.posV
+		elif self.pos.alignV == 'bottom':
+			mH += self.pos.posV + textHeight
+			mH = height - mH
+		elif self.pos.alignV == 'center':
+			mH = (height - textHeight) / 2
+
+		blitPos = (mW, mH)
 		blitObj.setBlitRect(blitPos, renderedSize)
 		blitObj.renderedData = self.renderedData
 		return blitObj
