@@ -23,6 +23,7 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.overlay = False
 		self.splitSpaces = False
 		self.zIndex = 0
+		self.maxWidth = 0
 		self.pos = dacapo.ui.position.Position()
 		self.font = dacapo.ui.font.Font()
 
