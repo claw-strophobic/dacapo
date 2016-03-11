@@ -63,19 +63,51 @@ class BackgroundTab(PreviewTab):
 
 	def __init__(self, type):
 		super(BackgroundTab, self).__init__(type)
+		s = Gdk.Screen.get_default()
 		g = CONFIG.gui[type]
 		self.set_border_width(10)
 		vbox = Gtk.VBox()
 		vbox.add(Gtk.Label(_('Pictures- & Background-Settings!')))
+		grid = Gtk.Grid()
+		grid.set_column_homogeneous(False)
+		grid.set_column_spacing(6)
 		self.prev_button = Gtk.Button(_("Preview"))
 		self.prev_button.set_sensitive(True)
 		self.prev_button.connect('clicked', self.on_preview)
 		self.prev_button.set_tooltip_text(_("Click here to see a preview of this field."))
-		vbox.add(self.prev_button)
+
+		if type == 'window':
+			labelWidth = Gtk.Label(_('Window width'))
+			labelHeight = Gtk.Label(_('Window height'))
+		else:
+			labelWidth = Gtk.Label(_('Fullscreen width'))
+			labelHeight = Gtk.Label(_('Fullscreen height'))
+
+		grid.add(labelWidth)
+		adjustment = Gtk.Adjustment(int(g.width), 0, int(s.get_width()), 1, 10, 0)
+		self.width_spinbutton = Gtk.SpinButton()
+		self.width_spinbutton.set_adjustment(adjustment)
+		self.width_spinbutton.set_value(int(g.width))
+		self.width_spinbutton.set_tooltip_text(_("Set here the pixel width of the display.") + " (max {!s})".format(s.get_width()))
+		grid.attach_next_to(self.width_spinbutton,labelWidth, Gtk.PositionType.RIGHT, 1, 1)
+
+		grid.attach_next_to(labelHeight, self.width_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
+		adjustment = Gtk.Adjustment(int(g.height), 0, int(s.get_height()), 1, 10, 0)
+		self.height_spinbutton = Gtk.SpinButton()
+		self.height_spinbutton.set_adjustment(adjustment)
+		self.height_spinbutton.set_value(int(g.height))
+		self.height_spinbutton.set_tooltip_text(_("Set here the pixel height of the display." + " (max {!s})".format(s.get_height())))
+		grid.attach_next_to(self.height_spinbutton,labelHeight, Gtk.PositionType.RIGHT, 1, 1)
+
+
+		labelBackground = Gtk.Label(_('Background colour'))
+		grid.attach_next_to(labelBackground,labelWidth, Gtk.PositionType.BOTTOM, 1, 1)
 		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
 		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
 		self.colorchooser.set_property("show-editor", True)
-		vbox.add(self.colorchooser)
+		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.RIGHT, 2, 1)
+		grid.attach_next_to(self.prev_button, self.colorchooser, Gtk.PositionType.BOTTOM, 1, 1)
+		vbox.add(grid)
 		self.add(vbox)
 
 	def getBlitObject( self ):
