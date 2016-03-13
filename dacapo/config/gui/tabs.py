@@ -119,6 +119,7 @@ class BackgroundTab(PreviewTab):
 			g = CONFIG.gui[self.type]
 			for field in g.fields:
 				a.append(g.fields[field].getBlitObject())
+			a.append(audio.getCover())
 			return a
 
 
