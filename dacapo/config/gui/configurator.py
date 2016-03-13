@@ -146,6 +146,7 @@ class Configurator(Gtk.Window):
 		if response == Gtk.ResponseType.ACCEPT:
 			file = dialog.get_filename()
 			self.audio = getAudioFile(file)
+			self.audio.loadFrontCover()
 			CONFIG.setConfig('TEMP', Key='AUDIOFILE', Value=self.audio)
 		dialog.destroy()
 		return
