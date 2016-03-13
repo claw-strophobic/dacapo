@@ -33,7 +33,7 @@ class Position(dacapo.ui.configelement.ConfigElement):
 		except: pass
 		try: self.posRefH = xml.find('posRefH').text
 		except: pass
-		try: self.maxWidth = int(xml.find('max-width').text)
+		try: self.maxWidth = int(xml.find('maxWidth').text)
 		except: pass
 		# Vertical
 		try: self.posV = int(xml.find('posV').text)
@@ -42,5 +42,5 @@ class Position(dacapo.ui.configelement.ConfigElement):
 		except: pass
 		try: self.posRefV = xml.find('posRefV').text
 		except: pass
-		try: self.maxHeight = int(xml.find('max-height').text)
+		try: self.maxHeight = int(xml.find('maxHeight').text)
 		except: pass
