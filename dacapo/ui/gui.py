@@ -31,6 +31,7 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)
 		self.lyricFont.grabXMLData(xml.find('lyricFont'))
+		self.pictureArea.grabXMLData(xml.find('pictures'))
 		fields = xml.find('fields')
 		for child in fields:
 			f = dacapo.ui.blitfield.BlitField(child.tag)
