@@ -25,6 +25,7 @@ try:
     import codecs      # utf8 support
     import StringIO
     from dacapo.config import readconfig
+    from dacapo.ui.blitpicture import BlitPicture
 except ImportError, err:
     errorhandling.Error.show()
     sys.exit(2)
@@ -441,7 +442,9 @@ class AudioFile(object):
         return datei
 
     def getCover(self):
-        return self.cover 
+        print("Pic-Type: {!s}".format(type(self.cover)))
+        pic = BlitPicture(self.cover)
+        return pic.getBlitObject()
 
     def loadLogo(self):
         return None
