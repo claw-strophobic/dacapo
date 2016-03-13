@@ -45,7 +45,7 @@ class BlitInterface(object):
 			print("Screen is None for blit: %s " % (blitObj.name))
 			return False
 		if (blitObj is None):
-			print("Rect is None for blit: %s " % (blitObj.name))
+			print("BlitObj is None - Returning false")
 			return False
 		if (blitObj.renderedData is None):
 			print("RenderedData is None for blit: %s " % (blitObj.name))
