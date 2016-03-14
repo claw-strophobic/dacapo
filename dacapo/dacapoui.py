@@ -26,79 +26,82 @@
 	reads the config to get the options.
 '''
 import sys
+import gettext
+t = gettext.translation('dacapo', "/usr/share/locale/")
+t.install()
+
 from dacapo import errorhandling
 try :
-	import gtk
-	import gtk.glade
+	from gi.repository import Gtk
 	import os, sys
 	import subprocess
 	from config import readconfig
-	from dacapoHelp import SHOWPIC_CHOICES, getLangText
+	from dacapoHelp import SHOWPIC_CHOICES
 	import dacapo 
 	from pkg_resources import resource_string
 except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
 
-UI_FILE = "dacapoui.glade"
-UI_CHK_BT = {"checkShuffle" : "shuffle" , "checkResume" : "resume", 
-	"checkFullscreen" : "fullscreen", "checkLyrics" : 
-	"showLyricsAsPics", "checkSynced" : "showLyricsSynced"}
+UI_CHK_BT = {_("Shuffle Mode") : "shuffle" , _("Resume Playlist") : "resume",
+	"Fullscreen Mode" : "fullscreen", "Show Song Lyrics" :
+	"showLyricsAsPics", "Show Synced Lyrics (karaoke)" : "showLyricsSynced"}
 PLAYER_ARGS = []
 CONFIG = readconfig.getConfigObject()
 
-class GUI:
+class GUI(Gtk.FileChooserDialog):
 	DEBUG = False
 	
 	def __init__(self):
-		ui_file = resource_string(__name__, UI_FILE)
-
-		self.builder = gtk.Builder()
-		self.builder.add_from_string(ui_file)
-		self.builder.connect_signals(self)
-
-		self.window = self.builder.get_object('dialog1')
-		self.window.set_title(CONFIG.getConfig('gui', 'misc', 'caption'))
+		super(GUI, self).__init__(_("Open audiofile(s) or playlist"),
+                                      None,
+                                      Gtk.FileChooserAction.OPEN,
+                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+										Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT))
 		icon = readconfig.getConfigDir() + CONFIG.getConfig('gui', 'misc', 'icon')
+		vbox = self.get_content_area()
+
 		try :
-			self.window.set_icon_from_file(icon)
+			self.set_icon_from_file(icon)
 		except:
 			errorhandling.Error.show() 
 			pass
-		filter = self.builder.get_object('filefilter1')
+		filter = Gtk.FileFilter()
+		filter.set_name(_("Music files"))
 		filter.add_pattern("*.m3u");
 		filter.add_pattern("*.flac");
 		filter.add_pattern("*.mp3");
 		filter.add_pattern("*.ogg");
 		filter.add_pattern("*.wma");
+		self.add_filter(filter)
 
 		self.chkVal = dict()
 
-		vbox2 = self.builder.get_object('vbox2')
-		cmbPics = gtk.combo_box_new_text()
-		cmbPics.set_title("Show Cover")
-		cmbPics.set_name("showPics")
-		for t in SHOWPIC_CHOICES :
-			if t <> 'help' :
-				cmbPics.append_text(getLangText('gui', t))
-
+		## Create ComboBox
+		type_store = Gtk.ListStore(int, str)
+		for i, tP in enumerate(SHOWPIC_CHOICES):
+			if tP <> 'help':
+				type_store.append((i,_(tP)))
+		cmbPics = Gtk.ComboBox.new_with_model(type_store)
+		renderer = Gtk.CellRendererText()
 		cmbPics.set_active(\
-			SHOWPIC_CHOICES.index(CONFIG.getConfig('gui', 'misc', cmbPics.name)))
+			SHOWPIC_CHOICES.index(CONFIG.getConfig('gui', 'misc', 'showPics')))
 		cmbPics.connect('changed', self.changed_cb, cmbPics.get_name() )
-		vbox2.add(cmbPics)
+		cmbPics.pack_start(renderer, True)
+		cmbPics.add_attribute(renderer, 'text', 1)
+		cmbPics.set_entry_text_column(1)
+		vbox.add(cmbPics)
 		self.chkVal[cmbPics.get_name()] = CONFIG.getConfig('gui', 'misc', cmbPics.get_name())
 
 		for key in UI_CHK_BT.iterkeys():
-			obj = self.builder.get_object(key)
-			obj.set_label(getLangText('gui', key))
+			obj = Gtk.CheckButton(key)
 			self.chkVal[UI_CHK_BT[key]] = CONFIG.getConfig('gui', 'misc', UI_CHK_BT[key])
-			obj.set_label(getLangText('gui', key))
 			obj.set_active(CONFIG.getConfig('gui', 'misc', UI_CHK_BT[key]))
 			obj.connect("toggled", self.callback, UI_CHK_BT[key])
+			vbox.add(obj)
 			
-
-		self.window.connect("destroy", self.destroy)
-		self.window.show_all()
+		self.connect("delete-event", Gtk.main_quit)
+		self.show_all()
 
 	def callback(self, widget, data=None):
 		# print "%s was toggled %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -108,17 +111,18 @@ class GUI:
 		model = cmbPics.get_model()
 		index = cmbPics.get_active()
 		self.chkVal[data] =SHOWPIC_CHOICES[index]
+		print(self.chkVal[data])
 		return
 	
 	def on_buttonCancel_clicked (self, button):
-		gtk.main_quit()
+		Gtk.main_quit()
 		
 	def on_buttonOK_clicked (self, button):
 		global PLAYER_ARGS
 		import copy
 		if self.window.get_filename() == None and\
 		  self.chkVal['resume'] == False :
-			self.info_msg(getLangText('gui', 'nofile'))
+			self.info_msg(_('gui', 'nofile'))
 			return
 		path = None
 		if getattr(sys, 'frozen', None):
@@ -136,11 +140,12 @@ class GUI:
 
 		self.window.destroy()
 		PLAYER_ARGS = copy.deepcopy(args)
-		gtk.main_quit()
+		Gtk.main_quit()
 		
 				
 	def destroy(window, self):
-		gtk.main_quit()
+		self.destroy()
+		Gtk.main_quit()
 
 
 	
@@ -148,9 +153,9 @@ class GUI:
 		"""
 		Zeigt einen Meldungstext an
 		"""
-		dlg = gtk.MessageDialog(parent=self.window, 
-		type=gtk.MESSAGE_INFO,
-		buttons=gtk.BUTTONS_OK,
+		dlg = Gtk.MessageDialog(parent=self.window,
+		type=Gtk.MESSAGE_INFO,
+		buttons=Gtk.BUTTONS_OK,
 		message_format=msg
 		)
 		dlg.run()
@@ -160,7 +165,7 @@ def main():
 	global PLAYER_ARGS
 	global CONFIG
 	app = GUI()
-	gtk.main()
+	response = app.run()
 	sys.argv = PLAYER_ARGS	
 	if PLAYER_ARGS <> [] :
 		try:
