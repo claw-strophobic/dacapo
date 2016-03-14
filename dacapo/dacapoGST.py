@@ -233,7 +233,7 @@ class GstPlayer(threading.Thread):
 				pass
 			else:
 				gst.element_unlink_many(pipe[-1], fake)
-				default, default_text = GStreamerSink("")
+				default, default_text = pygst.GStreamerSink("")
 				if default:
 					return pipe + default, pipeline + " ! " + default_text
 		else:
