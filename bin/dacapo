@@ -7,8 +7,6 @@
 # Dehalb wird die gesamte Argparse-Aufbereitung hier schon einmal
 # durchgeführt. Ein Auslagern in das dacapoHelp-Mddul brachte leider
 # keine Besserung...
-# gtk import als erstes, sonst gibt es unter Windows Probleme
-import gtk
 import sys
 # -------------------------------------------------------------------- #
 #!/usr/bin/python
