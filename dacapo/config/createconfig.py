@@ -18,10 +18,10 @@ def showMsg(msg):
 		answer = win32ui.MessageBox(msg, "Error", win32con.MB_OKCANCEL)
 		if answer == win32con.IDOK: return True
 	else :
-		import gtk
-		dlg = gtk.MessageDialog(None, 
-			type=gtk.MESSAGE_WARNING,
-			buttons=gtk.BUTTONS_OK_CANCEL,
+		from gi.repository import Gtk
+		dlg = Gtk.MessageDialog(None,
+			type=Gtk.MESSAGE_WARNING,
+			buttons=Gtk.BUTTONS_OK_CANCEL,
 			message_format=msg
 		)
 		answer = dlg.run()

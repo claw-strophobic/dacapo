@@ -37,10 +37,10 @@ class Error():
                 pass
         else :
             try:
-                import gtk
-                dlg = gtk.MessageDialog(None,
-                    type=gtk.MESSAGE_ERROR,
-                    buttons=gtk.BUTTONS_OK,
+                from gi.repository import Gtk
+                dlg = Gtk.MessageDialog(None,
+                    type=Gtk.MESSAGE_ERROR,
+                    buttons=Gtk.BUTTONS_OK,
                     message_format=msgLines
                 )
                 dlg.run()
