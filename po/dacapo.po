@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 15:45+0100\n"
-"PO-Revision-Date: 2016-03-14 14:31+0100\n"
+"PO-Revision-Date: 2016-03-14 16:05+0100\n"
 "Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
 "Language-Team: LANGUAGE <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -686,3 +686,23 @@ msgstr ""
 "= wie allCover aber als Diashow\t\t\tdiaShowAllPics = wie allPics aber als "
 "Diashow \t\t\thelp = zeige diese Hilfe und beende das Programm \n"
 "\t"
+
+#: dacapo/dacapoui.py:46 build/lib.linux-x86_64-2.7/dacapo/dacapoui.py:46
+msgid "Shuffle Mode"
+msgstr "Shuffle-Modus"
+
+#: dacapo/dacapoui.py:46 build/lib.linux-x86_64-2.7/dacapo/dacapoui.py:46
+msgid "Resume Playlist"
+msgstr "Liste Fortsetzen"
+
+#: dacapo/dacapoui.py:56 build/lib.linux-x86_64-2.7/dacapo/dacapoui.py:56
+msgid "Open audiofile(s) or playlist"
+msgstr "Öffne Audio-Datei(en) oder Playliste"
+
+#: dacapo/dacapoui.py:70 build/lib.linux-x86_64-2.7/dacapo/dacapoui.py:70
+msgid "Music files"
+msgstr "Musik Dateien"
+
+#: dacapo/dacapoui.py:125 build/lib.linux-x86_64-2.7/dacapo/dacapoui.py:125
+msgid "gui"
+msgstr "GUI"
