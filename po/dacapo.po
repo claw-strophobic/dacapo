@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 15:45+0100\n"
-"PO-Revision-Date: 2016-03-08 20:17+0100\n"
-"Last-Translator: Claw Strophobic <Claw.Strophobic@gmx.de>\n"
+"PO-Revision-Date: 2016-03-14 14:31+0100\n"
+"Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
 "Language-Team: LANGUAGE <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -303,134 +303,386 @@ msgstr "Entferne Bild"
 
 #: dacapo/config/configurator.py:20
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:295
-#: dacapo/config/configurator.py:302
+#: dacapo/config/configurator.py:302 dacapo/config/gui/configurator.py:36
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:36
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:302
 msgid "dacapo configurator"
 msgstr "dacapo Konfigurator"
 
 #: dacapo/config/configurator.py:29
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:303
-#: dacapo/config/configurator.py:310
+#: dacapo/config/configurator.py:310 dacapo/config/gui/configurator.py:63
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:63
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:310
 msgid "GUI Window"
 msgstr "GUI Window"
 
 #: dacapo/config/configurator.py:33
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:312
-#: dacapo/config/configurator.py:319
+#: dacapo/config/configurator.py:319 dacapo/config/gui/configurator.py:72
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:72
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:319
 msgid "GUI Fullscreen"
 msgstr "GUI Fullscreen"
 
 #: dacapo/config/configurator.py:37
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:321
-#: dacapo/config/configurator.py:328
+#: dacapo/config/configurator.py:328 dacapo/config/gui/configurator.py:81
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:81
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:328
 msgid "Metadata"
 msgstr "Metadaten"
 
 #: dacapo/config/configurator.py:41
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:325
-#: dacapo/config/configurator.py:332
+#: dacapo/config/configurator.py:332 dacapo/config/gui/configurator.py:85
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:85
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:332
 msgid "Audio & Debug"
 msgstr "Audio & Debug"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:27
-#: dacapo/config/configurator.py:27
+#: dacapo/config/configurator.py:27 dacapo/config/gui/__init__.py:38
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/__init__.py:38
 msgid "center"
 msgstr "Zentriert"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:28
-#: dacapo/config/configurator.py:28
+#: dacapo/config/configurator.py:28 dacapo/config/gui/__init__.py:39
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/__init__.py:39
 msgid "left"
 msgstr "Links"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:29
-#: dacapo/config/configurator.py:29
+#: dacapo/config/configurator.py:29 dacapo/config/gui/__init__.py:40
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/__init__.py:40
 msgid "right"
 msgstr "Rechts"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:148
-#: dacapo/config/configurator.py:150
+#: dacapo/config/configurator.py:150 dacapo/config/gui/tabs.py:70
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:70
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:150
 msgid "Pictures- & Background-Settings!"
 msgstr "Bild- und Hintergrund-Einstellungen"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:165
-#: dacapo/config/configurator.py:167
+#: dacapo/config/configurator.py:167 dacapo/config/gui/tabs.py:134
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:134
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:167
 msgid "Window-Fields-Settings"
 msgstr "Fenster-Felder-Einstellungen"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:174
-#: dacapo/config/configurator.py:177
+#: dacapo/config/configurator.py:177 dacapo/config/gui/tabs.py:144
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:144
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:177
 msgid "Field:"
 msgstr "Feld:"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:177
-#: dacapo/config/configurator.py:180
+#: dacapo/config/configurator.py:180 dacapo/config/gui/tabs.py:74
+#: dacapo/config/gui/tabs.py:147
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:74
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:147
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:180
 msgid "Preview"
 msgstr "Vorschau"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:235
-#: dacapo/config/configurator.py:240
+#: dacapo/config/configurator.py:240 dacapo/config/gui/tabs.py:210
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:210
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:240
 msgid "Lyric-Font-Settings!"
 msgstr "Lyric-Schrift-Einstellungen!"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:236
-#: dacapo/config/configurator.py:241
+#: dacapo/config/configurator.py:241 dacapo/config/gui/tabs.py:211
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:211
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:241
 msgid "Lyric position (vertical)"
 msgstr "Lyric Position (Vertical)"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:245
-#: dacapo/config/configurator.py:251
+#: dacapo/config/configurator.py:251 dacapo/config/gui/tabs.py:221
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:221
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:251
 msgid "Lyric align (horizontal)"
 msgstr "Lyric Ausrichtung (Horizontal)"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:285
-#: dacapo/config/configurator.py:292
+#: dacapo/config/configurator.py:292 dacapo/config/gui/tabs.py:262
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:262
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:292
 msgid "Pictures & Background"
 msgstr "Bilder & Hintergrund"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:289
-#: dacapo/config/configurator.py:296
+#: dacapo/config/configurator.py:296 dacapo/config/gui/tabs.py:266
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:266
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:296
 msgid "Lyric-Font"
 msgstr "Lyric-Schrift"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:308
-#: dacapo/config/configurator.py:315
+#: dacapo/config/configurator.py:315 dacapo/config/gui/configurator.py:68
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:68
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:315
 msgid "Window fields"
 msgstr "Fenster Felder"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:316
-#: dacapo/config/configurator.py:323
+#: dacapo/config/configurator.py:323 dacapo/config/gui/configurator.py:76
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:76
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:323
 msgid "Fullscreen fields"
 msgstr "Vollbild Felder"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:320
-#: dacapo/config/configurator.py:327
+#: dacapo/config/configurator.py:327 dacapo/config/gui/configurator.py:80
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:80
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:327
 msgid "Metadata-Settings!"
 msgstr "Metadata-Einstellungen!"
 
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:324
-#: dacapo/config/configurator.py:331
+#: dacapo/config/configurator.py:331 dacapo/config/gui/configurator.py:84
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:84
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:331
 msgid "Audio & Debug-Settings!"
 msgstr "Audio & Debug-Einstellungen!"
 
-#: dacapo/config/configurator.py:51
+#: dacapo/config/configurator.py:51 dacapo/config/gui/fontchooser.py:31
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/fontchooser.py:31
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:51
 msgid "Search here for a font name."
 msgstr "Suche hier nach einem Schriftnamen."
 
-#: dacapo/config/configurator.py:54
+#: dacapo/config/configurator.py:54 dacapo/config/gui/fontchooser.py:34
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/fontchooser.py:34
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:54
 msgid "Change here the text of the preview."
 msgstr "Ändere hier den Text für die Vorschau."
 
-#: dacapo/config/configurator.py:176
+#: dacapo/config/configurator.py:176 dacapo/config/gui/tabs.py:143
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:143
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:176
 msgid "Select an existing field here."
 msgstr "Selektiere hier ein existierendes Feld."
 
-#: dacapo/config/configurator.py:183
+#: dacapo/config/configurator.py:183 dacapo/config/gui/tabs.py:77
+#: dacapo/config/gui/tabs.py:150
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:77
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:150
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:183
 msgid "Click here to see a preview of this field."
 msgstr "Klicke hier um eine Vorschau anzuschauen."
 
-#: dacapo/config/configurator.py:247
+#: dacapo/config/configurator.py:247 dacapo/config/gui/tabs.py:217
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:217
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:247
 msgid "Set here the vertical position of the lyric."
 msgstr "Setze hier die vertikale Position für die Lyrics."
 
-#: dacapo/config/configurator.py:257
+#: dacapo/config/configurator.py:257 dacapo/config/gui/tabs.py:227
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:227
+#: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:257
 msgid "Set here the horizontal align of the lyric."
 msgstr "Setze hier die horizontale Ausrichtung für die Lyrics."
+
+#: dacapo/config/gui/configurator.py:107 dacapo/config/gui/configurator.py:136
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:107
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:136
+msgid "Open Audiofile"
+msgstr "Öffne Audiodatei"
+
+#: dacapo/config/gui/configurator.py:142
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:142
+msgid "Flac files"
+msgstr "FLAC Dateien"
+
+#: dacapo/config/gui/configurator.py:154
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:154
+msgid "Save Config File"
+msgstr "Speichere Config Datei"
+
+#: dacapo/config/gui/tabs.py:80
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:80
+msgid "Window width"
+msgstr "Fenster Breite"
+
+#: dacapo/config/gui/tabs.py:81
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:81
+msgid "Window height"
+msgstr "Fenster Höhe"
+
+#: dacapo/config/gui/tabs.py:83
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:83
+msgid "Fullscreen width"
+msgstr "Vollbild Breite"
+
+#: dacapo/config/gui/tabs.py:84
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:84
+msgid "Fullscreen height"
+msgstr "Vollbild Höhe"
+
+#: dacapo/config/gui/tabs.py:91
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:91
+msgid "Set here the pixel width of the display."
+msgstr "Setze hier die Breite des Bildschirms in Pixeln."
+
+#: dacapo/config/gui/tabs.py:99
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:99
+msgid "Set here the pixel height of the display. (max {!s})"
+msgstr "Setze hier die Höhe des Bildschirms in Pixeln. (Max. {!s})"
+
+#: dacapo/config/gui/tabs.py:103
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:103
+msgid "Background colour"
+msgstr "Hintergrundfarbe"
+
+#: dacapo/dacapoHelp.py:30 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:30
+msgid "The logfile-path: {!s} is missing. Please check the configuration."
+msgstr ""
+"Der Pfad zur Log-Datei: {!s} ist ungültig. Bitte prüfe die Konfiguration."
+
+#: dacapo/dacapoHelp.py:39 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:39
+msgid ""
+"Lightweight-Music-Player, who plays FLAC- or MP3-file and shows CD-cover, "
+"pictures and metadata, as well as song-lyrics (as a picture and/or synced)."
+msgstr ""
+"Lightweight-Music-Player, spielt FLAC- oder MP3-Datei ab und zeigt das ggf. "
+"Cover, Bilder und Metadaten, sowie Songtexte (als Bild und synchron) an."
+
+#: dacapo/dacapoHelp.py:40 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:40
+msgid "start on the last position from the last playlist"
+msgstr "Letzte Playlist an abgebrochener Stelle wieder aufnehmen"
+
+#: dacapo/dacapoHelp.py:41 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:41
+msgid "show no metadata, pictures etc."
+msgstr "keine GUI anzeigen"
+
+#: dacapo/dacapoHelp.py:42 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:42
+msgid "the given file is a playlist"
+msgstr "die gegebene Datei ist eine Playlist"
+
+#: dacapo/dacapoHelp.py:43 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:43
+msgid "print all debug messages to the logfile - from all modules"
+msgstr "gibt alle Debugmeldungen aus"
+
+#: dacapo/dacapoHelp.py:44 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:44
+msgid "print debug messages to the logfile from the playlist modules"
+msgstr "gibt Debugmeldungen aus der Playlistenverarbeitung aus"
+
+#: dacapo/dacapoHelp.py:45 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:45
+msgid "print debug messages to the logfile from the GUI modules"
+msgstr "gibt Debugmeldungen aus der GUI-Verarbeitung aus"
+
+#: dacapo/dacapoHelp.py:46 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:46
+msgid "print debug messages to the logfile from the GStreamer modules"
+msgstr "gibt Debugmeldungen aus der GStreamer-Verarbeitung aus"
+
+#: dacapo/dacapoHelp.py:47 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:47
+msgid "print debug messages to the logfile from the metadata modules"
+msgstr "gibt Debugmeldungen aus der Metadaten-Verarbeitung aus"
+
+#: dacapo/dacapoHelp.py:50 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:50
+msgid "show the ui in fullscreen mode"
+msgstr "führt den Player im Vollbildmodus aus"
+
+#: dacapo/dacapoHelp.py:51 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:51
+msgid "show the ui in window mode"
+msgstr "führt den Player im Fenstermodus aus"
+
+#: dacapo/dacapoHelp.py:53 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:53
+msgid "play the songs from the playlist in random order"
+msgstr "spielt die Lieder im Zufallsmodus ab"
+
+#: dacapo/dacapoHelp.py:54 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:54
+msgid "do not use ReplayGain"
+msgstr "ReplayGain nicht benutzen"
+
+#: dacapo/dacapoHelp.py:57 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:57
+msgid "show song lyrics as pictures"
+msgstr "zeige Lyrics als Bilder an"
+
+#: dacapo/dacapoHelp.py:58 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:58
+msgid "do not show song lyrics as pictures"
+msgstr "zeige Lyrics nicht als Bilder an"
+
+#: dacapo/dacapoHelp.py:61 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:61
+msgid "show synced song lyrics (like karaoke)"
+msgstr "zeige synchronisierte Lyrics an (Karaoke)"
+
+#: dacapo/dacapoHelp.py:62 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:62
+msgid "do not show synced song lyrics (like karaoke)"
+msgstr "zeige synchronisierte Lyrics nicht an (Karaoke)"
+
+#: dacapo/dacapoHelp.py:64 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:64
+msgid ""
+"show pictures. Type \"--showPics help\"  to get a list of possible options."
+msgstr ""
+"Bilder anzeigen. --showPics help angeben, um mögliche Auswahlen angezeigt zu "
+"bekommen."
+
+#: dacapo/dacapoHelp.py:65 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:65
+msgid "show a long help message"
+msgstr "langen Hilfetext anzeigen"
+
+#: dacapo/dacapoHelp.py:66 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:66
+msgid "show available fonts"
+msgstr "verfügbare Schriften anzeigen"
+
+#: dacapo/dacapoHelp.py:67 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:67
+msgid "the file(s) or playlist(s) which should be played"
+msgstr "Datei(en) oder Playlist(en), die gespielt werden soll(en)"
+
+#: dacapo/dacapoHelp.py:98 build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:98
+msgid ""
+"\n"
+"Lightweight-Music-Player,  who plays FLAC- or MP3-file and shows CD-cover,\n"
+"pictures and metadata, as well as song-lyrics (as a picture and/or "
+"synced). \n"
+"\n"
+"Keys while playing:\n"
+"\n"
+"\tHOME=First song from playlist\n"
+"\tEND=Last song from playlist\n"
+"\tSPACE=Pause/Start\n"
+"\tLEFT/RIGHT=+/-10 Seconds\n"
+"\tUP/DOWN=Next/Previous Song\n"
+"\tESC/Q=Quit\n"
+"\tF=Fullscreen/Window'\n"
+"\t\t\t"
+msgstr ""
+"\n"
+"Lightweight-Music-Player, spielt FLAC- oder MP3-Datei ab und zeigt das\n"
+" Cover und Metadaten an.\n"
+"Tasten währen des Betriebs:  \n"
+"\tHOME=Erstes Lied der Playlist \tEND=Letztes Lied der Playlist \t\t"
+"\tSPACE=Pause/Start \tLINKS/RECHTS=+/-10 Sekunden \tUP/DOWN=Nächsten/"
+"Vorherigen Song \tESC/Q=Beenden \tF=Fullscreen/Fenster\n"
+"\t\t\t"
+
+#: dacapo/dacapoHelp.py:140
+#: build/lib.linux-x86_64-2.7/dacapo/dacapoHelp.py:140
+msgid ""
+"\n"
+"showPics: Display pictures? Possible values are:\n"
+"\t\t\tNO = Show no pictures at all, only metadata\n"
+"\t\t\tcoverOnly = show only frontcover\n"
+"\t\t\tallCover = show all cover (Type 3-6 / Front, Back, Leaflet, Label)\n"
+"\t\t\tallPics = show all pictures\n"
+"\t\t\tdiaShowAllCover = like allCover, but shown as a slideshow\n"
+"\t\t\tdiaShowAllPics = like allPics, but shown as a slideshow\n"
+"\t\t\thelp = print this help and quit\n"
+"\t"
+msgstr ""
+"\n"
+"showPics: Bilder anzeigen? Mögliche Werte: \n"
+"\t\t\tNO = Keine Bilder anzeigen, nur Metadaten\t\t\tcoverOnly = Nur "
+"Frontcover anzeigen\t\t\tallCover = alle Cover-Bilder anzeigen (Typ 3-6 / "
+"Front, Back, Leaflet, Label)\t\t\tallPics = alle Bilder\t\t\tdiaShowAllCover "
+"= wie allCover aber als Diashow\t\t\tdiaShowAllPics = wie allPics aber als "
+"Diashow \t\t\thelp = zeige diese Hilfe und beende das Programm \n"
+"\t"
