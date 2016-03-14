@@ -95,7 +95,7 @@ def showFullHelp():
 	import pygame
 
 	try:
-		import gtk
+		from gi.repository import Gtk
 	except ImportError, err:
 		print "Modul dacapo.py: Error, couldn't load module >>gtk<<. %s" % (err)
 		sys.exit(2)
@@ -106,8 +106,7 @@ def showFullHelp():
 	print " "
 	print "Python Version: %s" %(fver(version_info))
 	print " "
-	print "GTK+: %s / PyGTK: %s" %(
-            fver(gtk.gtk_version), fver(gtk.pygtk_version))
+	print "GTK+: %s" %(fver(Gtk._version))
 	print " "
 	print "GStreamer: %s / PyGSt: %s" % (
             fver(gst.version()), fver(gst.pygst_version))
