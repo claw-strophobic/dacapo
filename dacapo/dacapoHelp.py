@@ -112,7 +112,7 @@ Keys while playing:\n
 	print " "
 	print "Python Version: %s" %(fver(version_info))
 	print " "
-	print "GTK+: %s" %(fver(Gtk._version))
+	print "GTK+: %s.%s.%s" %(Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
 	print " "
 	print "GStreamer: %s / PyGSt: %s" % (
             fver(gst.version()), fver(gst.pygst_version))
