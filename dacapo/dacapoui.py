@@ -76,8 +76,15 @@ class GUI(Gtk.FileChooserDialog):
 		self.add_filter(filter)
 
 		self.chkVal = dict()
+
 		grid = Gtk.Grid()
-		label = Gtk.Label(_("Show Pictures"))
+		grid.set_column_spacing(10)
+		grid.set_margin_left(10)
+		grid.set_halign(Gtk.Align.START)
+		grid.set_valign(Gtk.Align.CENTER)
+		grid.set_row_spacing(4)
+		grid.set_column_homogeneous(False)
+		label = Gtk.Label(_("Show Pictures"), xalign=0)
 		grid.add(label)
 		## Create ComboBox
 		type_store = Gtk.ListStore(int, str)
@@ -94,26 +101,22 @@ class GUI(Gtk.FileChooserDialog):
 		cmbPics.set_entry_text_column(1)
 		grid.attach_next_to(cmbPics, label, Gtk.PositionType.RIGHT, 1, 1)
 		self.chkVal[cmbPics.get_name()] = CONFIG.getConfig('gui', 'misc', cmbPics.get_name())
-		lastLabel = label
-		lastObj = cmbPics
-		i = 1
+		row = 1
+		col = 0
 
 		for key in UI_CHK_BT.iterkeys():
-			hbox = Gtk.HBox()
-			label = Gtk.Label(key)
-			obj = Gtk.Switch()
+			label = Gtk.Label(key, xalign=0)
+			obj = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
 			self.chkVal[UI_CHK_BT[key]] = CONFIG.getConfig('gui', 'misc', UI_CHK_BT[key])
 			obj.set_active(CONFIG.getConfig('gui', 'misc', UI_CHK_BT[key]))
 			obj.connect("notify::active", self.callback, UI_CHK_BT[key])
-			if (i % 2) == 0:
-				grid.attach(label, 0, 1, 1, 1)
-			else:
-				grid.attach(label, 2, 1, 1, 1)
+			grid.attach(label, col, row, 1, 1)
 			grid.attach_next_to(obj, label, Gtk.PositionType.RIGHT, 1, 1)
-			lastLabel = label
-			lastObj = obj
-			i += 1
-			
+			row += 1
+			if row >= 2:
+				row = 0
+				col += 2
+
 		vbox.add(grid)
 		self.connect("delete-event", Gtk.main_quit)
 		self.show_all()
