@@ -46,7 +46,7 @@ except ImportError, err:
 UI_CHK_BT = {_("Shuffle Mode") : "shuffle" , _("Resume Playlist") : "resume",
 	"Fullscreen Mode" : "fullscreen", "Show Song Lyrics" :
 	"showLyricsAsPics", "Show Synced Lyrics (karaoke)" : "showLyricsSynced"}
-PLAYER_ARGS = []
+
 CONFIG = readconfig.getConfigObject()
 
 class GUI(Gtk.FileChooserDialog):
@@ -92,6 +92,7 @@ class GUI(Gtk.FileChooserDialog):
 			if tP <> 'help':
 				type_store.append((i,_(tP)))
 		cmbPics = Gtk.ComboBox.new_with_model(type_store)
+		cmbPics.set_name('showPics')
 		renderer = Gtk.CellRendererText()
 		cmbPics.set_active(\
 			SHOWPIC_CHOICES.index(CONFIG.getConfig('gui', 'misc', 'showPics')))
@@ -107,9 +108,10 @@ class GUI(Gtk.FileChooserDialog):
 		for key in UI_CHK_BT.iterkeys():
 			label = Gtk.Label(key, xalign=0)
 			obj = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
+			obj.set_name(UI_CHK_BT[key])
 			self.chkVal[UI_CHK_BT[key]] = CONFIG.getConfig('gui', 'misc', UI_CHK_BT[key])
 			obj.set_active(CONFIG.getConfig('gui', 'misc', UI_CHK_BT[key]))
-			obj.connect("notify::active", self.callback, UI_CHK_BT[key])
+			obj.connect("notify::active", self.callback)
 			grid.attach(label, col, row, 1, 1)
 			grid.attach_next_to(obj, label, Gtk.PositionType.RIGHT, 1, 1)
 			row += 1
@@ -121,78 +123,44 @@ class GUI(Gtk.FileChooserDialog):
 		self.connect("delete-event", Gtk.main_quit)
 		self.show_all()
 
-	def callback(self, widget, data=None):
+	def callback(self, widget, name):
 		# print "%s was toggled %s" % (data, ("OFF", "ON")[widget.get_active()])
-		self.chkVal[data] = widget.get_active()
+		self.chkVal[widget.get_name()] = widget.get_active()
 
 	def changed_cb(self, cmbPics, data):
 		model = cmbPics.get_model()
 		index = cmbPics.get_active()
 		self.chkVal[data] =SHOWPIC_CHOICES[index]
-		print(self.chkVal[data])
+		print("{!s} : {!s}".format(data, self.chkVal[data]))
 		return
 	
-	def on_buttonCancel_clicked (self, button):
-		Gtk.main_quit()
-		
-	def on_buttonOK_clicked (self, button):
-		global PLAYER_ARGS
-		import copy
-		if self.window.get_filename() == None and\
-		  self.chkVal['resume'] == False :
-			self.info_msg(_('gui', 'nofile'))
-			return
-		path = None
-		if getattr(sys, 'frozen', None):
-			basedir = sys._MEIPASS
-		else:
-			basedir = os.path.dirname(os.path.realpath(__file__))
+
+
+def main():
+	global CONFIG
+	dialog = GUI()
+	response = dialog.run()
+	if response == Gtk.ResponseType.ACCEPT:
+		print(dialog.chkVal)
+		file = dialog.get_filename()
+		basedir = os.path.dirname(os.path.realpath(__file__))
 		args = []
 		args.append(os.path.join(basedir, __file__))
-		path = self.window.get_filename()
-		args.append(path)
+		args.append(file)
+		sys.argv = args
 
-		for key in self.chkVal.iterkeys():
-			CONFIG.setConfig('gui', 'misc', key, self.chkVal[key])
+		for key in dialog.chkVal.iterkeys():
+			CONFIG.setConfig('gui', 'misc', key, dialog.chkVal[key])
 
-
-		self.window.destroy()
-		PLAYER_ARGS = copy.deepcopy(args)
-		Gtk.main_quit()
-		
-				
-	def destroy(window, self):
-		self.destroy()
-		Gtk.main_quit()
-
-
-	
-	def info_msg(self, msg):
-		"""
-		Zeigt einen Meldungstext an
-		"""
-		dlg = Gtk.MessageDialog(parent=self.window,
-		type=Gtk.MESSAGE_INFO,
-		buttons=Gtk.BUTTONS_OK,
-		message_format=msg
-		)
-		dlg.run()
-		dlg.destroy()
-		
-def main():
-	global PLAYER_ARGS
-	global CONFIG
-	app = GUI()
-	response = app.run()
-	sys.argv = PLAYER_ARGS	
-	if PLAYER_ARGS <> [] :
-		try:
-			dacapo.play(CONFIG)
-		except SystemExit:
-			pass
-		except:
-			errorhandling.Error.show()
-			pass				
+		dialog.destroy()
+		if args <> [] :
+			try:
+				dacapo.play(CONFIG)
+			except SystemExit:
+				pass
+			except:
+				errorhandling.Error.show()
+				pass
 		
 if __name__ == "__main__":
     sys.exit(main())
