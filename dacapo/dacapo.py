@@ -17,6 +17,10 @@ import errorhandling
 import sys
 import os
 import dacapoHelp
+import gettext
+t = gettext.translation('dacapo', "/usr/share/locale/")
+t.install()
+
 try:
     import threading
     from config import readconfig
@@ -188,17 +192,15 @@ def play(config=None):
     oConfig.setConfig('gui', 'misc', 'showLyricsAsPics', bshowLyricAsPic)
     oConfig.setConfig('gui', 'misc', 'showPics', sDiaShow)
 
-    if len(args.FILE) <= 0 and \
-                    bResume == False :
-        sys.stderr.write(dacapoHelp.getLangText('gui', 'nofile') + '\n')
+    if len(args.FILE) <= 0 and bResume == False :
+        sys.stderr.write(_('No file choosen. No playlist resume. Nothing to do.') + '\n')
         return
 
     oPlaylist.setInput(args.FILE)
     if bResume : oPlaylist.resume()
     else: oPlaylist.proceed()
-    if len(oPlaylist.getPlaylist()) <= 0 and \
-                    bResume == False :
-        sys.stderr.write(dacapoHelp.getLangText('gui', 'nofile') + '\n')
+    if len(oPlaylist.getPlaylist()) <= 0 and bResume == False :
+        sys.stderr.write(_('No file choosen. No playlist resume. Nothing to do.') + '\n')
         return
 
     # Threading. Die GUI läuft in einem Thread, die GStreamer-Verarbeitung
