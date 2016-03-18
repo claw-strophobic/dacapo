@@ -11,7 +11,6 @@ import dacapo.ui.configelement
 import dacapo.ui.lyricfont
 import dacapo.ui.blitfield
 import dacapo.ui.position
-from gi.repository import Gdk
 
 class Gui(dacapo.ui.configelement.ConfigElement):
 
@@ -45,6 +44,7 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 			f.printValues()
 
 	def getRGBABackgroundColor(self):
+		from gi.repository import Gdk
 		color = Gdk.RGBA()
 		colorRGB = []
 		for c in self.backgroundColor:

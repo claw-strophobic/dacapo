@@ -8,7 +8,6 @@
 # published by the Free Software Foundation
 #
 import dacapo.ui.configelement
-from gi.repository import Gdk
 
 
 class Font(dacapo.ui.configelement.ConfigElement):
@@ -27,6 +26,7 @@ class Font(dacapo.ui.configelement.ConfigElement):
 		print('\nFont: {!s} Größe: {!s} Farbe: {!s}'.format(self.fontName, self.fontSize, self.fontColor))
 
 	def getRGBAColor(self):
+		from gi.repository import Gdk
 		color = Gdk.RGBA()
 		colorRGB = []
 		for c in self.fontColor:
