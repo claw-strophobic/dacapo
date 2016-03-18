@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import platform
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QDialog, \
@@ -14,7 +13,7 @@ import sys, os, time, math, locale
 import logging
 import traceback
 import threading
-from dacapo.metadata import *
+import dacapo.metadata
 from dacapo.dacapoGST import GstPlayer
 import dacapo.errorhandling
 import codecs
@@ -117,7 +116,7 @@ class Ui_Dialog(QtGui.QMainWindow):
 
         logging.debug("Audiodatei = " +  self.filename)
         self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
-        self.audioFile = getAudioFile(self.filename)
+        self.audioFile = dacapo.metadata.getAudioFile(self.filename)
         if self.audioFile <> None :
             try:
                 self.artistText.setText(QString(_fromUtf8(config.get('Audio', 'artist'))))
@@ -497,7 +496,7 @@ class Ui_Dialog(QtGui.QMainWindow):
                                               path, filter)))
         logging.debug("Audiodatei = " +  self.filename)
         self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
-        self.audioFile = getAudioFile(self.filename)
+        self.audioFile = dacapo.metadata.getAudioFile(self.filename)
         if self.audioFile <> None :
             self.artistText.setText(' '.join(self.audioFile.getMetaData('artist')))
             self.titelText.setText(' '.join(self.audioFile.getMetaData('title')))
