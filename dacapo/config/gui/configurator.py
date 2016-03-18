@@ -101,7 +101,7 @@ class Configurator(Gtk.Window):
 		action_group.add_actions([
 			("FileMenu", None, "File"),
 			("FileSave", Gtk.STOCK_SAVE, None, None, None,
-			 self.on_menu_file_new_generic),
+			 self.on_menu_save),
 			("FileSaveAs", Gtk.STOCK_SAVE_AS, None, None, None,
 			 self.on_menu_save_as),
 			("OpenAudio", None, _("Open Audiofile"), "<control>O", None,
@@ -161,10 +161,13 @@ class Configurator(Gtk.Window):
 		response = dialog.run()
 		if response == Gtk.ResponseType.ACCEPT:
 			file = dialog.get_filename()
+			CONFIG.saveConfig(file)
 
 		dialog.destroy()
 		return
 
+	def on_menu_save(self, widget):
+		CONFIG.saveConfig()
 
 
 	def on_menu_file_new_generic(self, widget):

@@ -16,9 +16,9 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 	def __init__(self, pic):
 		super(BlitPicture, self).__init__()
 		self.debug = True
-		self.data = pic
-		self.renderedData = self.scalePic(pic)
-		self.renderedSize = self.renderedData.get_size()
+		self.__data = pic
+		self.__renderedData = self.scalePic(pic)
+		self.__renderedSize = self.__renderedData.get_size()
 
 	def scalePic(self, pic):
 		from dacapo.config.gui import *
@@ -56,7 +56,7 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 	def getBlitObject( self ):
 		from dacapo.config.gui import *
 		blitObj = dacapo.ui.blitobject.BlitObject('picture')
-		if (self.renderedData is None) or (self.renderedSize is None):
+		if (self.__renderedData is None) or (self.__renderedSize is None):
 			return blitObj
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
@@ -65,12 +65,12 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		height = g.pictureArea.maxHeight
 		w = g.pictureArea.posH
 		h = g.pictureArea.posV
-		picW, picH = self.renderedSize
+		picW, picH = self.__renderedSize
 		# --> calculate the position ---------------------------
 		w += (width - picW) / 2
 		h += (height - picH) / 2
-		renderedSize = self.renderedSize
+		renderedSize = self.__renderedSize
 		blitPos = (w, h)
 		blitObj.setBlitRect(blitPos, renderedSize)
-		blitObj.renderedData = self.renderedData
+		blitObj.__renderedData = self.__renderedData
 		return blitObj

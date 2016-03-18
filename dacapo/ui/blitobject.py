@@ -15,15 +15,15 @@ class BlitObject(object):
 	def __init__(self, name):
 		super(BlitObject, self).__init__()
 		self.name = name
-		self.rect = pygame.Rect(0,0,0,0)
-		self.renderedData = None
-		self.blitPos = 0
-		self.renderedSize = 0
+		self.__rect = pygame.Rect(0, 0, 0, 0)
+		self.__renderedData = None
+		self.__blitPos = 0
+		self.__renderedSize = 0
 
 	def setBlitRect(self, pos, size):
-		self.blitPos = pos
-		self.renderedSize = size
-		try: self.rect = pygame.Rect(self.blitPos,self.renderedSize)
+		self.__blitPos = pos
+		self.__renderedSize = size
+		try: self.__rect = pygame.Rect(self.__blitPos, self.__renderedSize)
 		except: pass
 		return
 

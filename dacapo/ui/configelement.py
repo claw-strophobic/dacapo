@@ -7,8 +7,7 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation
 #
-import xml.etree.ElementTree as ET
-
+from lxml import etree
 
 class ConfigElement(object):
 	BOOLS = ['true', '1', 't', 'y', 'yes', 'yeah', 'yarp', 'yup', 'certainly', 'uh-huh']
@@ -38,6 +37,30 @@ class ConfigElement(object):
 				d[child.tag] = self.checkBool(child.text)
 			else :
 				pass
+
+	def getXMLData(self):
+		root = etree.Element(self.name, type='dict')
+		for attr, value in self.__dict__.iteritems():
+			if not callable(attr) and not attr.startswith("__"):
+				attrType = 'text'
+				if attr == 'backgroundColor' or attr == 'fontColor':
+					attrType = 'color'
+				elif isinstance(attr, int):
+					attrType = 'int'
+				elif isinstance(attr, bool):
+					attrType = 'boolean'
+				elif isinstance(attr, float):
+					attrType = 'float'
+				elif isinstance(attr, object):
+					getXML = getattr(attr, 'getXMLData', None)
+					if callable(getXML):
+						etree.SubElement(root, getXML())
+						continue
+				subel = etree.SubElement(root, attr, type=attrType)
+				subel.text = str(value)
+				print('Attribut {!s} type {!s} mit Wert {!s} gefunden'.format(attr, attrType, value))
+		return root
+
 
 	def __iter__(self):
 		for attr, value in self.__dict__.iteritems():

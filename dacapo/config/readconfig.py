@@ -216,6 +216,12 @@ class Config(object):
         return
 
 
+    def saveConfig(self, file=None):
+        from lxml import etree
+        g = self.gui['window']
+        for field in g.fields:
+            print(etree.tostring(g.fields[field].getXMLData(), pretty_print=True))
+
     def setDebug(self, Key, Value):
         # if self.debug : print "setDebug() --> Key: %s Value: %s " % (Key, Value)
         self.__dDebug[Key] = Value
