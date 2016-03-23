@@ -14,7 +14,7 @@ from dacapo import errorhandling
 from dacapo.ui import condition
 from dacapo.ui import gui as MetaGUI
 try:
-    import pkg_resources
+    # import pkg_resources
     import sys, os
     import xml.etree.ElementTree as ET
 except ImportError, err:
@@ -103,6 +103,7 @@ class Config(object):
 
 
     def loadConfig(self):
+        from lxml import etree
         self.__dConfigGUI = {}
         self.__dConfigAudio = {}
         self.__dDebug = {}
@@ -126,8 +127,9 @@ class Config(object):
             self.__version = [int(tmp[0]), int(tmp[1]), int(tmp[2])]
         if self.debug : print "Version: %s " % (version)
 
-        gui = root.find('gui')
-        for child in gui :
+        guitree = etree.parse(self.XML)
+        gui = guitree.xpath('gui')
+        for child in gui[0] :
             if ((child.tag == 'window') or (child.tag == 'fullscreen')):
                 g = MetaGUI.Gui(child.tag)
                 g.grabXMLData(child)

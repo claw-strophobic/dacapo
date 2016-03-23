@@ -29,13 +29,15 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)
-		self.lyricFont.grabXMLData(xml.find('lyricFont'))
-		self.pictureArea.grabXMLData(xml.find('pictures'))
-		fields = xml.find('fields')
-		for child in fields:
+		from lxml import etree
+		self.lyricFont.grabXMLData(xml.xpath('lyricFont')[0])
+		self.pictureArea.grabXMLData(etree.SubElement(xml, 'pictures'))
+		fields = xml.xpath('fields')
+		for child in fields[0]:
 			f = dacapo.ui.blitfield.BlitField(child.tag)
 			f.grabXMLData(child)
-			self.fields[child.tag] = f
+			if f.test():
+				self.fields[child.tag] = f
 
 	def printValues(self):
 		print('\nGui: {!s} {!s}x{!s} Background: {!s} Maus: {!s}'.format(self.name, self.height, self.width, self.backgroundColor, self.mouseVisible))
@@ -52,3 +54,25 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		parseThis = 'rgb(' + ','.join(colorRGB) + ')'
 		color.parse(parseThis)
 		return color
+
+	def setVars(self):
+		extendvars = {
+			'height': {
+				'target': 'height',
+				'type': 'int',
+			},
+			'width': {
+				'target': 'width',
+				'type': 'int',
+			},
+			'backgroundColor': {
+				'target': 'backgroundColor',
+				'type': 'color',
+			},
+			'mouseVisible': {
+				'target': 'mouseVisible',
+				'type': 'boolean',
+			},
+		}
+		self.vars.update(extendvars)
+

@@ -9,7 +9,7 @@
 #
 import dacapo.ui.configelement
 import dacapo.ui.position
-import dacapo.ui.font
+import dacapo.ui.fieldfont
 
 
 class Field(dacapo.ui.configelement.ConfigElement):
@@ -25,16 +25,59 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.zIndex = 0
 		self.maxWidth = 0
 		self.pos = dacapo.ui.position.Position()
-		self.font = dacapo.ui.font.Font()
+		self.font = dacapo.ui.fieldfont.FieldFont()
+
+	def setVars(self):
+		extendvars = {
+			'comments': {
+				'target': 'comments',
+				'type': 'text',
+			},
+			'value': {
+				'target': 'content',
+				'type': 'text',
+			},
+			'multiLine': {
+				'target': 'multiLine',
+				'type': 'boolean',
+			},
+			'overlay': {
+				'target': 'overlay',
+				'type': 'boolean',
+			},
+			'splitSpaces': {
+				'target': 'splitSpaces',
+				'type': 'boolean',
+			},
+			'zIndex': {
+				'target': 'zIndex',
+				'type': 'int',
+			},
+			'maxWidth': {
+				'target': 'maxWidth',
+				'type': 'int',
+			},
+		}
+		self.vars.update(extendvars)
+
+	def test(self):
+		res = True
+		if not isinstance(self.name, basestring) or len(self.name) <= 0:
+			#print('Field: {!s} {!s} IsString: {!s} Len: {!s}'.format(self.name, isinstance(self.name, basestring),len(self.name)))
+			res = False
+		if not isinstance(self.content, basestring) or len(self.content) <= 0:
+			#print('Content: {!s} {!s} IsString: {!s} Len: {!s}'.format(self.content, isinstance(self.content, basestring),len(self.content)))
+			res = False
+		return res
 
 	def grabXMLData(self, xml):
 		super(Field, self).grabXMLData(xml)
+		from lxml import etree
 		self.font.grabXMLData(xml)
 		self.pos.grabXMLData(xml)
-		self.content = xml.find('value').text
 
 	def printValues(self):
-		print('Field: {!s} Pos: {!s}x{!s} Font: {!s}'.format(self.name, self.pos.posH, self.pos.posV, self.font.fontName))
+		print('Field: {!s} Content: {!s} Pos: {!s}x{!s} Font: {!s}'.format(self.name, self.content, self.pos.posH, self.pos.posV, self.font.name))
 		members = [attr for attr in dir(self) if not callable(attr) and not attr.startswith("__")]
-		print(dict(self))
+		## print(dict(self))
 		# print members

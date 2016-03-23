@@ -25,22 +25,38 @@ class Position(dacapo.ui.configelement.ConfigElement):
 		self.posRefV = ''
 		self.maxHeight = 0
 
-	def grabXMLData(self, xml):
-		# Horizontal
-		try: self.posH = int(xml.find('posH').text)
-		except: pass
-		try: self.alignH = xml.find('alignH').text
-		except: pass
-		try: self.posRefH = xml.find('posRefH').text
-		except: pass
-		try: self.maxWidth = int(xml.find('maxWidth').text)
-		except: pass
-		# Vertical
-		try: self.posV = int(xml.find('posV').text)
-		except: pass
-		try: self.alignV = xml.find('alignV').text
-		except: pass
-		try: self.posRefV = xml.find('posRefV').text
-		except: pass
-		try: self.maxHeight = int(xml.find('maxHeight').text)
-		except: pass
+	def setVars(self):
+		self.vars = {
+			'alignH': {
+				'target': 'alignH',
+				'type': 'text',
+			},
+			'posH': {
+				'target': 'posH',
+				'type': 'int',
+			},
+			'posRefH': {
+				'target': 'posRefH',
+				'type': 'text',
+			},
+			'maxWidth': {
+				'target': 'maxWidth',
+				'type': 'int',
+			},
+			'alignV': {
+				'target': 'alignV',
+				'type': 'text',
+			},
+			'posV': {
+				'target': 'posV',
+				'type': 'int',
+			},
+			'posRefV': {
+				'target': 'posRefV',
+				'type': 'text',
+			},
+			'maxHeight': {
+				'target': 'maxHeight',
+				'type': 'int',
+			},
+		}

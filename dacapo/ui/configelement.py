@@ -14,29 +14,49 @@ class ConfigElement(object):
 
 	def __init__(self):
 		super(ConfigElement, self).__init__()
+		self.vars = {
+			'name': {
+				'target': 'name',
+				'type': 'text',
+			},
+		}
+		self.setVars()
+
+	def setVars(self):
+		pass
+
+	def test(self):
+		return False
 
 	def checkBool(self, test):
 		res = True if test.lower() in self.BOOLS else False
 		return res
 
-	def grabXMLData(self, xml):
+	def grabXMLData(self, xml, printme=False):
 		d = self.__dict__
 		for child in xml:
-			elementTyp = child.get("type", "str")
+			name = child.tag
+			value = child.text
+			if not self.vars.has_key(name):
+				continue
+			target = self.vars.get(name)['target']
+			elementTyp = self.vars.get(name)['type']
+			if printme:
+				print("Name: {!s} Value: {!s} Target: {!s} Type: {!s}".format(name, value, target, elementTyp))
 			if elementTyp == "int" :
-				d[child.tag] = int(child.text)
+				d[target] = int(value)
 			elif elementTyp == "float" :
-				d[child.tag] = float(child.text)
+				d[target] = float(value)
 			elif elementTyp == "tuple" :
-				d[child.tag] = tuple(child.text)
+				d[target] = tuple(value)
 			elif elementTyp == "color" :
-				tmp = tuple(child.text.split(','))
+				tmp = tuple(value.split(','))
 				color = (int(tmp[0]), int(tmp[1]), int(tmp[2]))
-				d[child.tag] = tuple(color)
+				d[target] = tuple(color)
 			elif elementTyp == "boolean" :
-				d[child.tag] = self.checkBool(child.text)
+				d[target] = self.checkBool(value)
 			else :
-				pass
+				d[target] = str(value)
 
 	def getXMLData(self):
 		root = etree.Element(self.name, type='dict')

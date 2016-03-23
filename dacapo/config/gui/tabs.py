@@ -180,9 +180,9 @@ class FieldTab(PreviewTab):
 		field = model.get_value(combo_iter, 1)
 		font_chooser = combo.font_chooser
 		font_chooser.setBGcolor(combo.type)
-		font = '{!s} {!s}'.format(field.font.fontName, field.font.fontSize)
+		font = '{!s} {!s}'.format(field.font.name, field.font.fontSize)
 		## print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
-		font_chooser.set_font(field.font.fontName, field.font.fontSize)
+		font_chooser.set_font(field.font.name, field.font.fontSize)
 		font_chooser.setFGcolor(field.font.getRGBAColor())
 		self.field = field
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
@@ -243,7 +243,7 @@ class LyricfontTab(Gtk.Box):
 		font_chooser = MyFontChooserWidget()
 		font_chooser.setBGcolor(type)
 		font_chooser.setFGcolor(g.lyricFont.getRGBAColor())
-		font_chooser.set_font(g.lyricFont.fontName, g.lyricFont.fontSize)
+		font_chooser.set_font(g.lyricFont.name, g.lyricFont.fontSize)
 		vbox.add(grid)
 
 		vbox.add(font_chooser)

@@ -9,21 +9,16 @@
 #
 import dacapo.ui.configelement
 
-
-class Font(dacapo.ui.configelement.ConfigElement):
+class FieldFont(dacapo.ui.configelement.ConfigElement):
 
 	def __init__(self):
-		super(Font, self).__init__()
-		self.fontName = ''
+		super(FieldFont, self).__init__()
+		self.name = ''
 		self.fontSize = 0
 		self.fontColor = ''
 
-	def grabXMLData(self, xml):
-		super(Font, self).grabXMLData(xml)
-		self.fontName = xml.find('font').text
-
 	def printValues(self):
-		print('\nFont: {!s} Größe: {!s} Farbe: {!s}'.format(self.fontName, self.fontSize, self.fontColor))
+		print('\nFont: {!s} Größe: {!s} Farbe: {!s}'.format(self.name, self.fontSize, self.fontColor))
 
 	def getRGBAColor(self):
 		from gi.repository import Gdk
@@ -34,3 +29,20 @@ class Font(dacapo.ui.configelement.ConfigElement):
 		parseThis = 'rgb(' + ','.join(colorRGB) + ')'
 		color.parse(parseThis)
 		return color
+
+	def setVars(self):
+		self.vars = {
+			'font': {
+				'target': 'name',
+				'type': 'text',
+			},
+			'fontSize': {
+				'target': 'fontSize',
+				'type': 'int',
+			},
+			'fontColor': {
+				'target': 'fontColor',
+				'type': 'color',
+			},
+		}
+
