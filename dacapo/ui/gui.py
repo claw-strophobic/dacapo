@@ -25,13 +25,13 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		self.pictureArea = None
 		self.name = name
 		self.lyricFont = dacapo.ui.lyricfont.LyricFont()
-		self.pictureArea = dacapo.ui.position.Position()
+		self.pictureArea = dacapo.ui.position.Position('picArea')
 
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)
 		from lxml import etree
 		self.lyricFont.grabXMLData(xml.xpath('lyricFont')[0])
-		self.pictureArea.grabXMLData(etree.SubElement(xml, 'pictures'))
+		self.pictureArea.grabXMLData(xml.xpath('pictures')[0])
 		fields = xml.xpath('fields')
 		for child in fields[0]:
 			f = dacapo.ui.blitfield.BlitField(child.tag)
