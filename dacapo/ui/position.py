@@ -12,8 +12,9 @@ import dacapo.ui.configelement
 
 class Position(dacapo.ui.configelement.ConfigElement):
 
-	def __init__(self):
+	def __init__(self, name=''):
 		super(Position, self).__init__()
+		self.name = name
 		# Horizontal
 		self.alignH = ''
 		self.posH = 0
@@ -24,6 +25,10 @@ class Position(dacapo.ui.configelement.ConfigElement):
 		self.posV = 0
 		self.posRefV = ''
 		self.maxHeight = 0
+
+	def printValues(self):
+		print('\nPicture-Area H: align {!s} pos {!s} posRef {!s} maxWidth: {!s}'.format(self.alignH, self.posH, self.posRefH, self.maxWidth))
+		print('\nPicture-Area V: align {!s} pos {!s} posRef {!s} maxHeight: {!s}'.format(self.alignV, self.posV, self.posRefV, self.maxHeight))
 
 	def setVars(self):
 		self.vars = {
