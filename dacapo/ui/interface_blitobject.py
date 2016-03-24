@@ -30,11 +30,9 @@ class BlitInterface(object):
 		print("Set Background-Color {!s} on size {!s}x{!s}".format(str(color), width, height))
 		image = pygame.Surface(screen.get_size())
 		image.fill(color)
-		print("Creating BlitObject")
 		obj = dacapo.ui.blitobject.BlitObject('Background')
 		obj.renderedData = image
 		obj.setBlitRect((0,0), screen.get_size())
-		print("Going to blitt that stuff")
 		self.doBlitObject(screen, obj, update)
 		return
 
