@@ -25,6 +25,7 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 		FPS = 30
 		fpsClock = pygame.time.Clock()
 		fpsClock.tick(FPS)
+		print("going to set pygame.display to: {!s}".format(self.type))
 		try:
 			if self.type == "fullscreen":
 				self.screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
@@ -34,17 +35,21 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 			print(pygame.get_error())
 			return
 
+		print("going to fill the background to: {!s}".format(g.backgroundColor))
 		try: self.doFillBackground(self.screen, g.backgroundColor, True)
 		except:
 			print(pygame.get_error())
 			return
+		print("going to get blit objeckt: ")
 		obj = self.getBlitObject()
+		print("going to blit objeckt-type: {!s}".format(type(obj)))
 		if isinstance(obj, types.ListType):
 			for o in obj:
 				self.doBlitObject(self.screen, o, True)
 		else:
 			print("doBlitObject: {!s}".format(type(obj)))
 			self.doBlitObject(self.screen, obj, True)
+		print("going to loop: ")
 		while True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:

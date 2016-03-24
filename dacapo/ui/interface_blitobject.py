@@ -25,34 +25,34 @@ class BlitInterface(object):
 		raise NotImplementedError( "Should have implemented this" )
 
 	def doFillBackground(self, screen, color, update=False):
-		try: screen.fill(color)
-		except:
-			raise pygame.get_error()
-			return
 		# Fenstergröße holen
 		width, height = screen.get_size()
 		print("Set Background-Color {!s} on size {!s}x{!s}".format(str(color), width, height))
 		image = pygame.Surface(screen.get_size())
 		image.fill(color)
+		print("Creating BlitObject")
 		obj = dacapo.ui.blitobject.BlitObject('Background')
-		obj.__renderedData = image
+		obj.renderedData = image
 		obj.setBlitRect((0,0), screen.get_size())
+		print("Going to blitt that stuff")
 		self.doBlitObject(screen, obj, update)
 		return
 
 	def doBlitObject(self, screen, blitObj, update=False):
+		print("--- on doBlitObject with {!s} ---".format(blitObj.name))
 		if (screen is None):
 			print("Screen is None for blit: %s " % (blitObj.name))
 			return False
+		print("  - Screen is not None")
 		if (blitObj is None):
 			print("BlitObj is None - Returning false")
 			return False
+		print("  - blitObj is not None")
 		if (blitObj.renderedData is None):
 			print("RenderedData is None for blit: %s " % (blitObj.name))
 			return False
-		print( \
-			"Trying blit for %s at position %s " % (
-				blitObj.name, blitObj.blitPos))
+		print("  - RenderedData is not None")
+		print("Trying blit for %s at position %s " % (blitObj.name, blitObj.blitPos))
 		if not screen.get_locked():
 			try: screen.blit(blitObj.renderedData, blitObj.rect)
 			except pygame.error, err:

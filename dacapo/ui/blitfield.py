@@ -16,11 +16,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 	def __init__(self, name):
 		super(BlitField, self).__init__(name)
-		self.__data = None
-		self.__renderedData = None
-		self.__renderedSize = None
-		self.__sysFont = None
-		self.__debug = True
+		self.data = None
+		self.renderedData = None
+		self.renderedSize = None
+		self.sysFont = None
+		self.debug = True
 
 	def getReplacedContent(self):
 		from dacapo.config.gui import *
@@ -43,13 +43,13 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		"""
 		# metadata holen und aufbereiten
 		from dacapo.config.gui import *
-		if (self.__sysFont is None):
+		if (self.sysFont is None):
 			if (not pygame.font.get_init()):
 				pygame.font.init()
-			try: self.__sysFont = pygame.font.SysFont(self.font.fontName, self.font.fontSize)
+			try: self.sysFont = pygame.font.SysFont(self.font.name, self.font.fontSize)
 			except pygame.error, err:
 				print(u"Error at pygame.font.SysFont(%s, %s) . %s " % (
-						self.font.fontName, self.font.fontSize, err))
+						self.font.name, self.font.fontSize, err))
 				return None
 
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
@@ -58,7 +58,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		gstPlayer = player.gstPlayer
 		isPlaylist = CONFIG.getConfig('TEMP', Key='PLAYLIST').isPlaylist()
 
-		if self.__debug: logging.debug(\
+		if self.debug: logging.debug(\
 				'rendere Texte: {0}'.format(
 				CONFIG.getConfig('TEMP', Key='FILENAME')
 				))
@@ -97,8 +97,8 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		if audio.getDiscNo() == "0" : textMetaVar['if_discNr'] = ''
 
 		vList = list()
-		self.__data = ''
-		self.__renderedData = None
+		self.data = ''
+		self.renderedData = None
 		if (self.content != None) and (self.content != '') :
 			s = self.content
 			try:
@@ -126,50 +126,50 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 					logging.debug('Try to get Bandlogo: %s: %s -> %s' % (
 						self.name,
 						self.content,
-						self.__data
+						self.data
 						))
 					logo = audio.preBlitLogo(self.name)
 					if logo == None:
 						pass
 					else:
-						self.__renderedData = logo
-						self.__renderedSize = self.__renderedData.get_size()
-						return self.__renderedData
+						self.renderedData = logo
+						self.renderedSize = self.renderedData.get_size()
+						return self.renderedData
 
 				if multi == False:
 					if (s != ''):
-						self.__data =  s
-						if self.__debug:
+						self.data =  s
+						if self.debug:
 							logging.debug('Rendere Metadaten: %s: %s -> %s' % (
 								self.name,
 								self.content,
-								self.__data
+								self.data
 								))
-						self.__renderedData = self.__sysFont.render(self.__data, True, self.font.fontColor)
-						self.__renderedSize = self.__renderedData.get_size()
+						self.renderedData = self.sysFont.render(self.data, True, self.font.fontColor)
+						self.renderedSize = self.renderedData.get_size()
 				else:
-					if self.__debug:
+					if self.debug:
 						logging.debug('Multiline: %s:' % (s))
 					if (self.splitSpaces == True):
-						if self.__debug: logging.debug('Split Spaces')
+						if self.debug: logging.debug('Split Spaces')
 						s = s.replace(' ', '\\n')
 					vList = s.split('\\n')
 					if (len(vList) > 0):
-						self.__data =  vList
+						self.data =  vList
 						image = self.get_rendered_maxwidth()
-						self.__renderedData = image
-						self.__renderedSize = image.get_size()
+						self.renderedData = image
+						self.renderedSize = image.get_size()
 
 			except pygame.error, err:
 				print("Autsch! Konnte Metadaten %s nicht rendern: %s" % (
-					self.name, self.__data))
+					self.name, self.data))
 				logging.warning("konnte Metadaten nicht rendern: %s: %s -> %s" %
 								(self.name,
 					self.content,
-					self.__data))
+					self.data))
 				logging.warning(err)
 
-		return self.__renderedData
+		return self.renderedData
 
 	def get_rendered_maxwidth(self):
 		from dacapo.config.gui import *
@@ -177,12 +177,12 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		maxwidth = self.maxWidth
 		if maxwidth == 0:
 			maxwidth = CONFIG.getConfig('gui', winstate, 'width')
-		if self.__debug:
+		if self.debug:
 			logging.debug('Rendere Metadaten mit Max-Width: %s %s: %s -> %s' % (
 				maxwidth,
 				self.name,
 				self.content,
-				self.__data
+				self.data
 				))
 		rList = list()
 		w = 0
@@ -191,26 +191,26 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		lineTest = ''
 		lineSave = None
 		counter = 0
-		for s in self.__data:
+		for s in self.data:
 			counter += 1
 			if len(lineTest) > 0:
 				lineTest = lineTest + ' ' + s
 			else:
 				lineTest = s
-			rData = self.__sysFont.render(
+			rData = self.sysFont.render(
 						lineTest,
 						True,
 						self.font.fontColor
 					)
 			wT,hT = rData.get_size()
-			if self.__debug:
+			if self.debug:
 				logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
-			if wT < maxwidth and counter < len(self.__data):
+			if wT < maxwidth and counter < len(self.data):
 				lineSave = rData
 				continue
 			if lineSave == None:
 				lineSave = rData
-			if self.__debug:
+			if self.debug:
 				logging.debug('List-Append Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
 			rList.append(rData)
 			lineTest = ''
@@ -235,19 +235,19 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			image.blit(r, (mW, hT))
 			hT += lineH
 
-		self.__renderedData = image
+		self.renderedData = image
 		return image
 
 
 	def getBlitObject( self ):
 		from dacapo.config.gui import *
-		if (self.__renderedData is None) or (self.__renderedSize is None):
+		if (self.renderedData is None) or (self.renderedSize is None):
 			print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
 			self.getRenderedData()
 		blitObj = dacapo.ui.blitobject.BlitObject(self.name)
-		if (self.__renderedData is None) or (self.__renderedSize is None):
+		if (self.renderedData is None) or (self.renderedSize is None):
 			return blitObj
-		renderedSize = self.__renderedSize
+		renderedSize = self.renderedSize
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		width = CONFIG.getConfig('gui', winstate, 'width')
 		height = CONFIG.getConfig('gui', winstate, 'height')
@@ -288,24 +288,24 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 		blitPos = (mW, mH)
 		blitObj.setBlitRect(blitPos, renderedSize)
-		blitObj.__renderedData = self.__renderedData
+		blitObj.renderedData = self.renderedData
 		return blitObj
 
 	def getRenderedData_OLD(self):
-		if (self.__sysFont is None):
+		if (self.sysFont is None):
 			if (not pygame.font.get_init()):
 				pygame.font.init()
-			try: self.__sysFont = pygame.font.SysFont(self.font.fontName, self.font.fontSize)
+			try: self.sysFont = pygame.font.SysFont(self.font.name, self.font.fontSize)
 			except pygame.error, err:
 				print(u"Error at pygame.font.SysFont(%s, %s) . %s " % (
-						self.font.fontName, self.font.fontSize, err))
+						self.font.name, self.font.fontSize, err))
 				return None
-		if (self.__renderedData is None):
-			try: self.__renderedData = self.__sysFont.render(self.content, True, self.font.fontColor)
+		if (self.renderedData is None):
+			try: self.renderedData = self.sysFont.render(self.content, True, self.font.fontColor)
 			except pygame.error, err:
 				print(u"Error at sysFont.render(%s, %s) . %s " % (
 						self.content, self.font.fontColor, err))
 				return None
-		self.__renderedSize = self.__renderedData.get_size()
-		return self.__renderedData
+		self.renderedSize = self.renderedData.get_size()
+		return self.renderedData
 
