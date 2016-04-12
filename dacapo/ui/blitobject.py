@@ -12,13 +12,14 @@ import pygame
 
 class BlitObject(object):
 
-	def __init__(self, name):
+	def __init__(self, name, zIndex=0):
 		super(BlitObject, self).__init__()
 		self.name = name
 		self.rect = pygame.Rect(0, 0, 0, 0)
 		self.renderedData = None
 		self.blitPos = 0
 		self.renderedSize = 0
+		self.zIndex = zIndex
 
 	def setBlitRect(self, pos, size):
 		self.blitPos = pos

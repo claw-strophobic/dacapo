@@ -19,6 +19,7 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
 	def on_preview(self, *data):
 		import types
+		import operator
 		g = CONFIG.gui[self.type]
 		CONFIG.setConfig('TEMP', 'gui', 'winState', self.type)
 		resolution = (g.width, g.height)
@@ -44,7 +45,8 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 		obj = self.getBlitObject()
 		print("going to blit objeckt-type: {!s}".format(type(obj)))
 		if isinstance(obj, types.ListType):
-			for o in obj:
+			sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
+			for o in sorted_x:
 				self.doBlitObject(self.screen, o, True)
 		else:
 			print("doBlitObject: {!s}".format(type(obj)))

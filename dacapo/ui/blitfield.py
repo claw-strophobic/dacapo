@@ -244,7 +244,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		if (self.renderedData is None) or (self.renderedSize is None):
 			print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
 			self.getRenderedData()
-		blitObj = dacapo.ui.blitobject.BlitObject(self.name)
+		blitObj = dacapo.ui.blitobject.BlitObject(self.name, zIndex=self.zIndex)
 		if (self.renderedData is None) or (self.renderedSize is None):
 			return blitObj
 		renderedSize = self.renderedSize

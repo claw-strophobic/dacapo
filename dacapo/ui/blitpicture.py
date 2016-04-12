@@ -13,12 +13,13 @@ import pygame
 
 class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 
-	def __init__(self, pic):
+	def __init__(self, pic, zIndex=-1):
 		super(BlitPicture, self).__init__()
 		self.debug = True
 		self.data = pic
 		self.renderedData = self.scalePic(pic)
 		self.renderedSize = self.renderedData.get_size()
+		self.zIndex = zIndex
 
 	def scalePic(self, pic):
 		from dacapo.config.gui import *
@@ -55,7 +56,7 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 
 	def getBlitObject( self ):
 		from dacapo.config.gui import *
-		blitObj = dacapo.ui.blitobject.BlitObject('picture')
+		blitObj = dacapo.ui.blitobject.BlitObject('picture', zIndex=self.zIndex)
 		if (self.renderedData is None) or (self.renderedSize is None):
 			return blitObj
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
