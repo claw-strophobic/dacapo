@@ -9,6 +9,7 @@
 #
 import pygame
 import dacapo.ui.blitobject
+import sys
 
 def find_between(s, first, last ):
 	try:
@@ -37,35 +38,41 @@ class BlitInterface(object):
 		return
 
 	def doBlitObject(self, screen, blitObj, update=False):
-		print("--- on doBlitObject with {!s} ---".format(blitObj.name))
-		if (screen is None):
-			print("Screen is None for blit: %s " % (blitObj.name))
-			return False
-		print("  - Screen is not None")
-		if (blitObj is None):
-			print("BlitObj is None - Returning false")
-			return False
-		print("  - blitObj is not None")
-		if (blitObj.renderedData is None):
-			print("RenderedData is None for blit: %s " % (blitObj.name))
-			return False
-		print("  - RenderedData is not None")
-		print("Trying blit for %s at position %s " % (blitObj.name, blitObj.blitPos))
-		if not screen.get_locked():
-			try: screen.blit(blitObj.renderedData, blitObj.rect)
-			except pygame.error, err:
-				print( \
-					"Error at self.screen.blit(%s, (%s)) . %s " % (
-						blitObj.name, blitObj.rect, err))
+		try:
+			print("--- on doBlitObject with {!s} ---".format(blitObj.name))
+			if (screen is None):
+				print("Screen is None for blit: %s " % (blitObj.name))
 				return False
-		if not screen.get_locked() and update == True:
-			screen.lock()
-			try:
-				pygame.display.update(blitObj.rect)
-			# try: pygame.display.flip()
-			except pygame.error, err:
-				print( \
-					"Error at pygame.display.update(%s) . %s " % (
-						blitObj.rect, err))
+			print("  - Screen is not None")
+			if (blitObj is None):
+				print("BlitObj is None - Returning false")
 				return False
-			screen.unlock()
+			print("  - blitObj is not None")
+			if (blitObj.renderedData is None):
+				print("RenderedData is None for blit: %s " % (blitObj.name))
+				return False
+			print("  - RenderedData is not None")
+			print("Trying blit for %s at position %s " % (blitObj.name, blitObj.blitPos))
+			if not screen.get_locked():
+				try: screen.blit(blitObj.renderedData, blitObj.rect)
+				except pygame.error, err:
+					print( \
+						"Error at self.screen.blit(%s, (%s)) . %s " % (
+							blitObj.name, blitObj.rect, err))
+					return False
+			if not screen.get_locked() and update == True:
+				screen.lock()
+				try:
+					pygame.display.update(blitObj.rect)
+				# try: pygame.display.flip()
+				except pygame.error, err:
+					print( \
+						"Error at pygame.display.update(%s) . %s " % (
+							blitObj.rect, err))
+					return False
+				screen.unlock()
+		except: # catch *all* exceptions
+			print(sys.exc_info()[0])
+			##event = pygame.event.Event(pygame.event.EventType(pygame.QUIT))
+			##pygame.event.post(event)
+			pygame.quit()

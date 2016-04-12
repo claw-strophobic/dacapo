@@ -11,6 +11,7 @@ import dacapo.ui.field
 import dacapo.ui.interface_blitobject
 import dacapo.ui.blitobject
 import pygame
+import sys
 
 class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -241,55 +242,62 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 	def getBlitObject( self ):
 		from dacapo.config.gui import *
-		if (self.renderedData is None) or (self.renderedSize is None):
-			print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
-			self.getRenderedData()
-		blitObj = dacapo.ui.blitobject.BlitObject(self.name, zIndex=self.zIndex)
-		if (self.renderedData is None) or (self.renderedSize is None):
+		try:
+			if (self.renderedData is None) or (self.renderedSize is None):
+				print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
+				self.getRenderedData()
+			blitObj = dacapo.ui.blitobject.BlitObject(self.name, zIndex=self.zIndex)
+			if (self.renderedData is None) or (self.renderedSize is None):
+				return blitObj
+			renderedSize = self.renderedSize
+			winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+			width = CONFIG.getConfig('gui', winstate, 'width')
+			height = CONFIG.getConfig('gui', winstate, 'height')
+			g = CONFIG.gui[winstate]
+			mW = 0
+			mH = 0
+			textWidth, textHeight = renderedSize
+			# align relatively to another object
+			if (self.pos.posRefH != '') and (g.fields.has_key(self.pos.posRefH)):
+				posRefH = g.fields[self.pos.posRefH].getBlitObject()
+				refPosW, refPosH = posRefH.blitPos
+				refWidth, refHeight = posRefH.renderedSize
+				mW = refPosW + refWidth
+
+			if (self.pos.posRefV != '') and (g.fields.has_key(self.pos.posRefV)):
+				posRefV = g.fields[self.pos.posRefV].getBlitObject()
+				refPosW, refPosH = posRefV.blitPos
+				refWidth, refHeight = posRefV.renderedSize
+				mH = refPosH + refHeight
+
+			## align left or right or center
+			if self.pos.alignH == 'left':
+				mW += self.pos.posH
+			elif self.pos.alignH == 'right':
+				mW += self.pos.posH + textWidth
+				mW = width - mW
+			elif self.pos.alignH == 'center':
+				mW = (width - textWidth) / 2
+
+			## align top or bottom or middle
+			if self.pos.alignV == 'top':
+				mH += self.pos.posV
+			elif self.pos.alignV == 'bottom':
+				mH += self.pos.posV + textHeight
+				mH = height - mH
+			elif self.pos.alignV == 'center':
+				mH = (height - textHeight) / 2
+
+			blitPos = (mW, mH)
+			blitObj.setBlitRect(blitPos, renderedSize)
+			blitObj.renderedData = self.renderedData
 			return blitObj
-		renderedSize = self.renderedSize
-		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
-		width = CONFIG.getConfig('gui', winstate, 'width')
-		height = CONFIG.getConfig('gui', winstate, 'height')
-		g = CONFIG.gui[winstate]
-		mW = 0
-		mH = 0
-		textWidth, textHeight = renderedSize
-		# align relatively to another object
-		if (self.pos.posRefH != '') and (g.fields.has_key(self.pos.posRefH)):
-			posRefH = g.fields[self.pos.posRefH].getBlitObject()
-			refPosW, refPosH = posRefH.blitPos
-			refWidth, refHeight = posRefH.renderedSize
-			mW = refPosW + refWidth
+		except: # catch *all* exceptions
+			print(sys.exc_info()[0])
+			##event = pygame.event.Event(pygame.event.EventType(pygame.QUIT))
+			##pygame.event.post(event)
+			pygame.quit()
 
-		if (self.pos.posRefV != '') and (g.fields.has_key(self.pos.posRefV)):
-			posRefV = g.fields[self.pos.posRefV].getBlitObject()
-			refPosW, refPosH = posRefV.blitPos
-			refWidth, refHeight = posRefV.renderedSize
-			mH = refPosH + refHeight
-
-		## align left or right or center
-		if self.pos.alignH == 'left':
-			mW += self.pos.posH
-		elif self.pos.alignH == 'right':
-			mW += self.pos.posH + textWidth
-			mW = width - mW
-		elif self.pos.alignH == 'center':
-			mW = (width - textWidth) / 2
-
-		## align top or bottom or middle
-		if self.pos.alignV == 'top':
-			mH += self.pos.posV
-		elif self.pos.alignV == 'bottom':
-			mH += self.pos.posV + textHeight
-			mH = height - mH
-		elif self.pos.alignV == 'center':
-			mH = (height - textHeight) / 2
-
-		blitPos = (mW, mH)
-		blitObj.setBlitRect(blitPos, renderedSize)
-		blitObj.renderedData = self.renderedData
-		return blitObj
 
 	def getRenderedData_OLD(self):
 		if (self.sysFont is None):

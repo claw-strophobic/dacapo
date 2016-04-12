@@ -27,6 +27,11 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		self.lyricFont = dacapo.ui.lyricfont.LyricFont()
 		self.pictureArea = dacapo.ui.position.Position('picArea')
 
+	def initFields(self):
+		for field in self.fields:
+			self.fields[field].renderedData = None
+			self.fields[field].renderedSize = None
+
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)
 		from lxml import etree

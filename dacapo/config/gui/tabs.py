@@ -123,8 +123,9 @@ class BackgroundTab(PreviewTab):
 			return None
 		else:
 			a = list()
-			CONFIG.readConfig()
+			## CONFIG.readConfig()
 			g = CONFIG.gui[self.type]
+			g.initFields()
 			for field in g.fields:
 				a.append(g.fields[field].getBlitObject())
 			a.append(audio.getCover())
