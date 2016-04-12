@@ -123,6 +123,7 @@ class BackgroundTab(PreviewTab):
 			return None
 		else:
 			a = list()
+			CONFIG.readConfig()
 			g = CONFIG.gui[self.type]
 			for field in g.fields:
 				a.append(g.fields[field].getBlitObject())

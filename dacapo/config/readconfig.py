@@ -101,9 +101,21 @@ class Config(object):
 # -------------------- readConfig() -----------------------------------------------------------------
 
 
+    def readConfig(self):
+        from lxml import etree
+        self.gui = {}
+        guitree = etree.parse(self.XML)
+        gui = guitree.xpath('gui')
+        for child in gui[0] :
+            if ((child.tag == 'window') or (child.tag == 'fullscreen')):
+                g = MetaGUI.Gui(child.tag)
+                g.grabXMLData(child)
+                self.gui[child.tag] = g
+            if self.debug : print child.tag, child.attrib
+            d = self.readChild(child)
+            self.__dConfigGUI[child.tag] = d
 
     def loadConfig(self):
-        from lxml import etree
         self.__dConfigGUI = {}
         self.__dConfigAudio = {}
         self.__dDebug = {}
@@ -127,16 +139,7 @@ class Config(object):
             self.__version = [int(tmp[0]), int(tmp[1]), int(tmp[2])]
         if self.debug : print "Version: %s " % (version)
 
-        guitree = etree.parse(self.XML)
-        gui = guitree.xpath('gui')
-        for child in gui[0] :
-            if ((child.tag == 'window') or (child.tag == 'fullscreen')):
-                g = MetaGUI.Gui(child.tag)
-                g.grabXMLData(child)
-                self.gui[child.tag] = g
-            if self.debug : print child.tag, child.attrib
-            d = self.readChild(child)
-            self.__dConfigGUI[child.tag] = d
+        self.readConfig()
 
         audio = root.find('audio_engine')
         self.__dConfigAudio = self.readChild(audio)
