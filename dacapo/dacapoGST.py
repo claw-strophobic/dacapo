@@ -12,7 +12,7 @@ try:
 	pygst.require("0.10")
 	import threading
 	import datetime
-	import gobject
+	from gi.repository import GObject
 	import gst
 	import traceback
 	import logging
@@ -46,8 +46,8 @@ class GstPlayer(threading.Thread):
 		self.setDuration(datetime.timedelta(seconds=0))
 		self.is_Playing = False
 		self.format = Format(FORMAT_TIME)
-		self.mainloop = gobject.MainLoop()
-		gobject.threads_init()
+		self.mainloop = GObject.MainLoop()
+		GObject.threads_init()
 		self.context = self.mainloop.get_context()
 		if self._gapless:
 			self.__init_pipelineGapless()
@@ -214,11 +214,11 @@ class GstPlayer(threading.Thread):
 
 		try:
 			pipe = [gst.parse_launch(element) for element in pipeline.split('!')]
-		except gobject.GError, err:
+		except GObject.GError, err:
 			logging.warning("Invalid GStreamer output pipeline, trying default. ")
 			try:
 				pipe = [gst.parse_launch("autoaudiosink")]
-			except gobject.GError:
+			except GObject.GError:
 				pipe = None
 			else:
 				pipeline = "autoaudiosink"
