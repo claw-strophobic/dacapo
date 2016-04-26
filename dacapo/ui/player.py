@@ -18,6 +18,7 @@ import sys
 import os
 import platform
 from dacapo import errorhandling
+from types import *
 
 if platform.system() == 'Windows':
 	try:
@@ -117,15 +118,20 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self._actScreen = None
 		try:
 			g = CONFIG.gui[self.winState]
-			CONFIG.setConfig('TEMP', 'gui', 'winState', self.winState)
-			self.screen.fill(self._config.getConfig('gui', self.winState,
-													'backgroundColor'))
+			print("going to fill the background to: {!s}".format(g.backgroundColor))
+			try: self.doFillBackground(self.screen, g.backgroundColor, True)
+			except:
+				print(pygame.get_error())
+				return
+			print("going to get blit object... ")
 			obj = self.getBlitObject()
 			sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
 			for o in sorted_x:
 				self.doBlitObject(self.screen, o, True)
 		except:
-			pass
+			logging.error("Error at blit-object %s " % (sys.exc_info()[0]))
+			errorhandling.Error.show()
+
 
 		self.timerIndex = 0
 
@@ -339,69 +345,73 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	# -------------------- Sync-Texte -----------------------------------------------------------------
 
 	def run(self):
+		# Verhindert, dass das Programm zu schnell laeuft
+		FPS = 30
+		fpsClock = pygame.time.Clock()
+		if self._debug: logging.debug("going to loop...")
 		while True:
-			# Verhindert, dass das Programm zu schnell laeuft
-			FPS = 30
-			fpsClock = pygame.time.Clock()
-			if self._ausschalter.isSet(): break
+			try:
+				if self._ausschalter.isSet(): break
 
-			if self._showGUI == True: self.update_sync_lyrics()
-			if self._showGUI == True: self.update_act_time()
+				if self._showGUI == True: self.update_sync_lyrics()
+				if self._showGUI == True: self.update_act_time()
 
-			for event in pygame.event.get():
-				# if self._debug : logging.debug("--> bin in event_loop mit event: %s " % (event))
-				if event.type == pygame.QUIT:
-					self.quit()
-				if event.type == pygame.ACTIVEEVENT:
-					if self.allwaysOnTop:
-						if not self.fullscreen:
-							if self._debug: logging.debug('Setze Fenster nach vorne. ')
-							self.SetWindowPos(pygame.display.get_wm_info()['window'],
-											  -1, 0, 0, self.resolution[0], self.resolution[1], 0x0013)
-				elif event.type == VIDEORESIZE:
-					# get actual size
-					screen = pygame.display.set_mode(event.dict['size'], pygame.RESIZABLE)
-					self.resolution = event.dict['size']
-				# self.doBlitText()
-
-				elif event.type == pygame.KEYDOWN:
-					if self._debug: logging.debug("Keydown-Event: %s" % (event.key))
-					if event.key == pygame.K_ESCAPE:
+				for event in pygame.event.get():
+					# if self._debug : logging.debug("--> bin in event_loop mit event: %s " % (event))
+					if event.type == pygame.QUIT:
 						self.quit()
-					if event.key == pygame.K_q:
-						self.quit()
-					if event.key == pygame.K_SPACE:
-						self.start_stop()
-					if event.key == pygame.K_f:
-						self.toggle_fullscreen()
-					if event.key == pygame.K_LEFT:
-						self._gstPlayer.seekPosition(self.seekSecs * float(-1))
-						self.audioFile.syncCount = 0
-						self.timerIndex = self._gstPlayer.queryNumericPosition()
-					if event.key == pygame.K_RIGHT:
-						self._gstPlayer.seekPosition(self.seekSecs)
-						self.timerIndex = self._gstPlayer.queryNumericPosition()
-					# if event.key == pygame.K_LSHIFT and event.key == pygame.K_LEFT:
-					#	self._gstPlayer.seekPosition(float(-30))
-					# if event.key == pygame.K_RSHIFT and event.key == pygame.K_RIGHT:
-					#	self._gstPlayer.seekPosition(float(+30))
-					if event.key == pygame.K_DOWN:
-						self.play_prev_song()
-					if event.key == pygame.K_UP:
-						self.play_next_song()
-					if event.key == pygame.K_LESS:
-						self.play_prev_song()
-					if event.key == pygame.K_GREATER:
-						self.play_next_song()
-					if event.key == pygame.K_HOME:
-						self.play_first_song()
-					if event.key == pygame.K_END:
-						self.play_last_song()
-				else:
-					# if self._debug : logging.debug("--> bin in event_loop mit event " + event + '')
-					pass
-			fpsClock.tick(FPS)
+					if event.type == pygame.ACTIVEEVENT:
+						if self.allwaysOnTop:
+							if not self.fullscreen:
+								if self._debug: logging.debug('Setze Fenster nach vorne. ')
+								self.SetWindowPos(pygame.display.get_wm_info()['window'],
+												  -1, 0, 0, self.resolution[0], self.resolution[1], 0x0013)
+					elif event.type == VIDEORESIZE:
+						# get actual size
+						screen = pygame.display.set_mode(event.dict['size'], pygame.RESIZABLE)
+						self.resolution = event.dict['size']
+					# self.doBlitText()
 
+					elif event.type == pygame.KEYDOWN:
+						if self._debug: logging.debug("Keydown-Event: %s" % (event.key))
+						if event.key == pygame.K_ESCAPE:
+							self.quit()
+						if event.key == pygame.K_q:
+							self.quit()
+						if event.key == pygame.K_SPACE:
+							self.start_stop()
+						if event.key == pygame.K_f:
+							self.toggle_fullscreen()
+						if event.key == pygame.K_LEFT:
+							self._gstPlayer.seekPosition(self.seekSecs * float(-1))
+							self.audioFile.syncCount = 0
+							self.timerIndex = self._gstPlayer.queryNumericPosition()
+						if event.key == pygame.K_RIGHT:
+							self._gstPlayer.seekPosition(self.seekSecs)
+							self.timerIndex = self._gstPlayer.queryNumericPosition()
+						# if event.key == pygame.K_LSHIFT and event.key == pygame.K_LEFT:
+						#	self._gstPlayer.seekPosition(float(-30))
+						# if event.key == pygame.K_RSHIFT and event.key == pygame.K_RIGHT:
+						#	self._gstPlayer.seekPosition(float(+30))
+						if event.key == pygame.K_DOWN:
+							self.play_prev_song()
+						if event.key == pygame.K_UP:
+							self.play_next_song()
+						if event.key == pygame.K_LESS:
+							self.play_prev_song()
+						if event.key == pygame.K_GREATER:
+							self.play_next_song()
+						if event.key == pygame.K_HOME:
+							self.play_first_song()
+						if event.key == pygame.K_END:
+							self.play_last_song()
+					else:
+						# if self._debug : logging.debug("--> bin in event_loop mit event " + event + '')
+						pass
+				fpsClock.tick(FPS)
+			except Exception, err:
+				errorhandling.Error.show()
+				sys.exit(2)
 		return
 
 
@@ -504,6 +514,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		if self.actSong > len(self.playlist):
 			self._gstPlayer.doStop()
+		if self._debug: logging.debug('done play next song. ')
 		return
 
 
@@ -594,7 +605,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if self._debug: logging.debug("DISPLAY DRIVER: %s " % (pygame.display.get_driver()))
 		if self._debug: logging.debug("DISPLAY INFO: %s " % (pygame.display.Info()))
 		if self._debug: logging.debug("WM INFO: %s " % (pygame.display.get_wm_info()))
-
+		if self._debug: logging.debug('done init display. ')
 		return
 
 	# -------------------- doQuit() -----------------------------------------------------------------
