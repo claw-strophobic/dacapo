@@ -722,7 +722,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		else:
 			a = list()
 			CONFIG.readConfig()
-			g = CONFIG.gui[self.type]
+			g = CONFIG.gui[self.winState]
 			g.initFields()
 			for field in g.fields:
 				a.append(g.fields[field].getBlitObject())
