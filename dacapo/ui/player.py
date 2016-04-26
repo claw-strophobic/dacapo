@@ -524,6 +524,8 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if self._debug: logging.debug('Initialisiere Display ')
 		try:
 			pygame.display.init()
+			if (not pygame.font.get_init()):
+				pygame.font.init()
 		except:
 			logging.error('Konnte Display nicht initialisieren! ')
 			logging.error(pygame.get_error())
