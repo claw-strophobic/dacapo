@@ -219,7 +219,12 @@ def play(config=None):
 
     # Starten
     #GUI.start()
-    GUI.run()
+    try:
+        if bDebugG: logging.debug('Going to run the GUI')
+        GUI.run()
+    except Exception, err:
+        errorhandling.Error.show()
+        sys.exit(2)
     # Hier wird gewartet bis der Hauptschalter umgelegt wurde.
     hauptschalter.wait()
 
