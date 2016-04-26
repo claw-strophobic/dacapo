@@ -617,7 +617,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if self._debug: logging.debug("Hauptschalter setzen... ")
 		self._hauptschalter.set()
 		if self._debug: logging.debug("Feierabend... ")
-		self.logFile.close()
 		readconfig.quit()
 		raise SystemExit
 		return
