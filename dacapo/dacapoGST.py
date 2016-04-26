@@ -266,6 +266,7 @@ class GstPlayer(threading.Thread):
 		self.player.set_property("uri", "file://" + self.filename)
 
 	def doPlay(self, filename):
+		return
 		from gst import STATE_NULL, STATE_PLAYING, STATE_PAUSED, FORMAT_TIME, MESSAGE_EOS, MESSAGE_ERROR, SECOND
 		self.player.set_state(STATE_NULL)
 		self._in_gapless_transition = False
