@@ -291,6 +291,7 @@ class GstPlayer(threading.Thread):
 
 		self.is_Playing = True
 		self.actualTitel = filename
+		if self.debug: logging.debug("done. leaving doplay ")
 
 	def doUnpause(self):
 		from gst import STATE_PLAYING
@@ -314,6 +315,7 @@ class GstPlayer(threading.Thread):
 		from gst import STATE_NULL, MESSAGE_EOS, MESSAGE_ERROR
 		USE_TRACK_CHANGE = True
 		t = message.type
+		# if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
 		if t == MESSAGE_EOS:
 			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
 			if self.stopWhenEOS:
@@ -323,9 +325,13 @@ class GstPlayer(threading.Thread):
 			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
 			self.player.set_state(STATE_NULL)
 			err, debug = message.parse_error()
-			logging.debug("dacapoGST on_message gst.MESSAGE_ERROR: %s " % err)
+			logging.debug('MESSAGE_ERROR: %r' % str(err).decode("utf8", 'replace'))
 		elif message.type == gst.MESSAGE_TAG:
 			# if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
+			taglist = message.parse_tag()
+			for key in taglist.keys():
+				# logging.info('MESSAGE_TAG: %s = %s' % (key, taglist[key]))
+				logging.info('MESSAGE_TAG: %s ' % (key))
 			pass
 		elif message.type == gst.MESSAGE_BUFFERING:
 			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
