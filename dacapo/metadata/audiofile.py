@@ -442,6 +442,7 @@ class AudioFile(object):
         return datei
 
     def getCover(self):
+        if self.cover == '???': self.loadFrontCover()
         print("Pic-Type: {!s}".format(type(self.cover)))
         pic = BlitPicture(self.cover)
         return pic.getBlitObject()
