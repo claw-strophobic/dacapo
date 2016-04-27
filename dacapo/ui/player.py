@@ -230,7 +230,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	# -------------------- Timer -----------------------------------------------------------------
 
 	def update_act_time(self, force=False):
-		return
 		if self.screen.get_locked(): return
 
 		try:
@@ -241,6 +240,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if newPos == None: return
 
 		if (self.pos == newPos) and (force == False): return
+		return
 
 		## if self._metaFields.get('TIME')['textActTime'] == None: return
 
