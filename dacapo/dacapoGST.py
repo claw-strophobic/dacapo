@@ -11,7 +11,7 @@ try:
 
 	# pyGst.require("0.10")
 	import threading
-	import datetime
+	import time
 	import gi
 	from gi.repository import GObject
 	gi.require_version('Gst', '1.0')
@@ -36,7 +36,7 @@ class GstPlayer(threading.Thread):
 		self.guiPlayer = self.config.getConfig('TEMP', Key='PLAYER')
 		self.debug = self.config.getConfig('debug', ' ', 'debugS')
 		self._gapless = self.config.getConfig('audio_engine', 'audio_engine', 'gapless')
-		self.setDuration(datetime.timedelta(seconds=0))
+		self.__strTime = "00:00"
 		self.is_Playing = False
 		self.mainloop = GObject.MainLoop()
 		GObject.threads_init()
@@ -277,13 +277,7 @@ class GstPlayer(threading.Thread):
 		self.player.set_state(Gst.State.PLAYING)
 		# Gst.gst_element_query_duration(self.player, GST_Gst.Format.TIME, time)
 		# print "TIME AUS GSTREAMER: " , time
-		try:
-			self.player.get_state(timeout=Gst.SECOND / 2)
-			duration = self.player.query_duration(Gst.Format.TIME, None)[0]
-			self.setDuration(datetime.timedelta(seconds=(duration / Gst.SECOND)))
-		except:
-			self.setDuration(datetime.timedelta(seconds=(500 / Gst.SECOND)))
-
+		self.setDuration()
 		self.is_Playing = True
 		self.actualTitel = filename
 		if self.debug: logging.debug("done. leaving doplay ")
@@ -349,29 +343,30 @@ class GstPlayer(threading.Thread):
 
 	def doTrackChange(self):
 		# self.player.get_state()
-		try:
-			self.player.get_state(timeout=Gst.SECOND / 2)
-			duration = self.player.query_duration(Gst.Format.TIME, None)[0]
-			self.setDuration(datetime.timedelta(seconds=(duration / Gst.SECOND)))
-		except:
-			if self.debug: logging.debug("--> Konnte Titellänge nicht speichern! ")
-			self.setDuration(datetime.timedelta(seconds=0))
+		self.setDuration()
 		self.actualTitel = self.filename
 
-	def setDuration(self, duration):
-		self.__time = duration
-		hours, remainder = divmod(self.__time.seconds, 3600)
-		minutes, seconds = divmod(remainder, 60)
-		# print '%s:%s:%s' % (hours, minutes, seconds)
-		if self.debug: logging.debug("--> setDuration() Stunden: %s Minuten: %s Sekunden: %s " % (
-		str(hours).zfill(2), str(minutes).zfill(2), str(seconds).zfill(2)))
-		strTime = ""
-		if hours > 0:
-			strTime = str(hours) + ":" + str(minutes).zfill(2)
+	def convert_ns(self, t):
+		# This method was submitted by Sam Mason.
+		# It's much shorter than the original one.
+		s,ns = divmod(t, 1000000000)
+		m,s = divmod(s, 60)
+
+		if m < 60:
+			return "%02i:%02i" %(m,s)
 		else:
-			strTime = str(minutes).zfill(1)
-		strTime += ":" + str(seconds).zfill(2)
-		self.__strTime = strTime
+			h,m = divmod(m, 60)
+			return "%i:%02i:%02i" %(h,m,s)
+
+	def setDuration(self):
+		self.player.get_state(timeout=Gst.SECOND / 2)
+		dur_int = self.player.query_duration(Gst.Format.TIME)[1]
+		if dur_int == -1:
+			if self.debug: logging.debug("--> setDuration() Couldn't get the length of the song")
+		dur_str = self.convert_ns(dur_int)
+		self.__time = dur_int
+		if self.debug: logging.debug("--> setDuration() {!s} {!s}".format(dur_int, dur_str))
+		self.__strTime = dur_str
 
 	def getDuration(self):
 		return self.__strTime
