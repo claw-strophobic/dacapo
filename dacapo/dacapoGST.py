@@ -372,57 +372,23 @@ class GstPlayer(threading.Thread):
 		return self.__strTime
 
 	def getNumericDuration(self):
-		return self.__time.seconds
+		return self.__time
 
 	def queryTimeRemaining(self):
 		time = self.queryNumericPosition()
 		duration = self.getNumericDuration()
 		remain = duration - time
-		hours, remainder = divmod(remain, 3600)
-		minutes, seconds = divmod(remainder, 60)
-		# if self.debug : print "--> query_position() : ", '%s:%s:%s' % (hours, minutes, seconds)
-		strTime = ""
-		if hours > 0:
-			strTime = str(hours) + ":" + str(minutes).zfill(2)
-		else:
-			strTime = str(minutes).zfill(1)
-		strTime += ":" + str(seconds).zfill(2)
-
-		return strTime
+		return self.convert_ns(remain)
 
 	def queryPosition(self):
-		p = 0
-		if self.is_Playing:
-			try:
-				p = self.player.query_position(Gst.Format.TIME, None)[0]
-				self._last_position = p
-			except BaseException:
-				p = self._last_position
-		else:
-			# During stream seeking querying the position fails.
-			# Better return the last valid one instead of 0.
-			try:
-				p = self._last_position
-			except BaseException:
-				return None
-
-		hours, remainder = divmod(p / Gst.SECOND, 3600)
-		minutes, seconds = divmod(remainder, 60)
-		# if self.debug : print "--> query_position() : ", '%s:%s:%s' % (hours, minutes, seconds)
-		strTime = ""
-		if hours > 0:
-			strTime = str(hours) + ":" + str(minutes).zfill(2)
-		else:
-			strTime = str(minutes).zfill(1)
-		strTime += ":" + str(seconds).zfill(2)
-
+		strTime = self.convert_ns(self.queryNumericPosition())
 		return strTime
 
 	def queryNumericPosition(self):
 		p = 0
 		if self.is_Playing:
 			try:
-				p = self.player.query_position(Gst.Format.TIME, None)[0]
+				p = self.player.query_position(Gst.Format.TIME)[1]
 				self._last_position = p
 			except BaseException:
 				p = self._last_position
@@ -433,41 +399,16 @@ class GstPlayer(threading.Thread):
 				p = self._last_position
 			except BaseException:
 				return None
-
-		hours, remainder = divmod(p / Gst.SECOND, 3600)
-		minutes, seconds = divmod(remainder, 60)
-		return (seconds + (minutes * 60))
+		return p
 
 	def queryPositionInMilliseconds(self):
-		p = 0
-		if self.is_Playing:
-			try:
-				p = self.player.query_position(Gst.Format.TIME, None)[0]
-				self._last_position = p
-			except BaseException:
-				p = self._last_position
-		else:
-			# During stream seeking querying the position fails.
-			# Better return the last valid one instead of 0.
-			try:
-				p = self._last_position
-			except BaseException:
-				return None
+		p = self.queryNumericPosition()
 		mseconds = (p / Gst.MSECOND)
-		hours, remainder = divmod(p / Gst.SECOND, 3600)
-		minutes, seconds = divmod(remainder, 60)
-		# print("P: %s Min: %s Sec: %s MSec: %s" % (p, minutes, seconds, mseconds) )
 		return mseconds
 
 	def seekPosition(self, pos=0):
-		try:
-			nanosecs, format = self.player.query_position(Gst.Format.TIME, None)
-		except:
-			return
-		try:
-			duration_nanosecs, format = self.player.query_duration(Gst.Format.TIME, None)
-		except:
-			return
+		nanosecs = self.queryNumericPosition()
+		duration_nanosecs = self.getNumericDuration()
 		# print "nanosecs: %s - pos: %s - SECOND %s" % (nanosecs, pos, SECOND)
 		self._posRange = float(duration_nanosecs) / Gst.SECOND
 		self._posValue = float(nanosecs) / Gst.SECOND
@@ -475,7 +416,7 @@ class GstPlayer(threading.Thread):
 
 		seek_time_secs = self._last_position + pos
 		if self._posNewValue < 0: self._posNewValue = 0
-		if self._posNewValue > self.__time.seconds: return
+		if self._posNewValue > self._posRange: return
 		if self.debug: logging.debug("Dauer: %s - Aktuelle Position: %s - Neue Position %s " % (
 		self._posRange, self._posValue, self._posNewValue))
 		try:
