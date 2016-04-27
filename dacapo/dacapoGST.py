@@ -7,13 +7,15 @@ import errorhandling
 import sys, os
 
 try:
-	import pygst
+	#import pygst
 
-	pygst.require("0.10")
+	# pyGst.require("0.10")
 	import threading
 	import datetime
+	import gi
 	from gi.repository import GObject
-	import gst
+	gi.require_version('Gst', '1.0')
+	from gi.repository import Gst
 	import traceback
 	import logging
 	from config import readconfig
@@ -21,19 +23,10 @@ except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
 
-# from gst import Pipeline, element_factory_make, STATE_NULL, STATE_PLAYING, STATE_PAUSED, MESSAGE_EOS, MESSAGE_ERROR
-
-try:
-	from gst import pbutils
-except ImportError:
-	pbutils = None
-
-
 ### Klassendefinitionen
 
 class GstPlayer(threading.Thread):
 	def __init__(self, ausschalter):
-		from gst import Pipeline, element_factory_make, Format, FORMAT_TIME
 		threading.Thread.__init__(self)
 		self.ausschalter = ausschalter
 		self.stopWhenEOS = True
@@ -45,9 +38,9 @@ class GstPlayer(threading.Thread):
 		self._gapless = self.config.getConfig('audio_engine', 'audio_engine', 'gapless')
 		self.setDuration(datetime.timedelta(seconds=0))
 		self.is_Playing = False
-		self.format = Format(FORMAT_TIME)
 		self.mainloop = GObject.MainLoop()
 		GObject.threads_init()
+		Gst.init(None)
 		self.context = self.mainloop.get_context()
 		if self._gapless:
 			self.__init_pipelineGapless()
@@ -56,39 +49,40 @@ class GstPlayer(threading.Thread):
 		if self.debug: logging.debug('GstPlayer __init__() -> done ')
 
 	def __init_pipeline(self):
+		if self.debug: logging.debug("start creating pipeline! ")
 		bReplayGain = self.config.getConfig('audio_engine', 'audio_engine', 'replayGain')
 		# Pipeline erstellen
-		self.player = gst.Pipeline("player")
+		self.player = Gst.Pipeline()
 		# File-Source erstellen und der Pipeline zufügen
-		self.filesrc = gst.element_factory_make("filesrc", "file-source")
+		self.filesrc = Gst.ElementFactory.make("filesrc", "file-source")
 		self.player.add(self.filesrc)
 
 		# (Auto-) Decoder erstellen und der Pipeline zufügen
-		self.decode = gst.element_factory_make("decodebin", "decode")
-		self.decode.connect("new-decoded-pad", self.OnDynamicPad)
+		self.decode = Gst.ElementFactory.make("decodebin", "decode")
+		self.decode.connect("pad-added", self.OnDynamicPad)
 		self.player.add(self.decode)
 
 		# Link den Decoder an die File-Source
 		self.filesrc.link(self.decode)
 
 		# Converter erstellen und zufügen
-		self.convert = gst.element_factory_make("audioconvert", "convert")
+		self.convert = Gst.ElementFactory.make("audioconvert", "convert")
 		# self.convert.connect("about-to-finish", self.on_about_to_finish)
 		self.player.add(self.convert)
 
 		# ReplayGain erstellen und zufügen
 		if bReplayGain:
 			if self.debug: logging.debug("ReplayGain wird aktiviert! ")
-			self.replay = gst.element_factory_make("rgvolume", "replay")
+			self.replay = Gst.ElementFactory.make("rgvolume", "replay")
 			self.player.add(self.replay)
 			self.convert.link(self.replay)
 			if self.debug: logging.debug("ReplayGain ist an Converter gelinkt! ")
 
 		# Output-Sink erstellen und zufügen
-		# self.sink = gst.element_factory_make("alsasink", "sink")
+		# self.sink = Gst.ElementFactory.make("alsasink", "sink")
 		sinkType = self.config.getConfig('audio_engine', ' ', 'sinkType') + 'sink'
 		if self.debug: logging.debug("Versuche Sink: %s " % sinkType)
-		self.sink = gst.element_factory_make(sinkType, "sink")
+		self.sink = Gst.ElementFactory.make(sinkType, "sink")
 		self.player.add(self.sink)
 		if bReplayGain:
 			self.replay.link(self.sink)
@@ -97,55 +91,53 @@ class GstPlayer(threading.Thread):
 			if self.debug: logging.debug("ReplayGain ist deaktiviert! \n ")
 			self.convert.link(self.sink)
 
-		# self.player.add(source, decoder, conv, sink)
-		# gst.element_link_many(source, self.decoder, conv, sink)
-
 		bus = self.player.get_bus()
 		bus.add_signal_watch()
 		self.__bus_id = bus.connect("message", self.on_message)
 		return
 
 	def __init_pipelineGapless(self):
+		if self.debug: logging.debug("start creating gapless pipeline! ")
 		bReplayGain = self.config.getConfig('audio_engine', 'audio_engine', 'replayGain')
 		USE_QUEUE = True
 
 		# Pipeline erstellen
 		self.pipe = []
-		# self.pipe += gst.Pipeline("player")
+		# self.pipe += Gst.Pipeline("player")
 		sinkType = self.config.getConfig('audio_engine', ' ', 'sinkType') + 'sink'
 		if self.debug: logging.debug("Versuche Sink: %s " % sinkType)
 		self.pipe, self.name = self.GStreamerSink(sinkType)
 		# self.pipe, self.name = self.GStreamerSink("alsasink")
-		conv = gst.element_factory_make('audioconvert')
+		conv = Gst.ElementFactory.make('audioconvert')
 		self.pipe = [conv] + self.pipe
 		prefix = []
 
 		if USE_QUEUE:
-			queue = gst.element_factory_make('queue')
-			queue.set_property('max-size-time', 500 * gst.MSECOND)
+			queue = Gst.ElementFactory.make('queue')
+			queue.set_property('max-size-time', 500 * Gst.MSECOND)
 			prefix.append(queue)
 
 		# playbin2 has started to control the volume through pulseaudio,
 		# which means the volume property can change without us noticing.
 		# Use our own volume element for now until this works with PA.
 		# Also, when using the queue, this removes the delay..
-		self._vol_element = gst.element_factory_make('volume')
+		self._vol_element = Gst.ElementFactory.make('volume')
 		prefix.append(self._vol_element)
 
 		# ReplayGain erstellen und zufügen
 		if bReplayGain:
 			if self.debug: logging.debug("ReplayGain wird aktiviert! ")
-			self.replay = gst.element_factory_make("rgvolume", "replay")
+			self.replay = Gst.ElementFactory.make("rgvolume", "replay")
 			prefix.append(self.replay)
 
 		self.pipe = prefix + self.pipe
 		# --------------------------------------------------------------------------------------------#
-		bufbin = gst.Bin()
+		bufbin = Gst.Bin()
 		map(bufbin.add, self.pipe)
 		if len(self.pipe) > 1:
 			try:
-				gst.element_link_many(*self.pipe)
-			except gst.LinkError, e:
+				Gst.element_link_many(*self.pipe)
+			except Gst.LinkError, e:
 				logging.error("Could not link GStreamer pipeline: '%s' " % e)
 				exc_type, exc_value, exc_traceback = sys.exc_info()
 				lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
@@ -155,22 +147,22 @@ class GstPlayer(threading.Thread):
 				return False
 
 		# Test to ensure output pipeline can preroll
-		bufbin.set_state(gst.STATE_READY)
-		result, state, pending = bufbin.get_state(timeout=gst.SECOND / 2)
-		if result == gst.STATE_CHANGE_FAILURE:
-			bufbin.set_state(gst.STATE_NULL)
+		bufbin.set_state(Gst.State.READY)
+		result, state, pending = bufbin.get_state(timeout=Gst.SECOND / 2)
+		if result == Gst.State.CHANGE_FAILURE:
+			bufbin.set_state(Gst.State.NULL)
 			self.__destroy_pipeline()
 			return False
 
 		# Make the sink of the first element the sink of the bin
-		gpad = gst.GhostPad('sink', self.pipe[0].get_pad('sink'))
+		gpad = Gst.GhostPad.new('sink', self.pipe[0].get_pad('sink'))
 		bufbin.add_pad(gpad)
 		# --------------------------------------------------------------------------------------------#
 
 
-		self.player = gst.element_factory_make("playbin2", "player")
+		self.player = Gst.ElementFactory.make("playbin", "player")
 		# by default playbin will render video -> suppress using fakesink
-		fakesink = gst.element_factory_make("fakesink", "fakesink")
+		fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
 		self.player.set_property("video-sink", fakesink)
 		# disable all video/text decoding in playbin2
 		GST_PLAY_FLAG_VIDEO = 1 << 0
@@ -180,7 +172,7 @@ class GstPlayer(threading.Thread):
 		self.player.set_property("flags", flags)
 		# set the buffer for gapless playback
 		duration = float(1.5)
-		duration = int(duration * 1000) * gst.MSECOND
+		duration = int(duration * 1000) * Gst.MSECOND
 		self.player.set_property('buffer-duration', duration)
 		# link the function for gapless playback
 		self.__atf_id = self.player.connect("about-to-finish", self.on_about_to_finish)
@@ -207,17 +199,17 @@ class GstPlayer(threading.Thread):
 
 		Returns the pipeline's description and a list of disconnected elements."""
 
-		if not pipeline and not gst.element_factory_find('gconfaudiosink'):
+		if not pipeline and not Gst.element_factory_find('gconfaudiosink'):
 			pipeline = "autoaudiosink"
 		elif not pipeline or pipeline == "gconf":
 			pipeline = "gconfaudiosink profile=music"
 
 		try:
-			pipe = [gst.parse_launch(element) for element in pipeline.split('!')]
+			pipe = [Gst.parse_launch(element) for element in pipeline.split('!')]
 		except GObject.GError, err:
 			logging.warning("Invalid GStreamer output pipeline, trying default. ")
 			try:
-				pipe = [gst.parse_launch("autoaudiosink")]
+				pipe = [Gst.parse_launch("autoaudiosink")]
 			except GObject.GError:
 				pipe = None
 			else:
@@ -226,14 +218,14 @@ class GstPlayer(threading.Thread):
 		if pipe:
 			# In case the last element is linkable with a fakesink
 			# it is not an audiosink, so we append the default pipeline
-			fake = gst.element_factory_make('fakesink')
+			fake = Gst.ElementFactory.make('fakesink')
 			try:
-				gst.element_link_many(pipe[-1], fake)
-			except gst.LinkError:
+				pipe[-1].link(fake)
+			except Gst.LinkError:
 				pass
 			else:
-				gst.element_unlink_many(pipe[-1], fake)
-				default, default_text = pygst.GStreamerSink("")
+				Gst.element_unlink_many(pipe[-1], fake)
+				default, default_text = pyGst.GStreamerSink("")
 				if default:
 					return pipe + default, pipeline + " ! " + default_text
 		else:
@@ -249,9 +241,14 @@ class GstPlayer(threading.Thread):
 		# know it got audio data for us. Use the get_pad call on the previously
 
 	# created audioconverter element asking to a "sink" pad.
-	def OnDynamicPad(self, dbin, pad, islast):
-		if self.debug: logging.debug("OnDynamicPad Called! ")
-		pad.link(self.convert.get_pad("sink"))
+	def OnDynamicPad(self, dbin, pad):
+		try:
+			string = pad.query_caps(None).to_string()
+			if self.debug: logging.debug("OnDynamicPad Called: {!s}".format(string))
+			pad.link(self.convert.get_static_pad("sink"))
+		except Exception, err:
+			errorhandling.Error.show()
+			self.doEnd()
 
 	def on_about_to_finish(self, bin):
 		# The current song is about to finish, if we want to play another
@@ -266,9 +263,7 @@ class GstPlayer(threading.Thread):
 		self.player.set_property("uri", "file://" + self.filename)
 
 	def doPlay(self, filename):
-		return
-		from gst import STATE_NULL, STATE_PLAYING, STATE_PAUSED, FORMAT_TIME, MESSAGE_EOS, MESSAGE_ERROR, SECOND
-		self.player.set_state(STATE_NULL)
+		self.player.set_state(Gst.State.NULL)
 		self._in_gapless_transition = False
 		if self.debug: logging.debug("playing in doPlay: %s " % filename)
 		if self.debug: logging.debug("abspath of file: %s " % os.path.abspath(filename))
@@ -279,85 +274,85 @@ class GstPlayer(threading.Thread):
 		else:
 			self.player.get_by_name("file-source").set_property("location", self.filename)
 		# self.player.get_by_name("file-source").set_property("location", self.filename)
-
-		self.player.set_state(STATE_PLAYING)
-		# gst.gst_element_query_duration(self.player, GST_FORMAT_TIME, time)
+		self.player.set_state(Gst.State.PLAYING)
+		# Gst.gst_element_query_duration(self.player, GST_Gst.Format.TIME, time)
 		# print "TIME AUS GSTREAMER: " , time
-		self.player.get_state()
 		try:
-			duration = self.player.query_duration(self.format)[0]
-			self.setDuration(datetime.timedelta(seconds=(duration / SECOND)))
+			self.player.get_state(timeout=Gst.SECOND / 2)
+			duration = self.player.query_duration(Gst.Format.TIME, None)[0]
+			self.setDuration(datetime.timedelta(seconds=(duration / Gst.SECOND)))
 		except:
-			self.setDuration(datetime.timedelta(seconds=(500 / SECOND)))
+			self.setDuration(datetime.timedelta(seconds=(500 / Gst.SECOND)))
 
 		self.is_Playing = True
 		self.actualTitel = filename
 		if self.debug: logging.debug("done. leaving doplay ")
 
 	def doUnpause(self):
-		from gst import STATE_PLAYING
-		self.player.set_state(STATE_PLAYING)
+		self.player.set_state(Gst.State.PLAYING)
 		self.is_Playing = True
 
 	def doPause(self):
-		from gst import STATE_PAUSED
-		self.player.set_state(STATE_PAUSED)
+		self.player.set_state(Gst.State.PAUSED)
 		self.is_Playing = False
 
 	def doStop(self):
-		from gst import STATE_NULL
-		self.player.set_state(STATE_NULL)
+		self.player.set_state(Gst.State.NULL)
 		self.is_Playing = False
 
 	def setStopWhenEOS(self, value=True):
 		self.stopWhenEOS = value
 
 	def on_message(self, bus, message):
-		from gst import STATE_NULL, MESSAGE_EOS, MESSAGE_ERROR
-		USE_TRACK_CHANGE = True
-		t = message.type
-		# if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
-		if t == MESSAGE_EOS:
-			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
-			if self.stopWhenEOS:
-				self.player.set_state(STATE_NULL)
-				self.guiPlayer.play_next_song()
-		elif t == MESSAGE_ERROR:
-			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
-			self.player.set_state(STATE_NULL)
-			err, debug = message.parse_error()
-			logging.debug('MESSAGE_ERROR: %r' % str(err).decode("utf8", 'replace'))
-		elif message.type == gst.MESSAGE_TAG:
-			# if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
-			taglist = message.parse_tag()
-			for key in taglist.keys():
-				# logging.info('MESSAGE_TAG: %s = %s' % (key, taglist[key]))
-				logging.info('MESSAGE_TAG: %s ' % (key))
-			pass
-		elif message.type == gst.MESSAGE_BUFFERING:
-			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
-			percent = message.parse_buffering()
-			# self.__buffering(percent)
-		elif message.type == gst.MESSAGE_ELEMENT:
-			if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
-			name = ""
-			if hasattr(message.structure, "get_name"):
-				name = message.structure.get_name()
-				self.actualTitel = name
+		try:
+			USE_TRACK_CHANGE = True
+			t = message.type
+			# if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+			if t == Gst.MessageType.EOS:
+				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				if self.stopWhenEOS:
+					self.player.set_state(Gst.State.NULL)
+					self.guiPlayer.play_next_song()
+			elif t == Gst.MessageType.ERROR:
+				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				self.player.set_state(Gst.State.NULL)
+				err, debug = message.parse_error()
+				logging.debug('MESSAGE_ERROR: %r' % str(err).decode("utf8", 'replace'))
+			elif message.type == Gst.MessageType.TAG:
+				# if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
+				taglist = message.parse_tag()
+				#for key in taglist.keys():
+					# logging.info('MESSAGE_TAG: %s = %s' % (key, taglist[key]))
+				#	logging.info('MESSAGE_TAG: %s ' % (key))
+			elif message.type == Gst.MessageType.BUFFERING:
+				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				percent = message.parse_buffering()
+				# self.__buffering(percent)
+			elif message.type == Gst.MessageType.ELEMENT:
+				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				name = ""
+				if hasattr(message.structure, "get_name"):
+					name = message.structure.get_name()
+					self.actualTitel = name
 
-			# This gets sent on song change. Because it is not in the docs
-			# we can not rely on it. Additionally we check in get_position
-			# which should trigger shortly after this.
-			if USE_TRACK_CHANGE and self._in_gapless_transition and \
-							name == "playbin2-stream-changed":
-				if self.debug: logging.debug("--> Titel hat sich geändert! %s" % name)
-				self.doTrackChange()
+				# This gets sent on song change. Because it is not in the docs
+				# we can not rely on it. Additionally we check in get_position
+				# which should trigger shortly after this.
+				if USE_TRACK_CHANGE and self._in_gapless_transition and \
+								name == "playbin-stream-changed":
+					if self.debug: logging.debug("--> Titel hat sich geändert! %s" % name)
+					self.doTrackChange()
+		except Exception, err:
+			errorhandling.Error.show()
+			self.doEnd()
+
 
 	def doTrackChange(self):
-		self.player.get_state()
+		# self.player.get_state()
 		try:
-			duration = self.player.query_duration(self.format)[0]
-			self.setDuration(datetime.timedelta(seconds=(duration / gst.SECOND)))
+			self.player.get_state(timeout=Gst.SECOND / 2)
+			duration = self.player.query_duration(Gst.Format.TIME, None)[0]
+			self.setDuration(datetime.timedelta(seconds=(duration / Gst.SECOND)))
 		except:
 			if self.debug: logging.debug("--> Konnte Titellänge nicht speichern! ")
 			self.setDuration(datetime.timedelta(seconds=0))
@@ -385,7 +380,6 @@ class GstPlayer(threading.Thread):
 		return self.__time.seconds
 
 	def queryTimeRemaining(self):
-		from gst import MSECOND, SECOND, QueryError
 		time = self.queryNumericPosition()
 		duration = self.getNumericDuration()
 		remain = duration - time
@@ -402,13 +396,12 @@ class GstPlayer(threading.Thread):
 		return strTime
 
 	def queryPosition(self):
-		from gst import MSECOND, SECOND, QueryError
 		p = 0
 		if self.is_Playing:
 			try:
-				p = self.player.query_position(self.format)[0]
+				p = self.player.query_position(Gst.Format.TIME, None)[0]
 				self._last_position = p
-			except QueryError:
+			except BaseException:
 				p = self._last_position
 		else:
 			# During stream seeking querying the position fails.
@@ -418,7 +411,7 @@ class GstPlayer(threading.Thread):
 			except BaseException:
 				return None
 
-		hours, remainder = divmod(p / SECOND, 3600)
+		hours, remainder = divmod(p / Gst.SECOND, 3600)
 		minutes, seconds = divmod(remainder, 60)
 		# if self.debug : print "--> query_position() : ", '%s:%s:%s' % (hours, minutes, seconds)
 		strTime = ""
@@ -431,13 +424,12 @@ class GstPlayer(threading.Thread):
 		return strTime
 
 	def queryNumericPosition(self):
-		from gst import MSECOND, SECOND, QueryError
 		p = 0
 		if self.is_Playing:
 			try:
-				p = self.player.query_position(self.format)[0]
+				p = self.player.query_position(Gst.Format.TIME, None)[0]
 				self._last_position = p
-			except QueryError:
+			except BaseException:
 				p = self._last_position
 		else:
 			# During stream seeking querying the position fails.
@@ -447,18 +439,17 @@ class GstPlayer(threading.Thread):
 			except BaseException:
 				return None
 
-		hours, remainder = divmod(p / SECOND, 3600)
+		hours, remainder = divmod(p / Gst.SECOND, 3600)
 		minutes, seconds = divmod(remainder, 60)
 		return (seconds + (minutes * 60))
 
 	def queryPositionInMilliseconds(self):
-		from gst import MSECOND, SECOND, QueryError
 		p = 0
 		if self.is_Playing:
 			try:
-				p = self.player.query_position(self.format)[0]
+				p = self.player.query_position(Gst.Format.TIME, None)[0]
 				self._last_position = p
-			except QueryError:
+			except BaseException:
 				p = self._last_position
 		else:
 			# During stream seeking querying the position fails.
@@ -467,26 +458,25 @@ class GstPlayer(threading.Thread):
 				p = self._last_position
 			except BaseException:
 				return None
-		mseconds = (p / MSECOND)
-		hours, remainder = divmod(p / SECOND, 3600)
+		mseconds = (p / Gst.MSECOND)
+		hours, remainder = divmod(p / Gst.SECOND, 3600)
 		minutes, seconds = divmod(remainder, 60)
 		# print("P: %s Min: %s Sec: %s MSec: %s" % (p, minutes, seconds, mseconds) )
 		return mseconds
 
 	def seekPosition(self, pos=0):
-		from gst import CORE_ERROR_SEEK, FORMAT_TIME, SEEK_FLAG_FLUSH, SEEK_FLAG_KEY_UNIT, MSECOND, SECOND
 		try:
-			nanosecs, format = self.player.query_position(self.format)
+			nanosecs, format = self.player.query_position(Gst.Format.TIME, None)
 		except:
 			return
 		try:
-			duration_nanosecs, format = self.player.query_duration(self.format)
+			duration_nanosecs, format = self.player.query_duration(Gst.Format.TIME, None)
 		except:
 			return
 		# print "nanosecs: %s - pos: %s - SECOND %s" % (nanosecs, pos, SECOND)
-		self._posRange = float(duration_nanosecs) / SECOND
-		self._posValue = float(nanosecs) / SECOND
-		self._posNewValue = (float(nanosecs) / SECOND) + float(pos)
+		self._posRange = float(duration_nanosecs) / Gst.SECOND
+		self._posValue = float(nanosecs) / Gst.SECOND
+		self._posNewValue = (float(nanosecs) / Gst.SECOND) + float(pos)
 
 		seek_time_secs = self._last_position + pos
 		if self._posNewValue < 0: self._posNewValue = 0
@@ -494,8 +484,8 @@ class GstPlayer(threading.Thread):
 		if self.debug: logging.debug("Dauer: %s - Aktuelle Position: %s - Neue Position %s " % (
 		self._posRange, self._posValue, self._posNewValue))
 		try:
-			self.player.seek_simple(FORMAT_TIME, SEEK_FLAG_FLUSH | SEEK_FLAG_KEY_UNIT, self._posNewValue * SECOND)
-		except CORE_ERROR_SEEK:
+			self.player.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, self._posNewValue * Gst.SECOND)
+		except Gst.CORE_ERROR_SEEK:
 			pass
 
 		return
@@ -519,8 +509,8 @@ class GstPlayer(threading.Thread):
 
 		try:
 			if self.player:
-				self.player.set_state(gst.STATE_NULL)
-				self.player.get_state(timeout=gst.SECOND / 2)
+				self.player.set_state(Gst.State.NULL)
+				self.player.get_state(timeout=Gst.SECOND / 2)
 				self.player = None
 		except:
 			pass
@@ -535,8 +525,7 @@ class GstPlayer(threading.Thread):
 		return
 
 	def doEnd(self):
-		from gst import STATE_NULL
-		self.player.set_state(STATE_NULL)
+		self.player.set_state(Gst.State.NULL)
 		self.ausschalter.set()
 		self.__destroy_pipeline()
 		self.mainloop.quit()
