@@ -54,6 +54,8 @@ class BlitInterface(object):
 			print("  - RenderedData is not None")
 			print("Trying blit for %s at position %s " % (blitObj.name, blitObj.blitPos))
 			if not screen.get_locked():
+				if (blitObj.savedBackground == None):
+					blitObj.doSaveBackground(screen)
 				try: screen.blit(blitObj.renderedData, blitObj.rect)
 				except pygame.error, err:
 					print( \

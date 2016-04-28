@@ -8,7 +8,7 @@
 # published by the Free Software Foundation
 #
 import pygame
-
+import logging
 
 class BlitObject(object):
 
@@ -20,6 +20,7 @@ class BlitObject(object):
 		self.blitPos = 0
 		self.renderedSize = 0
 		self.zIndex = zIndex
+		self.savedBackground = None
 
 	def setBlitRect(self, pos, size):
 		self.blitPos = pos
@@ -28,3 +29,16 @@ class BlitObject(object):
 		except: pass
 		return
 
+	def doSaveBackground(self, screen):
+		try: self.savedBackground = screen.subsurface(self.rect).copy()
+		except: self.savedBackground = None
+		return
+
+	def doRestoreBackground(self, screen):
+		if self.savedBackground == None:
+			return
+		try: screen.blit(self.savedBackground, self.rect)
+		except pygame.error, err:
+			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (self.name, self.rect, err))
+			return False
+		return
