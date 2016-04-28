@@ -54,6 +54,7 @@ LIST_NAME = CONFIG_DIR + 'lastPlaylistNumber.tmp'
 
 class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	def __init__(self, ausschalter, hauptschalter):
+		super(playerGUI, self).__init__()
 
 		self._ausschalter = ausschalter
 		self._hauptschalter = hauptschalter
