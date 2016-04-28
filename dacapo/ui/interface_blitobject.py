@@ -41,7 +41,26 @@ class BlitInterface(object):
 		self.doBlitObject(screen, obj, update)
 		return
 
+	def doSaveBackground(self, screen, blitObj):
+		try:
+			self.savedBackground = screen.subsurface(blitObj.rect).copy()
+			print("Saved screen(%s, (%s))." % (blitObj.name, blitObj.rect))
+		except pygame.error, err:
+			self.savedBackground = None
+			print("Error at saving screen(%s, (%s)) . %s " % (blitObj.name, blitObj.rect, err))
+		return
+
+	def doRestoreBackground(self, screen, blitObj):
+		if self.savedBackground == None:
+			return
+		try: screen.blit(self.savedBackground, blitObj.rect)
+		except pygame.error, err:
+			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (blitObj.name, blitObj.rect, err))
+			return False
+		return
+
 	def doBlitObject(self, screen, blitObj, update=False):
+		from types import *
 		try:
 			if (screen is None):
 				return False
@@ -49,9 +68,12 @@ class BlitInterface(object):
 				return False
 			if (blitObj.renderedData is None):
 				return False
+			if (self.savedBackground is None):
+				self.doSaveBackground(screen, blitObj)
+			else:
+				self.doRestoreBackground(screen, blitObj)
+				pass
 			if not screen.get_locked():
-				if (blitObj.savedBackground == None):
-					blitObj.doSaveBackground(screen)
 				try: screen.blit(blitObj.renderedData, blitObj.rect)
 				except pygame.error, err:
 					logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (blitObj.name, blitObj.rect, err))
