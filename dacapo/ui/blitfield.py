@@ -116,10 +116,6 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 				s = audio.replaceTags(s)
 
-				if '#time#' in s :
-					posActTime = self.name
-					textActTime = s
-
 				s = s.replace('#time#', gstPlayer.getDuration())
 				s = s.replace('#duration#', gstPlayer.getDuration())
 
