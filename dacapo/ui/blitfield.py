@@ -116,7 +116,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 				s = audio.replaceTags(s)
 
-				s = s.replace('#time#', gstPlayer.getDuration())
+				s = s.replace('#time#', gstPlayer.queryPosition())
 				s = s.replace('#duration#', gstPlayer.getDuration())
 
 				if '#bandlogo#' in s:
@@ -240,7 +240,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		from dacapo.config.gui import *
 		try:
 			if (self.renderedData is None) or (self.renderedSize is None):
-				print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
+				# print(u"renderedData or renderedSize is none for field {!s}. Will try to render".format((self.name)))
 				self.getRenderedData()
 			blitObj = dacapo.ui.blitobject.BlitObject(self.name, zIndex=self.zIndex)
 			if (self.renderedData is None) or (self.renderedSize is None):
