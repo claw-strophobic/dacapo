@@ -26,6 +26,7 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.maxWidth = 0
 		self.pos = dacapo.ui.position.Position()
 		self.font = dacapo.ui.fieldfont.FieldFont()
+		self.isTimeField = False
 
 	def setVars(self):
 		extendvars = {
@@ -75,6 +76,8 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		from lxml import etree
 		self.font.grabXMLData(xml)
 		self.pos.grabXMLData(xml)
+		if (self.content.find('%time%') > -1): self.isTimeField = True
+
 
 	def printValues(self):
 		print('Field: {!s} Content: {!s} Pos: {!s}x{!s} Font: {!s}'.format(self.name, self.content, self.pos.posH, self.pos.posV, self.font.name))
