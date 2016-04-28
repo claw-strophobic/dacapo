@@ -40,20 +40,12 @@ class BlitInterface(object):
 
 	def doBlitObject(self, screen, blitObj, update=False):
 		try:
-			print("--- on doBlitObject with {!s} ---".format(blitObj.name))
 			if (screen is None):
-				print("Screen is None for blit: %s " % (blitObj.name))
 				return False
-			print("  - Screen is not None")
 			if (blitObj is None):
-				print("BlitObj is None - Returning false")
 				return False
-			print("  - blitObj is not None")
 			if (blitObj.renderedData is None):
-				print("RenderedData is None for blit: %s " % (blitObj.name))
 				return False
-			print("  - RenderedData is not None")
-			print("Trying blit for %s at position %s " % (blitObj.name, blitObj.blitPos))
 			if not screen.get_locked():
 				if (blitObj.savedBackground == None):
 					blitObj.doSaveBackground(screen)
