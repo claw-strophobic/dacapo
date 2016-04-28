@@ -23,6 +23,9 @@ def find_between(s, first, last ):
 
 class BlitInterface(object):
 
+	def __init__(self):
+		self.savedBackground = None
+
 	def getBlitObject( self ):
 		raise NotImplementedError( "Should have implemented this" )
 
