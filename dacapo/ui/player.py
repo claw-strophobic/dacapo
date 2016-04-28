@@ -240,8 +240,11 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if newPos == None: return
 
 		if (self.pos == newPos) and (force == False): return
-		return
 
+		g = CONFIG.gui[self.winState]
+		if (g.timeField is None): return
+
+		return
 		## if self._metaFields.get('TIME')['textActTime'] == None: return
 
 		# if self._debug : print "Aktuelle Position: %s " % (self._gstPlayer.queryNumericPosition())
