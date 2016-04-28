@@ -76,24 +76,6 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			'if_discNr'
 			)
 
-		for key1 in textMetaVar.iterkeys() :
-			s = textMetaVar.get(key1)
-			try:
-				s = s.replace('%time%', gstPlayer.getDuration())
-				s = s.replace('%duration%', gstPlayer.getDuration())
-				if isPlaylist :
-					s = s.replace('%tracknumberlist%', str(player.getActSong()))
-					s = s.replace('%tracktotallist%', str(
-							player.getNumberOfSongs()))
-				text = s
-				while True :
-					text = self.find_between(s, '%', '%')
-					if text == '' : break
-					s = s.replace('%' + text + '%', audio.getMetaData(text))
-
-				textMetaVar[key1] = s
-			except: pass
-
 		if not isPlaylist : textMetaVar['if_playlist'] = ''
 		if audio.getDiscNo() == "0" : textMetaVar['if_discNr'] = ''
 
