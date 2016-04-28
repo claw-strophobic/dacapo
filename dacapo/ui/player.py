@@ -55,7 +55,6 @@ LIST_NAME = CONFIG_DIR + 'lastPlaylistNumber.tmp'
 class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	def __init__(self, ausschalter, hauptschalter):
 		super(playerGUI, self).__init__()
-
 		self._ausschalter = ausschalter
 		self._hauptschalter = hauptschalter
 		pygame.init()
@@ -244,7 +243,9 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		g = CONFIG.gui[self.winState]
 		if (g.timeField is None): return
-
+		g.timeField.getRenderedData()
+		obj = g.timeField.getBlitObject()
+		self.doBlitObject(self.screen, obj, True)
 		return
 		## if self._metaFields.get('TIME')['textActTime'] == None: return
 
