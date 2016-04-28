@@ -10,6 +10,7 @@
 import pygame
 import dacapo.ui.blitobject
 import sys
+import logging
 
 def find_between(s, first, last ):
 	try:
@@ -58,9 +59,7 @@ class BlitInterface(object):
 					blitObj.doSaveBackground(screen)
 				try: screen.blit(blitObj.renderedData, blitObj.rect)
 				except pygame.error, err:
-					print( \
-						"Error at self.screen.blit(%s, (%s)) . %s " % (
-							blitObj.name, blitObj.rect, err))
+					logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (blitObj.name, blitObj.rect, err))
 					return False
 			if not screen.get_locked() and update == True:
 				screen.lock()
@@ -68,9 +67,7 @@ class BlitInterface(object):
 					pygame.display.update(blitObj.rect)
 				# try: pygame.display.flip()
 				except pygame.error, err:
-					print( \
-						"Error at pygame.display.update(%s) . %s " % (
-							blitObj.rect, err))
+					logging.warning("Error at pygame.display.update(%s) . %s " % (blitObj.rect, err))
 					return False
 				screen.unlock()
 		except: # catch *all* exceptions
