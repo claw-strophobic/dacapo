@@ -50,13 +50,10 @@ class BlitInterface(object):
 				return False
 			if (blitObj.renderedData is None):
 				return False
-			if (blitObj.getSavedBackground() is False):
-				print("field {!s} saving Background ".format(type(blitObj.name)))
-				blitObj.doSaveBackground(screen, blitObj)
+			if (blitObj.getSavedBackground() is None):
+				blitObj.doSaveBackground(screen)
 			else:
-				print("field {!s} restoring Background ".format(type(blitObj.name)))
-				blitObj.doRestoreBackground(screen, blitObj)
-				pass
+				blitObj.doRestoreBackground(screen)
 			if not screen.get_locked():
 				try: screen.blit(blitObj.renderedData, blitObj.rect)
 				except pygame.error, err:
