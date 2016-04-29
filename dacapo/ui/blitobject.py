@@ -33,7 +33,7 @@ class BlitObject(object):
 	def getSavedBackground(self):
 		print("field is {!s} field.savedBackground is {!s}".format(type(self.blitField), type(self.blitField.savedBackground)))
 		if (self.blitField is None):
-			return False
+			return None
 		return self.blitField.savedBackground
 
 	def doSaveBackground(self, screen):
