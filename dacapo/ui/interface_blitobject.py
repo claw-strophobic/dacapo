@@ -24,7 +24,7 @@ def find_between(s, first, last ):
 class BlitInterface(object):
 
 	def __init__(self):
-		self.savedBackground = None
+		pass
 
 	def getBlitObject( self ):
 		raise NotImplementedError( "Should have implemented this" )
@@ -41,24 +41,6 @@ class BlitInterface(object):
 		self.doBlitObject(screen, obj, update)
 		return
 
-	def doSaveBackground(self, screen, blitObj):
-		try:
-			self.savedBackground = screen.subsurface(blitObj.rect).copy()
-			print("Saved screen(%s, (%s))." % (blitObj.name, blitObj.rect))
-		except pygame.error, err:
-			self.savedBackground = None
-			print("Error at saving screen(%s, (%s)) . %s " % (blitObj.name, blitObj.rect, err))
-		return
-
-	def doRestoreBackground(self, screen, blitObj):
-		if self.savedBackground == None:
-			return
-		try: screen.blit(self.savedBackground, blitObj.rect)
-		except pygame.error, err:
-			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (blitObj.name, blitObj.rect, err))
-			return False
-		return
-
 	def doBlitObject(self, screen, blitObj, update=False):
 		from types import *
 		try:
@@ -68,10 +50,12 @@ class BlitInterface(object):
 				return False
 			if (blitObj.renderedData is None):
 				return False
-			if (self.savedBackground is None):
-				self.doSaveBackground(screen, blitObj)
+			if (blitObj.getSavedBackground() is False):
+				print("field {!s} saving Background ".format(type(blitObj.name)))
+				blitObj.doSaveBackground(screen, blitObj)
 			else:
-				self.doRestoreBackground(screen, blitObj)
+				print("field {!s} restoring Background ".format(type(blitObj.name)))
+				blitObj.doRestoreBackground(screen, blitObj)
 				pass
 			if not screen.get_locked():
 				try: screen.blit(blitObj.renderedData, blitObj.rect)

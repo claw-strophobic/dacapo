@@ -22,6 +22,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		self.renderedSize = None
 		self.sysFont = None
 		self.debug = True
+		self.savedBackground = None
 
 	def getReplacedContent(self):
 		from dacapo.config.gui import *
@@ -269,6 +270,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			blitPos = (mW, mH)
 			blitObj.setBlitRect(blitPos, renderedSize)
 			blitObj.renderedData = self.renderedData
+			blitObj.blitField = self
 			return blitObj
 		except: # catch *all* exceptions
 			print(sys.exc_info()[0])
