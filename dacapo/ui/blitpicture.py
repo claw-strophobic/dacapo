@@ -20,6 +20,7 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		self.renderedData = self.scalePic(pic)
 		self.renderedSize = self.renderedData.get_size()
 		self.zIndex = zIndex
+		self.savedBackground = None
 
 	def scalePic(self, pic):
 		from dacapo.config.gui import *
@@ -74,4 +75,5 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		blitPos = (w, h)
 		blitObj.setBlitRect(blitPos, renderedSize)
 		blitObj.renderedData = self.renderedData
+		blitObj.blitField = self
 		return blitObj
