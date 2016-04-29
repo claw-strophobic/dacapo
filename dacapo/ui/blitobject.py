@@ -10,6 +10,7 @@
 import pygame
 import logging
 
+
 class BlitObject(object):
 
 	def __init__(self, name, zIndex=0):
@@ -31,7 +32,6 @@ class BlitObject(object):
 		return
 
 	def getSavedBackground(self):
-		print("field is {!s} field.savedBackground is {!s}".format(type(self.blitField), type(self.blitField.savedBackground)))
 		if (self.blitField is None):
 			return None
 		return self.blitField.savedBackground
@@ -40,10 +40,8 @@ class BlitObject(object):
 		if (self.blitField is None): return
 		try:
 			self.blitField.savedBackground = screen.subsurface(self.rect).copy()
-			print("Saved screen(%s, (%s))." % (self.name, self.rect))
 		except pygame.error, err:
 			self.blitField.savedBackground = None
-			print("Error at saving screen(%s, (%s)) . %s " % (self.name, self.rect, err))
 		return
 
 	def doRestoreBackground(self, screen):
