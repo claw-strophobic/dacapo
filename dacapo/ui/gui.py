@@ -27,6 +27,7 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		self.lyricFont = dacapo.ui.lyricfont.LyricFont()
 		self.pictureArea = dacapo.ui.position.Position('picArea')
 		self.timeField = None
+		self.lyricField = None
 
 	def initFields(self):
 		for field in self.fields:
@@ -46,6 +47,8 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 				self.fields[child.tag] = f
 				if f.isTimeField:
 					self.timeField = f
+				if f.isLyricField:
+					self.lyricField = f
 
 	def printValues(self):
 		print('\nGui: {!s} {!s}x{!s} Background: {!s} Maus: {!s}'.format(self.name, self.height, self.width, self.backgroundColor, self.mouseVisible))

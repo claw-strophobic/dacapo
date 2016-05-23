@@ -291,59 +291,14 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		return
 
 	def blit_sync_lyrics(self, nextLine=False):
-		return
-		# keine Texte = Abbruch
-		key1 = 'syncedLyricsLine'
 		if len(self.audioFile.syncText) <= 0: return
-		# List-Index > Anzahl Text-Zeilen = Abbruch
 		if self.audioFile.syncCount > len(self.audioFile.syncText): return
-		if self._debug: logging.debug("Soll Text darstellen: %s" % \
-									  (self.audioFile.syncText[self.audioFile.syncCount]))
-		width, height = self.resolution
+		g = CONFIG.gui[self.winState]
+		if (g.lyricField is None): return
 
-		# versuchen, alten Text zu löschen
-		self.clearRect(self._metaFields, key1)
-
-		# Nur die nächste Zeile rendern, wenn Zeit gekommen ist...
-		if nextLine:
-			if not self._metaFields.has_key(key1):
-				self._metaFields[key1] = dict()
-
-			self._metaFields[key1]['data'] = \
-				self.audioFile.syncText[self.audioFile.syncCount]
-			self._metaFields[key1]['overlay'] = True
-			self._metaFields[key1]['renderedData'] = \
-				self._metaFields.get('lyricFont')['sysFont'].render(
-					self._metaFields[key1]['data'],
-					True,
-					self._metaFields.get('lyricFont')['fontColor']
-				)
-
-		if not self._metaFields.has_key(key1): return
-		if not self._metaFields[key1]['renderedData'] == None:
-			txtW, txtH = self._metaFields[key1]['renderedData'].get_size()
-			w = 0
-			h = self._metaFields.get('lyricFont')['posV']
-			if self._metaFields.get('lyricFont')['alignH'].upper() == "CENTER":
-				w = (width - txtW) / 2
-			if self._metaFields.get('lyricFont')['alignH'] == "RIGHT":
-				w = (width - txtW)
-			self._metaFields[key1]['renderedSize'] = (txtW, txtH)
-			self._metaFields[key1]['blitPos'] = (w, h)
-
-			try:
-				self.clearRect(self._metaFields, key1)
-				self.blit_rect(
-					self._metaFields.get(key1)['renderedData'],
-					Rect(
-						self._metaFields.get(key1)['blitPos'],
-						self._metaFields.get(key1)['renderedSize']
-					),
-					text=self._metaFields.get(key1)['data'],
-					update=True
-				)
-			except:
-				pass
+		g.lyricField.replaceData(self.audioFile.syncText[self.audioFile.syncCount])
+		obj = g.lyricField.getBlitObject()
+		self.doBlitObject(self.screen, obj, True)
 		return
 
 

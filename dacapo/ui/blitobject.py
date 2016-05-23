@@ -41,6 +41,9 @@ class BlitObject(object):
 
 		try:
 			self.blitField.savedBackground = screen.subsurface(self.rect).copy()
+			self.blitField.savedBackgroundRect = self.rect.copy()
+			if (self.blitField.isLyricField):
+				print("Saving Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		except pygame.error, err:
 			self.blitField.savedBackground = None
 			logging.warning("Error saving Background on %s: %s" % (self.name, err))
@@ -51,10 +54,14 @@ class BlitObject(object):
 
 	def doRestoreBackground(self, screen):
 		if (self.blitField is None): return
+
 		if self.blitField.savedBackground is None:
 			return
-		try: screen.blit(self.blitField.savedBackground, self.rect)
+		try:
+			screen.blit(self.blitField.savedBackground, self.blitField.savedBackgroundRect)
+			if (self.blitField.isLyricField):
+				pygame.display.update(self.blitField.savedBackgroundRect)
 		except pygame.error, err:
-			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (self.name, self.rect, err))
+			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (self.name, self.blitField.savedBackgroundRect, err))
 			return False
 		return

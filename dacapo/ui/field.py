@@ -27,6 +27,7 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.pos = dacapo.ui.position.Position()
 		self.font = dacapo.ui.fieldfont.FieldFont()
 		self.isTimeField = False
+		self.isLyricField = False
 
 	def setVars(self):
 		extendvars = {
@@ -77,6 +78,7 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.font.grabXMLData(xml)
 		self.pos.grabXMLData(xml)
 		if (self.content.find('%time%') > -1): self.isTimeField = True
+		if (self.content.find('%synclyrics%') > -1): self.isLyricField = True
 
 
 	def printValues(self):
