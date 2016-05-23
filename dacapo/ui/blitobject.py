@@ -38,10 +38,15 @@ class BlitObject(object):
 
 	def doSaveBackground(self, screen):
 		if (self.blitField is None): return
+
 		try:
 			self.blitField.savedBackground = screen.subsurface(self.rect).copy()
 		except pygame.error, err:
 			self.blitField.savedBackground = None
+			logging.warning("Error saving Background on %s: %s" % (self.name, err))
+		except:
+			self.blitField.savedBackground = None
+			logging.warning("Error saving Background on %s" % (self.name))
 		return
 
 	def doRestoreBackground(self, screen):
