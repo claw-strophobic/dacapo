@@ -21,13 +21,11 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 		self.backgroundColor = None
 		self.mouseVisible = False
 		self.fields = {}
-		self.lyricFont = None
 		self.pictureArea = None
 		self.name = name
-		self.lyricFont = dacapo.ui.lyricfont.LyricFont()
-		self.pictureArea = dacapo.ui.position.Position('picArea')
 		self.timeField = None
 		self.lyricField = None
+		self.picField = None
 
 	def initFields(self):
 		for field in self.fields:
@@ -37,8 +35,6 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)
 		from lxml import etree
-		self.lyricFont.grabXMLData(xml.xpath('lyricFont')[0])
-		self.pictureArea.grabXMLData(xml.xpath('pictures')[0])
 		fields = xml.xpath('fields')
 		for child in fields[0]:
 			f = dacapo.ui.blitfield.BlitField(child.tag)
@@ -49,10 +45,12 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 					self.timeField = f
 				if f.isLyricField:
 					self.lyricField = f
+				if f.isPicField:
+					self.picField = f
 
 	def printValues(self):
 		print('\nGui: {!s} {!s}x{!s} Background: {!s} Maus: {!s}'.format(self.name, self.height, self.width, self.backgroundColor, self.mouseVisible))
-		self.lyricFont.printValues()
+		self.lyricField.printValues()
 		for k,f in self.fields.iteritems():
 			f.printValues()
 

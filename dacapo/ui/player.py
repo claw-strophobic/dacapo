@@ -155,7 +155,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	# -------------------- slideshow ----------------------------------------------------------------
 
 	def slide_show(self):
-
+		return
 		if self._debug: logging.debug("pygame.display.get_init = %s " % (pygame.display.get_init()))
 		if self._debug: logging.debug("pygame.display.get_active = %s " % (pygame.display.get_active()))
 		if self._debug: logging.debug(
@@ -169,7 +169,12 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 							  % (self.diaIndex, len(self.diaShowPics)))
 			return
 
+		g = CONFIG.gui[self.winState]
+		if (g.picField is None): return
 
+		g.picField.replaceData(self.audioFile.syncText[self.audioFile.syncCount])
+		obj = g.lyricField.getBlitObject()
+		self.doBlitObject(self.screen, obj, True)
 		# Fenstergröße holen
 		picPlace = self._config.getConfig('gui', self.winState, 'pictures')
 		width = picPlace['width']
@@ -698,7 +703,8 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			g = CONFIG.gui[self.winState]
 			g.initFields()
 			for field in g.fields:
-				a.append(g.fields[field].getBlitObject())
+				if not g.fields[field].isPicField:
+					a.append(g.fields[field].getBlitObject())
 			a.append(audio.getCover())
 			return a
 

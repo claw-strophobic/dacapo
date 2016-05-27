@@ -26,11 +26,12 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		from dacapo.config.gui import *
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
-		winWidth = g.pictureArea.maxWidth
-		winHeight = g.pictureArea.maxHeight
+		if (g.picField is None): return None
+		winWidth = g.picField.maxWidth
+		winHeight = g.picField.maxHeight
 
 		# --> skalieren -------------------------------
-		if self.debug : logging.debug("Pic-Area: {!s} * {!s} at {!s}, {!s}".format(winWidth, winHeight, g.pictureArea.posH, g.pictureArea.posV))
+		if self.debug : logging.debug("Pic-Area: {!s} * {!s} at {!s}, {!s}".format(winWidth, winHeight, g.picField.pos.posH, g.picField.pos.posV))
 		picW, picH = pic.get_size()
 
 		if picW == 0 : picW = 1
@@ -63,10 +64,10 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
 		# get the screen-size
-		width = g.pictureArea.maxWidth
-		height = g.pictureArea.maxHeight
-		w = g.pictureArea.posH
-		h = g.pictureArea.posV
+		width = g.picField.maxWidth
+		height = g.picField.maxHeight
+		w = g.picField.pos.posH
+		h = g.picField.pos.posV
 		picW, picH = self.renderedSize
 		# --> calculate the position ---------------------------
 		w += (width - picW) / 2
