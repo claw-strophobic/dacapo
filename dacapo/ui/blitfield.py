@@ -224,8 +224,8 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			width = CONFIG.getConfig('gui', winstate, 'width')
 			height = CONFIG.getConfig('gui', winstate, 'height')
 			g = CONFIG.gui[winstate]
-			mW = 0
-			mH = 0
+			mW = self.pos.posH
+			mH = self.pos.posV
 			textWidth, textHeight = renderedSize
 			# align relatively to another object
 			if (self.pos.posRefH != '') and (g.fields.has_key(self.pos.posRefH)):
