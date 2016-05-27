@@ -24,9 +24,12 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.splitSpaces = False
 		self.zIndex = 0
 		self.maxWidth = 0
+		self.maxHeight = 0
 		self.pos = dacapo.ui.position.Position()
 		self.font = dacapo.ui.fieldfont.FieldFont()
 		self.isTimeField = False
+		self.isLyricField = False
+		self.isPicField = False
 
 	def setVars(self):
 		extendvars = {
@@ -58,6 +61,10 @@ class Field(dacapo.ui.configelement.ConfigElement):
 				'target': 'maxWidth',
 				'type': 'int',
 			},
+			'maxHeight': {
+				'target': 'maxHeight',
+				'type': 'int',
+			},
 		}
 		self.vars.update(extendvars)
 
@@ -77,6 +84,8 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.font.grabXMLData(xml)
 		self.pos.grabXMLData(xml)
 		if (self.content.find('%time%') > -1): self.isTimeField = True
+		if (self.content.find('%synclyrics%') > -1): self.isLyricField = True
+		if (self.content.find('%pictures%') > -1): self.isPicField = True
 
 
 	def printValues(self):

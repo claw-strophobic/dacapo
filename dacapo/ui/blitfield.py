@@ -23,6 +23,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		self.sysFont = None
 		self.debug = True
 		self.savedBackground = None
+		self.savedBackgroundRect = None
 
 	def getReplacedContent(self):
 		from dacapo.config.gui import *
@@ -34,16 +35,6 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		return s
 
 	def getRenderedData(self):
-		"""
-		In dieser Funktion werden die metadata in die Variablen
-		gelesen und anhand der parametresierten Werte gerendert.
-		In doBlitText werden diese dann weiter verarbeitet.
-		Zurückgegeben wird ein Dictionary mit den Keys:
-			- Feldname
-				- ['data'] -> die aufbereiteten Daten
-				- ['renderedData'] -> die gerenderten Daten
-		"""
-		# metadata holen und aufbereiten
 		from dacapo.config.gui import *
 		if (self.sysFont is None):
 			if (not pygame.font.get_init()):
@@ -279,21 +270,8 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			pygame.quit()
 
 
-	def getRenderedData_OLD(self):
-		if (self.sysFont is None):
-			if (not pygame.font.get_init()):
-				pygame.font.init()
-			try: self.sysFont = pygame.font.SysFont(self.font.name, self.font.fontSize)
-			except pygame.error, err:
-				print(u"Error at pygame.font.SysFont(%s, %s) . %s " % (
-						self.font.name, self.font.fontSize, err))
-				return None
-		if (self.renderedData is None):
-			try: self.renderedData = self.sysFont.render(self.content, True, self.font.fontColor)
-			except pygame.error, err:
-				print(u"Error at sysFont.render(%s, %s) . %s " % (
-						self.content, self.font.fontColor, err))
-				return None
-		self.renderedSize = self.renderedData.get_size()
-		return self.renderedData
+	def replaceData(self, data):
+		self.content = data
+		self.renderedData = None
+		return
 
