@@ -18,7 +18,7 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		self.debug = True
 		self.data = pic
 		self.renderedData = self.scalePic(pic)
-		self.renderedSize = self.renderedData.get_size()
+		self.renderedSize = None if self.renderedData is None else self.renderedData.get_size()
 		self.zIndex = zIndex
 		self.savedBackground = None
 
