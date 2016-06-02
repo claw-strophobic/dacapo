@@ -50,10 +50,8 @@ class BlitInterface(object):
 				return False
 			if (blitObj.renderedData is None):
 				return False
-			if (blitObj.getSavedBackground() is None):
-				blitObj.doSaveBackground(screen)
-			else:
-				blitObj.doRestoreBackground(screen)
+			blitObj.doRestoreBackground(screen)
+			blitObj.doSaveBackground(screen)
 			if not screen.get_locked():
 				try: screen.blit(blitObj.renderedData, blitObj.rect)
 				except pygame.error, err:

@@ -262,6 +262,9 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			blitObj.setBlitRect(blitPos, renderedSize)
 			blitObj.renderedData = self.renderedData
 			blitObj.blitField = self
+			blitObj.CONFIG = CONFIG
+			if self.isTimeField:blitObj.backup = True
+			if self.isLyricField:blitObj.backup = True
 			return blitObj
 		except: # catch *all* exceptions
 			print(sys.exc_info()[0])

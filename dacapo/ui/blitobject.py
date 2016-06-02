@@ -22,6 +22,8 @@ class BlitObject(object):
 		self.renderedSize = 0
 		self.zIndex = zIndex
 		self.blitField = None
+		self.backup = False
+		self.CONFIG = None
 
 
 	def setBlitRect(self, pos, size):
@@ -37,31 +39,48 @@ class BlitObject(object):
 		return self.blitField.savedBackground
 
 	def doSaveBackground(self, screen):
+		if (self.backup is False): return
 		if (self.blitField is None): return
 
 		try:
-			self.blitField.savedBackground = screen.subsurface(self.rect).copy()
+			if (self.blitField.isPicField):
+				print("Try Saving Background for %s Size: %s" % (self.name,self.rect.size))
+				image = pygame.Surface(self.rect.size)
+				winState = self.CONFIG.getConfig('TEMP', 'gui', 'winState')
+				color = self.CONFIG.getConfig('gui', winState, 'backgroundColor')
+				print("Try Filling Background with color %s for state %s for %s Size: %s" % (str(color), winState, self.name,self.rect.size))
+				self.blitField.doFillBackground(image, color)
+				print("Saving Background: {!s}".format(type(image)))
+				self.blitField.savedBackground = image
+			else:
+				self.blitField.savedBackground = screen.subsurface(self.rect).copy()
 			self.blitField.savedBackgroundRect = self.rect.copy()
-			if (self.blitField.isLyricField):
+			if (self.blitField.isPicField):
 				print("Saving Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		except pygame.error, err:
 			self.blitField.savedBackground = None
 			logging.warning("Error saving Background on %s: %s" % (self.name, err))
 		except:
+			import sys
 			self.blitField.savedBackground = None
 			logging.warning("Error saving Background on %s" % (self.name))
+			logging.warning(sys.exc_info()[0])
 		return
 
 	def doRestoreBackground(self, screen):
+		if (self.backup is False): return
 		if (self.blitField is None): return
 
 		if self.blitField.savedBackground is None:
 			return
+		if (self.blitField.isPicField):
+			print("Restoring Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		try:
 			screen.blit(self.blitField.savedBackground, self.blitField.savedBackgroundRect)
-			if (self.blitField.isLyricField):
+			if (self.blitField.isLyricField) or (self.blitField.isPicField):
 				pygame.display.update(self.blitField.savedBackgroundRect)
 		except pygame.error, err:
 			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (self.name, self.blitField.savedBackgroundRect, err))
 			return False
+
 		return

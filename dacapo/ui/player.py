@@ -19,6 +19,7 @@ import os
 import platform
 from dacapo import errorhandling
 from types import *
+from dacapo.ui.blitpicture import BlitPicture
 
 if platform.system() == 'Windows':
 	try:
@@ -71,6 +72,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self._debug = self._config.getConfig('debug', ' ', 'debugGUI')
 		self._gapless = self._config.getConfig('audio_engine', 'audio_engine', 'gapless')
 		self._resize = False
+		self.diaShowPics = None
 
 		self.replayGain = self._config.getConfig('audio_engine', 'audio_engine', 'replayGain')
 		self.set_slide_mode(self._config.getConfig('gui', 'misc', 'showPics'))
@@ -116,6 +118,10 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		# Fenster initialisieren (mit Hintergrundfarbe füllen
 		self._actScreen = None
+		self.timerIndex = 0
+		self.diaShowPics = []
+		self.diaIndex = -1
+		self.diaShowPics.append(self.audioFile.getFrontCover())
 		try:
 			g = CONFIG.gui[self.winState]
 			print("going to fill the background to: {!s}".format(g.backgroundColor))
@@ -133,21 +139,16 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			errorhandling.Error.show()
 
 
-		self.timerIndex = 0
-
-		self.diaShowPics = []
-		self.diaIndex = - 1
 		# der Bereich der aktuellen Position wird bereinigt
 		## key1 = self._metaFields.get('TIME')['posActTime']
 		## self.clearRect(self._metaFields, key1)
 		self._saveScreen = self.screen.copy()
 		self._actScreen = self.screen.copy()
 
-		if not self._resize: self.timerIndex = self._gstPlayer.queryNumericPosition()
+		if not self._resize: self.timerIndex = self._gstPlayer.queryPositionInMilliseconds() / 1000
 		if not self._resize:
 			self.audioFile.loadPictures()
-		self.diaShowPics = self.audioFile.preBlitDiaShow()
-		self.slide_show()
+		self.diaShowPics = self.audioFile.getAllPics()
 
 		self._resize = False
 		return
@@ -155,26 +156,38 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	# -------------------- slideshow ----------------------------------------------------------------
 
 	def slide_show(self):
-		return
+		if self.diaShowPics is None: return False
 		if self._debug: logging.debug("pygame.display.get_init = %s " % (pygame.display.get_init()))
 		if self._debug: logging.debug("pygame.display.get_active = %s " % (pygame.display.get_active()))
 		if self._debug: logging.debug(
 			"Anzahl Bilder: %s -> aktuelles Bild: Nr %s" % (len(self.diaShowPics), self.diaIndex))
 		if len(self.diaShowPics) <= 1 and self.diaIndex >= 0:
 			if self._debug: logging.debug("Breche diaShow ab, da Anzahl Bilder: %s " % (len(self.diaShowPics)))
-			return
+			return False
 		if len(self.diaShowPics) < self.diaIndex:
 			if self._debug:
 				logging.debug("Breche diaShow ab, da diaIndex: %s > Anzahl Bilder: %s "
 							  % (self.diaIndex, len(self.diaShowPics)))
-			return
+			return False
 
 		g = CONFIG.gui[self.winState]
 		if (g.picField is None): return
+		# if Index bigger than number of pics -> initialize the Index
+		self.diaIndex += 1
+		if self.diaIndex > (len(self.diaShowPics) - 1): self.diaIndex = 0
+		print("Number of pictures: %s" % (len(self.diaShowPics)))
 
-		g.picField.replaceData(self.audioFile.syncText[self.audioFile.syncCount])
-		obj = g.lyricField.getBlitObject()
-		self.doBlitObject(self.screen, obj, True)
+		print("Pic-Type: {!s}".format(type(self.diaShowPics[self.diaIndex])))
+		pic = BlitPicture(self.diaShowPics[self.diaIndex])
+
+		print("Picture-Index: %s - trying to get Blitobject" % (self.diaIndex))
+		blitobj = pic.getBlitObject()
+		return blitobj
+
+		print("Picture-Index: %s - trying to blit object" % (self.diaIndex))
+		self.doBlitObject(self.screen, blitobj, True)
+		print("Picture-Index: %s - trying to blit object - done\n" % (self.diaIndex))
+		return
 		# Fenstergröße holen
 		picPlace = self._config.getConfig('gui', self.winState, 'pictures')
 		width = picPlace['width']
@@ -251,14 +264,28 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		g.timeField.getRenderedData()
 		obj = g.timeField.getBlitObject()
 		self.doBlitObject(self.screen, obj, True)
-		return
 		## if self._metaFields.get('TIME')['textActTime'] == None: return
 
 		# if self._debug : print "Aktuelle Position: %s " % (self._gstPlayer.queryNumericPosition())
-		if self._gstPlayer.queryNumericPosition() > (self.timerIndex + self.diaShowTime):
+		seconds = self._gstPlayer.queryPositionInMilliseconds() / 1000
+		if seconds >= (self.timerIndex + self.diaShowTime):
+			if self._debug : print("Aktuelle Position: %s >= %s " % (seconds, (self.timerIndex + self.diaShowTime)))
 			if not force:
-				self.slide_show()
-			self.timerIndex = self._gstPlayer.queryNumericPosition()
+				try:
+					print("going to get blit object... ")
+					obj = self.getBlitObject(update=True)
+					sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
+					for o in sorted_x:
+						self.doBlitObject(self.screen, o, True)
+				except:
+					logging.error("Error at blit-object %s " % (sys.exc_info()[0]))
+					errorhandling.Error.show()
+
+			self.timerIndex = seconds
+			obj = g.lyricField.getBlitObject()
+			g.lyricField.savedBackground = None
+			self.doBlitObject(self.screen, obj, True)
+		return
 
 		key1 = self._metaFields.get('TIME')['posActTime']
 		self.clearUpdateRect(self._metaFields, key1)
@@ -350,10 +377,10 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 						if event.key == pygame.K_LEFT:
 							self._gstPlayer.seekPosition(self.seekSecs * float(-1))
 							self.audioFile.syncCount = 0
-							self.timerIndex = self._gstPlayer.queryNumericPosition()
+							self.timerIndex = self._gstPlayer.queryPositionInMilliseconds() / 1000
 						if event.key == pygame.K_RIGHT:
 							self._gstPlayer.seekPosition(self.seekSecs)
-							self.timerIndex = self._gstPlayer.queryNumericPosition()
+							self.timerIndex = self._gstPlayer.queryPositionInMilliseconds() / 1000
 						# if event.key == pygame.K_LSHIFT and event.key == pygame.K_LEFT:
 						#	self._gstPlayer.seekPosition(float(-30))
 						# if event.key == pygame.K_RSHIFT and event.key == pygame.K_RIGHT:
@@ -693,19 +720,28 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			pass
 		return
 
-	def getBlitObject( self ):
+	def getBlitObject( self, update=False ):
 		audio = self.audioFile
 		if audio is None:
 			return None
 		else:
-			a = list()
-			CONFIG.readConfig()
-			g = CONFIG.gui[self.winState]
-			g.initFields()
-			for field in g.fields:
-				if not g.fields[field].isPicField:
-					a.append(g.fields[field].getBlitObject())
-			a.append(audio.getCover())
+			if update is True:
+				a = list(self.fieldList)
+			else:
+				a = list()
+				self.fieldList = list()
+				CONFIG.readConfig()
+				g = CONFIG.gui[self.winState]
+				g.initFields()
+				for field in g.fields:
+					if not g.fields[field].isPicField:
+						a.append(g.fields[field].getBlitObject())
+						if (hasattr(g.fields[field], 'overlay')) and (g.fields[field].overlay is True):
+							print("Adding field %s" % (g.fields[field].name))
+							self.fieldList.append(g.fields[field].getBlitObject())
+			pic = self.slide_show()
+			if pic is not False:
+				a.append(pic)
 			return a
 
 
