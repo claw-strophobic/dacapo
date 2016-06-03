@@ -109,6 +109,7 @@ class BackgroundTab(PreviewTab):
 		grid.attach_next_to(labelBackground, self.height_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
 		self.colorchooser = MyColorChooserWidget()
 		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
+		self.colorchooser.connect_color_activated(self.onColorSet)
 		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.BOTTOM, 1, 1)
 
 		self.prev_button = Gtk.Button(_("Preview"))
@@ -136,8 +137,11 @@ class BackgroundTab(PreviewTab):
 			a.append(audio.getCover())
 			return a
 
-	def onColorSet( self, obj, color ):
-		print('New color {!s}'.format(color))
+	def onColorSet( self, obj, colorchooser):
+		color = self.colorchooser.get_rgba()
+		g = CONFIG.gui[self.type]
+		g.setValue('backgroundColor', color)
+
 
 
 class FieldTab(PreviewTab):

@@ -8,18 +8,20 @@
 # published by the Free Software Foundation
 #
 from dacapo.config.gui import *
+import pprint
 
 class MyColorChooserWidget(Gtk.ColorChooserWidget):
 
 	def __init__(self):
 		super(MyColorChooserWidget, self).__init__()
 		self.set_property("show-editor", True)
-		box = None
-		self.print_attr(self)
-
-				##if type(attr).__name__ == "SearchEntry":
-		# members = [attr for attr in dir(self) if not callable(attr) and not attr.startswith("__")]
-		# print members
+		self.colorEditor = None
+		self.entryField = None
+		self.get_attr(self)
+		# self.print_attr(self.colorEditor)
+		# pprint.pprint(self.my_even_fancier_attribute_getter(self.colorEditor))
+		if (self.entryField is not None):
+			self.entryField.connect("changed", self.color_activated)
 		provider = Gtk.CssProvider()
 		provider.load_from_data('.entry { background: white; }')
 		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
@@ -28,27 +30,25 @@ class MyColorChooserWidget(Gtk.ColorChooserWidget):
 
 		self.connect("color-activated", self.color_activated)
 
-	def print_attr(self, box):
-		for attr in box:
+	def color_activated(self, entry):
+		color = self.get_rgba()
+
+	def connect_color_activated(self, method):
+		self.entryField.connect("changed", method, self)
+
+	def get_attr(self, obj):
+		for attr in obj:
 			if str.lower(type(attr).__name__) == "box":
-				print('\n\t {!s}'.format(type(attr).__name__))
-				self.print_attr(attr)
+				self.get_attr(attr)
 			elif str.lower(type(attr).__name__) == "grid":
-				print('\n\t {!s}'.format(type(attr).__name__))
-				self.print_attr(attr)
+				self.get_attr(attr)
 			elif str.lower(type(attr).__name__) == "gtk.coloreditor":
-				print('\n\t {!s}'.format(type(attr).__name__))
-				self.print_attr(attr)
-			else:
-				print('Colorchooser attr-Type {!s}'.format(type(attr).__name__))
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "overlay":
+				self.colorEditor = attr
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "entry":
+				self.entryField = attr
 
-	def color_activated(colorchooserwidget, color):
-		red = (color.red * 255)
-		green = (color.green * 255)
-		blue = (color.blue * 255)
-
-		print("Hex: #%02x%02x%02x" % (red, green, blue))
-
-	def set_rgba(self, color):
-		super(MyColorChooserWidget, self).set_rgba(color)
-		self.color_activated(color)
+	def my_even_fancier_attribute_getter(self, obj):
+		return [(attr, value) for attr, value in obj.__dict__.items() if not callable(value)]

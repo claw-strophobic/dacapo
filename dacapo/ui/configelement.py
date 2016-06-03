@@ -81,6 +81,29 @@ class ConfigElement(object):
 				print('Attribut {!s} type {!s} mit Wert {!s} gefunden'.format(attr, attrType, value))
 		return root
 
+	def setValue(self, key, value):
+		if not self.vars.has_key(key):
+			return
+		d = self.__dict__
+		elementTyp = self.vars.get(key)['type']
+		target = self.vars.get(key)['target']
+		if elementTyp == "int":
+			d[target] = int(value)
+		elif elementTyp == "float":
+			d[target] = float(value)
+		elif elementTyp == "tuple":
+			d[target] = tuple(value)
+		elif elementTyp == "color":
+			r = int(round(value.red * 255, 0))
+			b = int(round(value.blue * 255, 0))
+			g = int(round(value.green * 255, 0))
+			color = (r, g, b)
+			d[target] = tuple(color)
+			print('New color {!s}'.format(d[target]))
+		elif elementTyp == "boolean":
+			d[target] = self.checkBool(value)
+		else:
+			d[target] = str(value)
 
 	def __iter__(self):
 		for attr, value in self.__dict__.iteritems():
