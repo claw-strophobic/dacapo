@@ -185,6 +185,9 @@ class Configurator(Gtk.Window):
 	def getDuration(self):
 		return "3:25"
 
+	def queryPosition(self):
+		return "1:23"
+
 	def getActSong(self):
 		return 3
 

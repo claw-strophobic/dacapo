@@ -267,7 +267,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			if self.isLyricField:blitObj.backup = True
 			return blitObj
 		except: # catch *all* exceptions
-			print(sys.exc_info()[0])
+			print(sys.exc_info())
 			##event = pygame.event.Event(pygame.event.EventType(pygame.QUIT))
 			##pygame.event.post(event)
 			pygame.quit()
