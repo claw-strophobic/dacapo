@@ -9,6 +9,7 @@
 #
 from dacapo.config.gui import *
 from dacapo.config.gui.fontchooser import MyFontChooserWidget
+from dacapo.config.gui.colorchooser import MyColorChooserWidget
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -74,14 +75,9 @@ class BackgroundTab(PreviewTab):
 		g = CONFIG.gui[type]
 		self.set_border_width(10)
 		vbox = Gtk.VBox()
-		vbox.add(Gtk.Label(_('Pictures- & Background-Settings!')))
 		grid = Gtk.Grid()
 		grid.set_column_homogeneous(False)
 		grid.set_column_spacing(6)
-		self.prev_button = Gtk.Button(_("Preview"))
-		self.prev_button.set_sensitive(True)
-		self.prev_button.connect('clicked', self.on_preview)
-		self.prev_button.set_tooltip_text(_("Click here to see a preview of this field."))
 
 		if type == 'window':
 			labelWidth = Gtk.Label(_('Window width'))
@@ -89,6 +85,7 @@ class BackgroundTab(PreviewTab):
 		else:
 			labelWidth = Gtk.Label(_('Fullscreen width'))
 			labelHeight = Gtk.Label(_('Fullscreen height'))
+		labelDummy = Gtk.Label(' ')
 
 		grid.add(labelWidth)
 		adjustment = Gtk.Adjustment(int(g.width), 0, int(s.get_width()), 1, 10, 0)
@@ -98,7 +95,7 @@ class BackgroundTab(PreviewTab):
 		self.width_spinbutton.set_tooltip_text(_("Set here the pixel width of the display.") + " (max {!s})".format(s.get_width()))
 		grid.attach_next_to(self.width_spinbutton,labelWidth, Gtk.PositionType.RIGHT, 1, 1)
 
-		grid.attach_next_to(labelHeight, self.width_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
+		grid.attach_next_to(labelHeight, labelWidth, Gtk.PositionType.BOTTOM, 1, 1)
 		adjustment = Gtk.Adjustment(int(g.height), 0, int(s.get_height()), 1, 10, 0)
 		self.height_spinbutton = Gtk.SpinButton()
 		self.height_spinbutton.set_adjustment(adjustment)
@@ -106,19 +103,25 @@ class BackgroundTab(PreviewTab):
 		self.height_spinbutton.set_tooltip_text(_("Set here the pixel height of the display." + " (max {!s})".format(s.get_height())))
 		grid.attach_next_to(self.height_spinbutton,labelHeight, Gtk.PositionType.RIGHT, 1, 1)
 
+		grid.attach_next_to(labelDummy, labelHeight, Gtk.PositionType.BOTTOM, 1, 1)
 
 		labelBackground = Gtk.Label(_('Background colour'))
-		grid.attach_next_to(labelBackground,labelWidth, Gtk.PositionType.BOTTOM, 1, 1)
-		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
+		grid.attach_next_to(labelBackground, self.height_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
+		self.colorchooser = MyColorChooserWidget()
 		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
-		self.colorchooser.set_property("show-editor", True)
-		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.RIGHT, 2, 1)
-		grid.attach_next_to(self.prev_button, self.colorchooser, Gtk.PositionType.BOTTOM, 1, 1)
+		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.BOTTOM, 1, 1)
+
+		self.prev_button = Gtk.Button(_("Preview"))
+		self.prev_button.set_sensitive(True)
+		self.prev_button.connect('clicked', self.on_preview)
+		self.prev_button.set_tooltip_text(_("Click here to see a preview of this field."))
+		grid.attach_next_to(self.prev_button, labelDummy, Gtk.PositionType.BOTTOM, 1, 1)
 		vbox.add(grid)
 		self.add(vbox)
 
 	def getBlitObject( self ):
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
+		CONFIG.setConfig('TEMP', 'gui', 'winState', self.type)
 		if audio is None:
 			return None
 		else:
@@ -127,9 +130,14 @@ class BackgroundTab(PreviewTab):
 			g = CONFIG.gui[self.type]
 			g.initFields()
 			for field in g.fields:
-				a.append(g.fields[field].getBlitObject())
+				if not g.fields[field].isPicField and hasattr(g.fields[field], 'zIndex'):
+					print('Adding field {!s}'.format(g.fields[field].name))
+					a.append(g.fields[field].getBlitObject())
 			a.append(audio.getCover())
 			return a
+
+	def onColorSet( self, obj, color ):
+		print('New color {!s}'.format(color))
 
 
 class FieldTab(PreviewTab):
@@ -272,6 +280,6 @@ class GuiTab(Gtk.Box):
 		self.notebook.append_page(self.page_background, Gtk.Label(_("Pictures & Background")))
 
 		# 2nd tab -> Lyricfont settings
-		self.page_font = LyricfontTab(type)
-		self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
+		# self.page_font = LyricfontTab(type)
+		# self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
 
