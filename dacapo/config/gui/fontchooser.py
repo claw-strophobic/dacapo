@@ -8,6 +8,7 @@
 # published by the Free Software Foundation
 #
 from dacapo.config.gui import *
+from dacapo.config.gui.colorchooser import MyColorChooserWidget
 
 class MyFontChooserWidget(Gtk.FontChooserWidget):
 
@@ -34,7 +35,9 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 					self.entry.set_tooltip_text(_("Change here the text of the preview."))
 
 		box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-		self.colorchooser = Gtk.ColorChooserWidget(show_editor=True)
+		self.colorchooser = MyColorChooserWidget()
+		self.colorchooser.connect_color_activated(self.color_cb)
+
 		box.add(self.colorchooser)
 		self.add(box)
 		# connect signal from the font chooser to the callback function
@@ -46,6 +49,11 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 	def font_cb(self, event, user_data):
 		# print in the terminal
 		print("You chose the font " + self.get_font())
+		return
+
+	# callback function:
+	def color_cb(self, event, user_data):
+		self.setFGcolor(self.colorchooser.get_rgba())
 		return
 
 	def set_font(self, fontName, fontSize):
