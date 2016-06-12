@@ -93,6 +93,7 @@ class BackgroundTab(PreviewTab):
 		self.width_spinbutton.set_adjustment(adjustment)
 		self.width_spinbutton.set_value(int(g.width))
 		self.width_spinbutton.set_tooltip_text(_("Set here the pixel width of the display.") + " (max {!s})".format(s.get_width()))
+		self.width_spinbutton.connect('value-changed', self.onValueChanged, 'width')
 		grid.attach_next_to(self.width_spinbutton,labelWidth, Gtk.PositionType.RIGHT, 1, 1)
 
 		grid.attach_next_to(labelHeight, labelWidth, Gtk.PositionType.BOTTOM, 1, 1)
@@ -101,16 +102,23 @@ class BackgroundTab(PreviewTab):
 		self.height_spinbutton.set_adjustment(adjustment)
 		self.height_spinbutton.set_value(int(g.height))
 		self.height_spinbutton.set_tooltip_text(_("Set here the pixel height of the display." + " (max {!s})".format(s.get_height())))
+		self.height_spinbutton.connect('value-changed', self.onValueChanged, 'height')
 		grid.attach_next_to(self.height_spinbutton,labelHeight, Gtk.PositionType.RIGHT, 1, 1)
 
-		grid.attach_next_to(labelDummy, labelHeight, Gtk.PositionType.BOTTOM, 1, 1)
+		labelMouseVisible = Gtk.Label(_('Show the mouse cursor'))
+		grid.attach_next_to(labelMouseVisible, labelHeight, Gtk.PositionType.BOTTOM, 1, 1)
+		self.mouseVisible = Gtk.CheckButton()
+		self.mouseVisible.connect("toggled", self.onToggled, 'mouseVisible')
+		grid.attach_next_to(self.mouseVisible, labelMouseVisible, Gtk.PositionType.RIGHT, 1, 1)
+
+		grid.attach_next_to(labelDummy, labelMouseVisible, Gtk.PositionType.BOTTOM, 1, 7)
 
 		labelBackground = Gtk.Label(_('Background colour'))
-		grid.attach_next_to(labelBackground, self.height_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
+		grid.attach_next_to(labelBackground, self.width_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
 		self.colorchooser = MyColorChooserWidget()
 		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
 		self.colorchooser.connect_color_activated(self.onColorSet)
-		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.BOTTOM, 1, 1)
+		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.BOTTOM, 1, 10)
 
 		self.prev_button = Gtk.Button(_("Preview"))
 		self.prev_button.set_sensitive(True)
@@ -143,6 +151,18 @@ class BackgroundTab(PreviewTab):
 		g.setValue('backgroundColor', color)
 
 
+	def onToggled(self, obj, data):
+		v = obj.get_active()
+		print('New {!s}: {!s}'.format(data, v))
+		g = CONFIG.gui[self.type]
+		g.setValue(data, v)
+
+	def onValueChanged(self, obj, data):
+		v = obj.get_value_as_int()
+		print('New {!s}: {!s}'.format(data, v))
+		g = CONFIG.gui[self.type]
+		g.setValue(data, v)
+
 
 class FieldTab(PreviewTab):
 
@@ -160,6 +180,7 @@ class FieldTab(PreviewTab):
 
 		## add fields
 		font_chooser = MyFontChooserWidget()
+		font_chooser.colorchooser.connect_color_activated(self.onColorChanged)
 
 		self.fields = self.get_field_combo(type, font_chooser)
 		self.fields.set_tooltip_text(_("Select an existing field here."))
@@ -218,6 +239,13 @@ class FieldTab(PreviewTab):
 			#self.field.content = self.field.getReplacedContent()
 			#print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
 			return self.field.getBlitObject()
+
+
+	def onColorChanged(self, obj, colorchooser):
+		color = colorchooser.get_rgba()
+		print("Setze Farbe für Feld {!s}".format(self.field.name))
+		self.field.font.setValue('fontColor', color)
+
 
 class LyricfontTab(Gtk.Box):
 
