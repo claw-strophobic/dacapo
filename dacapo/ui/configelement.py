@@ -29,7 +29,7 @@ class ConfigElement(object):
 		return False
 
 	def checkBool(self, test):
-		res = True if test.lower() in self.BOOLS else False
+		res = True if str(test).lower() in self.BOOLS else False
 		return res
 
 	def grabXMLData(self, xml, printme=False):
