@@ -277,7 +277,7 @@ class GstPlayer(threading.Thread):
 		self.player.set_state(Gst.State.PLAYING)
 		# Gst.gst_element_query_duration(self.player, GST_Gst.Format.TIME, time)
 		# print "TIME AUS GSTREAMER: " , time
-		self.setDuration()
+		self.getGstDuration()
 		self.is_Playing = True
 		self.actualTitel = filename
 		if self.debug: logging.debug("done. leaving doplay ")
@@ -343,7 +343,7 @@ class GstPlayer(threading.Thread):
 
 	def doTrackChange(self):
 		# self.player.get_state()
-		self.setDuration()
+		self.getGstDuration()
 		self.actualTitel = self.filename
 
 	def convert_ns(self, t):
@@ -358,20 +358,26 @@ class GstPlayer(threading.Thread):
 			h,m = divmod(m, 60)
 			return "%i:%02i:%02i" %(h,m,s)
 
-	def setDuration(self):
+	def getGstDuration(self):
 		self.player.get_state(timeout=Gst.SECOND / 2)
 		dur_int = self.player.query_duration(Gst.Format.TIME)[1]
-		if dur_int == -1:
-			if self.debug: logging.debug("--> setDuration() Couldn't get the length of the song")
+		if dur_int <= 0:
+			if self.debug: logging.debug("--> Couldn't get the length of the song. Trying again.")
 		dur_str = self.convert_ns(dur_int)
 		self.__time = dur_int
-		if self.debug: logging.debug("--> setDuration() {!s} {!s}".format(dur_int, dur_str))
+		if self.debug: logging.debug("-->  {!s} {!s}".format(dur_int, dur_str))
 		self.__strTime = dur_str
 
 	def getDuration(self):
+		if self.__time <= 0:
+			if self.debug: logging.debug("--> Wrong Duration. Trying to get the real one.")
+			self.getGstDuration()
 		return self.__strTime
 
 	def getNumericDuration(self):
+		if self.__time <= 0:
+			if self.debug: logging.debug("--> Wrong Duration. Trying to get the real one.")
+			self.getGstDuration()
 		return self.__time
 
 	def queryTimeRemaining(self):
