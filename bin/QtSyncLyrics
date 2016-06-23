@@ -149,18 +149,19 @@ class Ui_Dialog(QtGui.QMainWindow):
 
     #sets the value of the progress bar emited
     def setCurTime(self):
-        self.actPos = self.gstPlayer.queryNumericPosition()
-        self.actPosStr = self.gstPlayer.queryPosition()
+        actPos = self.gstPlayer.queryPositionInMilliseconds()
+        actPosStr = self.gstPlayer.queryPosition()
         self.lblTimeCur.setText( \
             QtGui.QApplication.translate("Dialog", \
-                                         self.actPosStr, None, \
+                                         actPosStr, None, \
                                          QtGui.QApplication.UnicodeUTF8))
         self.remTime = self.gstPlayer.queryTimeRemaining()
         self.lblTimeRemaining.setText( \
             QtGui.QApplication.translate("Dialog", \
                                          self.remTime, None, \
                                          QtGui.QApplication.UnicodeUTF8))
-        value = self.actPos * self.seekSlider.maximum() / self.gstPlayer.getNumericDuration()
+        value = actPos * 1000
+        ##print("--> Value: {!s} \t Actual Position: {!s} \t Slider-Max {!s} \t Duration:{!s}".format(value, actPos, self.seekSlider.maximum(), (self.gstPlayer.getNumericDuration() / 1000)))
         if (self.seekSlider.value() != value) :
             self.seekSlider.setValue( value )
 
@@ -428,9 +429,9 @@ class Ui_Dialog(QtGui.QMainWindow):
         return
 
     def seekSliderChangeValue(self, value):
-        actPos = self.gstPlayer.queryNumericPosition()
-        slide = value * self.gstPlayer.getNumericDuration() / self.seekSlider.maximum()
-        newPos = slide - actPos
+        actPos = self.gstPlayer.queryPositionInMilliseconds()
+        slidePos = value / 1000
+        newPos = (slidePos - actPos) / 1000
         self.gstPlayer.seekPosition(float(newPos))
         if self.getDebug() :
             logging.debug("Slider Value: %s Alte Pos: %s Neue Position: %s" % (value, actPos, newPos))
@@ -472,8 +473,7 @@ class Ui_Dialog(QtGui.QMainWindow):
             if self.filename <> "":
                 self.isPlay = True
                 self.gstPlayer.doPlay(self.filename)
-                self.seekSlider.setMaximum( \
-                    self.gstPlayer.getNumericDuration() )
+                self.seekSlider.setMaximum(self.gstPlayer.getNumericDuration() / 1000 )
                 self.btnPausePlay.setIcon(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_pause.png'))
         elif self.isPlay == True :
             self.isPlay = False
