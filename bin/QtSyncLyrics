@@ -71,9 +71,7 @@ class Loop(QtCore.QThread):
                 break
             if self.gui.isPlay == True:
                 self.emit(QtCore.SIGNAL("setCurTime"))
-            # self.gui.setCurTime()
-            #set timer
-            time.sleep(0.05)
+            time.sleep(0.5)
 
 #this code produced using pyuic from qt designer
 class Ui_Dialog(QtGui.QMainWindow):
