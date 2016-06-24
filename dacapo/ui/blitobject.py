@@ -44,13 +44,11 @@ class BlitObject(object):
 
 		try:
 			if (self.blitField.isPicField):
-				# print("Try Saving Background for %s Size: %s" % (self.name,self.rect.size))
 				image = pygame.Surface(self.rect.size)
 				winState = self.CONFIG.getConfig('TEMP', 'gui', 'winState')
 				color = self.CONFIG.getConfig('gui', winState, 'backgroundColor')
 				logging.debug("Try Filling Background with color %s for state %s for %s Size: %s" % (str(color), winState, self.name,self.rect.size))
 				self.blitField.doFillBackground(image, color)
-				# print("Saving Background: {!s}".format(type(image)))
 				self.blitField.savedBackground = image
 			else:
 				self.blitField.savedBackground = screen.subsurface(self.rect).copy()

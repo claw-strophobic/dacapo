@@ -32,7 +32,7 @@ class BlitInterface(object):
 	def doFillBackground(self, screen, color, update=False):
 		# Fenstergröße holen
 		width, height = screen.get_size()
-		print("Set Background-Color {!s} on size {!s}x{!s}".format(str(color), width, height))
+		logging.debug("Set Background-Color {!s} on size {!s}x{!s}".format(str(color), width, height))
 		image = pygame.Surface(screen.get_size())
 		image.fill(color)
 		obj = dacapo.ui.blitobject.BlitObject('Background')

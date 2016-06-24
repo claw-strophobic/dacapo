@@ -33,24 +33,24 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		winHeight = g.picField.maxHeight
 
 		# --> skalieren -------------------------------
-		if self.debug : logging.debug("Pic-Area: {!s} * {!s} at {!s}, {!s}".format(winWidth, winHeight, g.picField.pos.posH, g.picField.pos.posV))
+		logging.debug("Pic-Area: {!s} * {!s} at {!s}, {!s}".format(winWidth, winHeight, g.picField.pos.posH, g.picField.pos.posV))
 		picW, picH = pic.get_size()
 
 		if picW == 0 : picW = 1
 		proz = (winWidth * 100.0) / (picW)
 		h = int(round( (picH * proz) / 100.0))
 		w = int(round(winWidth))
-		if self.debug : logging.debug("Picture skalieren: " \
-			"Originalbreite: %s Hoehe: %s PROZENT: %s " \
-			"-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
+		logging.debug("Scale picture: " \
+			"Original width: %s height: %s PROCENT: %s " \
+			"-> New W: %s H: %s" % (picW, picH, proz, w, h))
 		if h > winHeight :
 			proz = (winHeight * 100.0) / (h)
 			w = int(round( (w * proz) / 100.0 ))
 			h = int(round( (h * proz) / 100.0))
-			if self.debug : logging.debug(\
-				"NEUSKALIERUNG da Bild zu hoch wurde: "\
-				"Originalbreite: %s Hoehe: %s PROZENT: %s " \
-				"-> Neue W: %s H: %s " % (picW, picH, proz, w, h))
+			logging.debug(\
+				"Scale picture again because it was to high: "\
+				"Original width: %s height: %s PROCENT: %s " \
+				"-> New W: %s H: %s " % (picW, picH, proz, w, h))
 		result = pygame.transform.scale(pic, (w, h))
 		# <-- skalieren -------------------------------
 

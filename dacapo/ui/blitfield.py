@@ -51,22 +51,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		gstPlayer = player.gstPlayer
 		isPlaylist = CONFIG.getConfig('TEMP', Key='PLAYLIST').isPlaylist()
 
-		if self.debug: logging.debug(\
-				'rendere Texte: {0}'.format(
-				CONFIG.getConfig('TEMP', Key='FILENAME')
-				))
+		logging.debug('Rendering Text: {0}'.format(CONFIG.getConfig('TEMP', Key='FILENAME')))
 
 		textMetaVar = {}
-		textMetaVar['if_playlist'] = CONFIG.getConfig(
-			'gui',
-			'metaData',
-			'if_playlist'
-			)
-		textMetaVar['if_discNr'] = CONFIG.getConfig(
-			'gui',
-			'metaData',
-			'if_discNr'
-			)
+		textMetaVar['if_playlist'] = CONFIG.getConfig('gui', 'metaData', 'if_playlist')
+		textMetaVar['if_discNr'] = CONFIG.getConfig('gui', 'metaData', 'if_discNr')
 
 		if not isPlaylist : textMetaVar['if_playlist'] = ''
 		if audio.getDiscNo() == "0" : textMetaVar['if_discNr'] = ''
@@ -74,7 +63,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		vList = list()
 		self.data = ''
 		self.renderedData = None
-		if (self.content != None) and (self.content != '') :
+		if (self.content != None):
 			s = self.content
 			try:
 				s = s.replace('%if_playlist%', textMetaVar['if_playlist'])
@@ -94,11 +83,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				s = s.replace('#duration#', gstPlayer.getDuration())
 
 				if '#bandlogo#' in s:
-					logging.debug('Try to get Bandlogo: %s: %s -> %s' % (
-						self.name,
-						self.content,
-						self.data
-						))
+					logging.debug('Try to get Bandlogo: %s: %s -> %s' % (self.name, self.content, self.data))
 					logo = audio.preBlitLogo(self.name)
 					if logo == None:
 						pass
@@ -110,17 +95,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				if multi == False:
 					if (s != ''):
 						self.data =  s
-						if self.debug:
-							logging.debug('Rendere Metadaten: %s: %s -> %s' % (
-								self.name,
-								self.content,
-								self.data
-								))
+						logging.debug('Rendering Metadata: %s: %s -> %s' % (self.name, self.content, self.data))
 						self.renderedData = self.sysFont.render(self.data, True, self.font.fontColor)
 						self.renderedSize = self.renderedData.get_size()
 				else:
-					if self.debug:
-						logging.debug('Multiline: %s:' % (s))
+					logging.debug('Multiline: %s:' % (s))
 					if (self.splitSpaces == True):
 						if self.debug: logging.debug('Split Spaces')
 						s = s.replace(' ', '\\n')
@@ -134,10 +113,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			except pygame.error, err:
 				print("Autsch! Konnte Metadaten %s nicht rendern: %s" % (
 					self.name, self.data))
-				logging.warning("konnte Metadaten nicht rendern: %s: %s -> %s" %
-								(self.name,
-					self.content,
-					self.data))
+				logging.warning("Can't render Metadata: %s: %s -> %s" % (self.name, self.content, self.data))
 				logging.warning(err)
 
 		return self.renderedData
@@ -148,13 +124,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		maxwidth = self.maxWidth
 		if maxwidth == 0:
 			maxwidth = CONFIG.getConfig('gui', winstate, 'width')
-		if self.debug:
-			logging.debug('Rendere Metadaten mit Max-Width: %s %s: %s -> %s' % (
-				maxwidth,
-				self.name,
-				self.content,
-				self.data
-				))
+		logging.debug('Rendering Metadata with Max-Width: %s %s: %s -> %s' % (maxwidth, self.name, self.content, self.data))
 		rList = list()
 		w = 0
 		h = 0
@@ -174,15 +144,13 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 						self.font.fontColor
 					)
 			wT,hT = rData.get_size()
-			if self.debug:
-				logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
+			logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
 			if wT < maxwidth and counter < len(self.data):
 				lineSave = rData
 				continue
 			if lineSave == None:
 				lineSave = rData
-			if self.debug:
-				logging.debug('List-Append Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
+			logging.debug('List-Append Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
 			rList.append(rData)
 			lineTest = ''
 			lineSave = None

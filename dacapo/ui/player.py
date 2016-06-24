@@ -120,12 +120,12 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self.diaShowPics.append(self.audioFile.getFrontCover())
 		try:
 			g = CONFIG.gui[self.winState]
-			print("going to fill the background to: {!s}".format(g.backgroundColor))
+			logging.debug("going to fill the background to: {!s}".format(g.backgroundColor))
 			try: self.doFillBackground(self.screen, g.backgroundColor, True)
 			except:
 				print(pygame.get_error())
 				return
-			print("going to get blit object... ")
+			logging.debug("going to get blit object... ")
 			obj = self.getBlitObject()
 			sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
 			for o in sorted_x:
@@ -272,7 +272,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			g.lyricField.savedBackground = None
 			self.doBlitObject(self.screen, obj, True)
 			if (g.timeField is None): return
-			print("Replaced Data: %s" % (g.timeField.getReplacedContent()))
 			obj = g.timeField.getBlitObject()
 			self.doBlitObject(self.screen, obj, True)
 
@@ -706,7 +705,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 					if not g.fields[field].isPicField:
 						a.append(g.fields[field].getBlitObject())
 						if (hasattr(g.fields[field], 'overlay')) and (g.fields[field].overlay is True):
-							print("Adding field %s" % (g.fields[field].name))
+							logging.debug("Adding overlay field %s" % (g.fields[field].name))
 							self.fieldList.append(g.fields[field].getBlitObject())
 			pic = self.slide_show()
 			if pic is not False:
