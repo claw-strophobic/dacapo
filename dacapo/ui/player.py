@@ -251,10 +251,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if (self.pos == newPos) and (force == False): return
 
 		g = CONFIG.gui[self.winState]
-		if (g.timeField is None): return
-		g.timeField.getRenderedData()
-		obj = g.timeField.getBlitObject()
-		self.doBlitObject(self.screen, obj, True)
 
 		# if self._debug : print "Aktuelle Position: %s " % (self._gstPlayer.queryNumericPosition())
 		seconds = self._gstPlayer.queryPositionInMilliseconds() / 1000
@@ -275,6 +271,15 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			obj = g.lyricField.getBlitObject()
 			g.lyricField.savedBackground = None
 			self.doBlitObject(self.screen, obj, True)
+			if (g.timeField is None): return
+			print("Replaced Data: %s" % (g.timeField.getReplacedContent()))
+			obj = g.timeField.getBlitObject()
+			self.doBlitObject(self.screen, obj, True)
+
+		if (g.timeField is None): return
+		g.timeField.getRenderedData()
+		obj = g.timeField.getBlitObject()
+		self.doBlitObject(self.screen, obj, True)
 
 		self.pos = newPos
 		return

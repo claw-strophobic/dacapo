@@ -75,8 +75,7 @@ class BlitObject(object):
 			logging.debug("Restoring Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		try:
 			screen.blit(self.blitField.savedBackground, self.blitField.savedBackgroundRect)
-			if (self.blitField.isLyricField) or (self.blitField.isPicField):
-				pygame.display.update(self.blitField.savedBackgroundRect)
+			pygame.display.update(self.blitField.savedBackgroundRect)
 		except pygame.error, err:
 			logging.warning("Error at self.screen.blit(%s, (%s)) . %s " % (self.name, self.blitField.savedBackgroundRect, err))
 			return False
