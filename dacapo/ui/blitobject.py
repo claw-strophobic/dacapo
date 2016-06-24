@@ -69,10 +69,8 @@ class BlitObject(object):
 
 	def doRestoreBackground(self, screen):
 		if (self.backup is False): return
-		if (self.blitField is None): return
+		if (self.getSavedBackground() is None): return
 
-		if self.blitField.savedBackground is None:
-			return
 		if (self.blitField.isPicField):
 			logging.debug("Restoring Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		try:
