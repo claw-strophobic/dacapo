@@ -44,19 +44,19 @@ class BlitObject(object):
 
 		try:
 			if (self.blitField.isPicField):
-				print("Try Saving Background for %s Size: %s" % (self.name,self.rect.size))
+				# print("Try Saving Background for %s Size: %s" % (self.name,self.rect.size))
 				image = pygame.Surface(self.rect.size)
 				winState = self.CONFIG.getConfig('TEMP', 'gui', 'winState')
 				color = self.CONFIG.getConfig('gui', winState, 'backgroundColor')
-				print("Try Filling Background with color %s for state %s for %s Size: %s" % (str(color), winState, self.name,self.rect.size))
+				logging.debug("Try Filling Background with color %s for state %s for %s Size: %s" % (str(color), winState, self.name,self.rect.size))
 				self.blitField.doFillBackground(image, color)
-				print("Saving Background: {!s}".format(type(image)))
+				# print("Saving Background: {!s}".format(type(image)))
 				self.blitField.savedBackground = image
 			else:
 				self.blitField.savedBackground = screen.subsurface(self.rect).copy()
 			self.blitField.savedBackgroundRect = self.rect.copy()
 			if (self.blitField.isPicField):
-				print("Saving Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
+				logging.debug("Saving Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		except pygame.error, err:
 			self.blitField.savedBackground = None
 			logging.warning("Error saving Background on %s: %s" % (self.name, err))
@@ -74,7 +74,7 @@ class BlitObject(object):
 		if self.blitField.savedBackground is None:
 			return
 		if (self.blitField.isPicField):
-			print("Restoring Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
+			logging.debug("Restoring Background for %s Rect: %s" % (self.name,self.blitField.savedBackgroundRect))
 		try:
 			screen.blit(self.blitField.savedBackground, self.blitField.savedBackgroundRect)
 			if (self.blitField.isLyricField) or (self.blitField.isPicField):

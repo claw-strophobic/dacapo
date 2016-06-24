@@ -69,7 +69,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self._showGUI = bool(self._config.getConfig('TEMP', Key='SHOWGUI'))
 		bResume = self._config.getConfig('TEMP', Key='RESUME')
 		# Erstellt einen Zeitnehmer
-		self._debug = self._config.getConfig('debug', ' ', 'debugGUI')
 		self._gapless = self._config.getConfig('audio_engine', 'audio_engine', 'gapless')
 		self._resize = False
 		self.diaShowPics = None
@@ -78,14 +77,11 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self.set_slide_mode(self._config.getConfig('gui', 'misc', 'showPics'))
 
 		# gstPlayer wird als GTK-thread gestartet
-		if self._debug: logging.debug( \
-			'versuche GstPlayer zu starten...')
+		logging.debug('Trying to start GstPlayer...')
 		self._gstPlayer = GstPlayer(ausschalter)
 		self._gstPlayer.start()
-		if self._debug: logging.debug( \
-			'versuche GstPlayer zu starten... done.')
-		oPlaylist = self._config.getConfig(
-			'TEMP', Key='PLAYLIST')
+		logging.debug('Trying to start GstPlayer... done.')
+		oPlaylist = self._config.getConfig('TEMP', Key='PLAYLIST')
 		self.isPlaylist = oPlaylist.isPlaylist()
 		self.playlist = oPlaylist.getPlaylist()
 		self.actSong = 0
@@ -139,9 +135,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			errorhandling.Error.show()
 
 
-		# der Bereich der aktuellen Position wird bereinigt
-		## key1 = self._metaFields.get('TIME')['posActTime']
-		## self.clearRect(self._metaFields, key1)
 		self._saveScreen = self.screen.copy()
 		self._actScreen = self.screen.copy()
 
@@ -157,16 +150,14 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 	def slide_show(self):
 		if self.diaShowPics is None: return False
-		if self._debug: logging.debug("pygame.display.get_init = %s " % (pygame.display.get_init()))
-		if self._debug: logging.debug("pygame.display.get_active = %s " % (pygame.display.get_active()))
-		if self._debug: logging.debug(
-			"Anzahl Bilder: %s -> aktuelles Bild: Nr %s" % (len(self.diaShowPics), self.diaIndex))
+		logging.debug("pygame.display.get_init = %s " % (pygame.display.get_init()))
+		logging.debug("pygame.display.get_active = %s " % (pygame.display.get_active()))
+		logging.debug("Number of pictures: %s -> actual pic: No %s" % (len(self.diaShowPics), self.diaIndex))
 		if len(self.diaShowPics) <= 1 and self.diaIndex >= 0:
-			if self._debug: logging.debug("Breche diaShow ab, da Anzahl Bilder: %s " % (len(self.diaShowPics)))
+			logging.debug("Stopping slideshow, because no of pics: %s " % (len(self.diaShowPics)))
 			return False
 		if len(self.diaShowPics) < self.diaIndex:
-			if self._debug:
-				logging.debug("Breche diaShow ab, da diaIndex: %s > Anzahl Bilder: %s "
+			logging.debug("Stopping slideshow because diaIndex: %s > number of pics: %s "
 							  % (self.diaIndex, len(self.diaShowPics)))
 			return False
 
@@ -175,12 +166,12 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		# if Index bigger than number of pics -> initialize the Index
 		self.diaIndex += 1
 		if self.diaIndex > (len(self.diaShowPics) - 1): self.diaIndex = 0
-		print("Number of pictures: %s" % (len(self.diaShowPics)))
+		logging.debug("Number of pictures: %s" % (len(self.diaShowPics)))
 
-		print("Pic-Type: {!s}".format(type(self.diaShowPics[self.diaIndex])))
+		logging.debug("Pic-Type: {!s}".format(type(self.diaShowPics[self.diaIndex])))
 		pic = BlitPicture(self.diaShowPics[self.diaIndex])
 
-		print("Picture-Index: %s - trying to get Blitobject" % (self.diaIndex))
+		logging.debug("Picture-Index: %s - trying to get Blitobject" % (self.diaIndex))
 		blitobj = pic.getBlitObject()
 		return blitobj
 
@@ -264,15 +255,14 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		g.timeField.getRenderedData()
 		obj = g.timeField.getBlitObject()
 		self.doBlitObject(self.screen, obj, True)
-		## if self._metaFields.get('TIME')['textActTime'] == None: return
 
 		# if self._debug : print "Aktuelle Position: %s " % (self._gstPlayer.queryNumericPosition())
 		seconds = self._gstPlayer.queryPositionInMilliseconds() / 1000
 		if seconds >= (self.timerIndex + self.diaShowTime):
-			if self._debug : print("Aktuelle Position: %s >= %s " % (seconds, (self.timerIndex + self.diaShowTime)))
+			logging.debug("Aktuelle Position: %s >= %s " % (seconds, (self.timerIndex + self.diaShowTime)))
 			if not force:
 				try:
-					print("going to get blit object... ")
+					logging.debug("going to get blit object... ")
 					obj = self.getBlitObject(update=True)
 					sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
 					for o in sorted_x:
@@ -285,32 +275,9 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			obj = g.lyricField.getBlitObject()
 			g.lyricField.savedBackground = None
 			self.doBlitObject(self.screen, obj, True)
-		return
-
-		key1 = self._metaFields.get('TIME')['posActTime']
-		self.clearUpdateRect(self._metaFields, key1)
 
 		self.pos = newPos
-		## self._metaFields = self.metaFontsObject.getRenderedActTime()
-		try:
-			self.blit_rect(
-				self._metaFields.get(key1)['renderedData'],
-				Rect(
-					self._metaFields.get(key1)['blitPos'],
-					self._metaFields.get(key1)['renderedSize']
-				),
-				text=self._metaFields.get(key1)['data'],
-				update=True
-			)
-		except:
-			pass
-
 		return
-
-
-	# -------------------- Timer -----------------------------------------------------------------
-
-	# -------------------- Sync-Texte -----------------------------------------------------------------
 
 	def update_sync_lyrics(self):
 		if len(self.audioFile.syncText) <= 0: return
@@ -340,7 +307,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		# Verhindert, dass das Programm zu schnell laeuft
 		FPS = 30
 		fpsClock = pygame.time.Clock()
-		if self._debug: logging.debug("going to loop...")
+		logging.debug("going to loop...")
 		while True:
 			try:
 				if self._ausschalter.isSet(): break
@@ -355,7 +322,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 					if event.type == pygame.ACTIVEEVENT:
 						if self.allwaysOnTop:
 							if not self.fullscreen:
-								if self._debug: logging.debug('Setze Fenster nach vorne. ')
+								logging.debug('Setze Fenster nach vorne. ')
 								self.SetWindowPos(pygame.display.get_wm_info()['window'],
 												  -1, 0, 0, self.resolution[0], self.resolution[1], 0x0013)
 					elif event.type == VIDEORESIZE:
@@ -365,7 +332,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 					# self.doBlitText()
 
 					elif event.type == pygame.KEYDOWN:
-						if self._debug: logging.debug("Keydown-Event: %s" % (event.key))
+						logging.debug("Keydown-Event: %s" % (event.key))
 						if event.key == pygame.K_ESCAPE:
 							self.quit()
 						if event.key == pygame.K_q:
@@ -414,10 +381,10 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	def toggle_fullscreen(self):
 		if self.fullscreen == True:
 			self.fullscreen = False
-			if self._debug: logging.debug('Going to window-mode')
+			logging.debug('Going to window-mode')
 		else:
 			self.fullscreen = True
-			if self._debug: logging.debug('Going to fullscreen-mode')
+			logging.debug('Going to fullscreen-mode')
 		self.winState = 'window'
 		if self.fullscreen: self.winState = 'fullscreen'
 		CONFIG.setConfig('TEMP', 'gui', 'winState', self.winState)
@@ -428,7 +395,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		return
 
 	def start_stop(self):
-		if self._debug: logging.debug('--> Status: {0} '.format(self.status))
+		logging.debug('--> Status: {0} '.format(self.status))
 		if self.status == "Start":
 			self.status = "Stop"
 			self._gstPlayer.doUnpause()
@@ -462,7 +429,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if len(self.playlist) <= 0: self.quit()
 		while self.actSong < len(self.playlist):
 			self.filename = self.playlist[self.actSong]
-			if self._debug: logging.debug('Versuche folgenden Song zu spielen: {0}'.format(self.filename))
+			logging.debug('Versuche folgenden Song zu spielen: {0}'.format(self.filename))
 			datei = open(LIST_NAME, "w")
 			datei.write(str(self.actSong))
 			datei.close()
@@ -473,32 +440,31 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			if mimehelp.isInMimeTypes(self.filename):
 				self._config.setConfig('TEMP', Key='FILENAME', Value=self.filename)
 				if self._showGUI == True:
-					if self._debug: logging.info('Versuche Metadaten zu laden ')
+					logging.info('Versuche Metadaten zu laden ')
 					self.audioFile = getAudioFile(self.filename)
 					self._config.setConfig('TEMP', Key='AUDIOFILE', Value=self.audioFile)
-					if self._debug:
-						antwort = "Ja"
-						if self.audioFile == None:
-							antwort = "Nein"
-						logging.info('Metadaten geladen? %s' % (antwort))
+					antwort = "Yes"
+					if self.audioFile == None:
+						antwort = "No"
+					logging.info('Loaded Metadata? %s' % (antwort))
 					if self.audioFile <> None:
 						# if self._debug : print 'Hole Cover: {0}'.format(self.filename)
 						# self.pic = self.audioFile.getCover()
-						if self._debug: logging.info('Starte GStreamer: {0} '.format(self.filename))
+						logging.info('Starte GStreamer: {0} '.format(self.filename))
 						if GAPLESS:
 							self._gstPlayer.doGaplessPlay(self.filename)
 						else:
 							self._gstPlayer.doPlay(self.filename)
-						if self._debug: logging.debug('Bereite Texte auf: {0} '.format(self.filename))
+						logging.debug('Bereite Texte auf: {0} '.format(self.filename))
 						self.display_text()
-						if self._debug: logging.debug('Alles super: {0} '.format(self.filename))
+						logging.debug('Alles super: {0} '.format(self.filename))
 						break
 					else:
 						print  >> sys.stderr, "Fehler bei Nummer: ", self.actSong, " Titel: ", self.filename
 						logging.error('Fehler bei Nummer: %s Titel: %s ' % (self.actSong, self.filename))
 						if self.actSong >= len(self.playlist): self.quit()
 				else:
-					if self._debug: logging.info('Starte GStreamer: {0} '.format(self.filename))
+					logging.info('Starte GStreamer: {0} '.format(self.filename))
 					if GAPLESS:
 						self._gstPlayer.doGaplessPlay(self.filename)
 					else:
@@ -506,7 +472,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		if self.actSong > len(self.playlist):
 			self._gstPlayer.doStop()
-		if self._debug: logging.debug('done play next song. ')
+		logging.debug('done play next song. ')
 		return
 
 
@@ -524,7 +490,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		if platform.system() == 'Windows':
 			self.SetWindowPos = windll.user32.SetWindowPos
 			self.allwaysOnTop = self._config.getConfig('gui', 'window', 'allwaysOnTop')
-		if self._debug: logging.debug('Initialisiere Display ')
+		logging.debug('Initialisiere Display ')
 		try:
 			pygame.display.init()
 			if (not pygame.font.get_init()):
@@ -533,14 +499,14 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			logging.error('Konnte Display nicht initialisieren! ')
 			logging.error(pygame.get_error())
 			self.quit()
-		if self._debug: logging.debug('setze Ueberschrift ')
+		logging.debug('setze Ueberschrift ')
 		try:
 			pygame.display.set_caption(self._config.getConfig('gui', 'misc', 'caption'))
 		except:
 			logging.error('Konnte Ueberschrift nicht setzen! ')
 			logging.error(pygame.get_error())
 
-		if self._debug: logging.debug('setze Icon ')
+		logging.debug('setze Icon ')
 		iconfile = CONFIG_DIR + self._config.getConfig('gui', 'misc', 'icon')
 		w = self._config.getConfig('gui', 'misc', 'iconsize')
 		h = self._config.getConfig('gui', 'misc', 'iconsize')
@@ -551,7 +517,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.warning('Konnte Icon nicht setzen! ')
 			logging.warning(pygame.get_error())
-		if self._debug: logging.debug('hole Konfiguration ')
+		logging.debug('hole Konfiguration ')
 		self.resolution = (
 			self._config.getConfig('gui', self.winState, 'width'),
 			self._config.getConfig('gui', self.winState, 'height'))
@@ -560,18 +526,16 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 					  (self.resolution[0], self.resolution[1]))
 		try:
 			if self.fullscreen:
-				if self._debug:
-					logging.debug("Verfügbare Modi: %s " % (pygame.display.list_modes(0, pygame.FULLSCREEN)))
-					logging.debug('Setze angeforderten Modus: %s x %s %s' %
-								  (self.resolution[0], self.resolution[1], pygame.FULLSCREEN ))
+				logging.debug("Verfügbare Modi: %s " % (pygame.display.list_modes(0, pygame.FULLSCREEN)))
+				logging.debug('Setze angeforderten Modus: %s x %s %s' %
+							  (self.resolution[0], self.resolution[1], pygame.FULLSCREEN ))
 				self.screen = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN)
 			else:
-				if self._debug:
-					logging.debug('Setze angeforderten Modus: %s x %s %s' %
-								  (self.resolution[0], self.resolution[1], pygame.RESIZABLE ))
+				logging.debug('Setze angeforderten Modus: %s x %s %s' %
+							  (self.resolution[0], self.resolution[1], pygame.RESIZABLE ))
 				self.screen = pygame.display.set_mode(self.resolution)
 				if self.allwaysOnTop:
-					if self._debug: logging.debug('Setze Fenster nach vorne. ')
+					logging.debug('Setze Fenster nach vorne. ')
 					# self.SetWindowPos(pygame.display.get_wm_info()['window'], -2, x, y, 0, 0, 0x0001)
 					self.SetWindowPos(pygame.display.get_wm_info()['window'],
 									  -1, 0, 0, self.resolution[0], self.resolution[1], 0x0013)
@@ -583,9 +547,9 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		self.showLyricsAsPics = self._config.getConfig('gui', 'misc', 'showLyricsAsPics')
 		self.seekSecs = self._config.getConfig('gui', 'misc', 'seekSeconds')
-		if self._debug: logging.debug('Anzahl Sekunden für FFW/FBW: %s' % (self.seekSecs))
+		logging.debug('Anzahl Sekunden für FFW/FBW: %s' % (self.seekSecs))
 
-		if self._debug: logging.debug('Mouse verstecken. ')
+		logging.debug('Mouse verstecken. ')
 		try:
 			pygame.mouse.set_visible(self._config.getConfig('gui', self.winState, 'mouseVisible'))
 		except:
@@ -594,34 +558,34 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		self.diaShowTime = self._config.getConfig('gui', 'misc', 'diaShowTime')
 		# if self._debug : logging.debug("has focus?: %s " % (pygame.key.get_focused()))
-		if self._debug: logging.debug("DISPLAY DRIVER: %s " % (pygame.display.get_driver()))
-		if self._debug: logging.debug("DISPLAY INFO: %s " % (pygame.display.Info()))
-		if self._debug: logging.debug("WM INFO: %s " % (pygame.display.get_wm_info()))
-		if self._debug: logging.debug('done init display. ')
+		logging.debug("DISPLAY DRIVER: %s " % (pygame.display.get_driver()))
+		logging.debug("DISPLAY INFO: %s " % (pygame.display.Info()))
+		logging.debug("WM INFO: %s " % (pygame.display.get_wm_info()))
+		logging.debug('done init display. ')
 		return
 
 	# -------------------- doQuit() -----------------------------------------------------------------
 
 
 	def quit(self):
-		if self._debug: logging.debug("aufraeumen und beenden... ")
-		if self._debug: logging.debug("Ausschalter setzen... ")
+		logging.debug("aufraeumen und beenden... ")
+		logging.debug("Ausschalter setzen... ")
 		self._ausschalter.set()
-		if self._debug: logging.debug("gstPlayer stoppen... ")
+		logging.debug("gstPlayer stoppen... ")
 		self._gstPlayer.doStop()
-		if self._debug: logging.debug("gstPlayer beenden... ")
+		logging.debug("gstPlayer beenden... ")
 		self._gstPlayer.doEnd()
 		del self._gstPlayer
-		if self._debug: logging.debug("audioFile beenden... ")
+		logging.debug("audioFile beenden... ")
 		try:
 			del self.audioFile
 		except:
 			pass
-		if self._debug: logging.debug("pygame beenden... ")
+		logging.debug("pygame beenden... ")
 		pygame.quit()
-		if self._debug: logging.debug("Hauptschalter setzen... ")
+		logging.debug("Hauptschalter setzen... ")
 		self._hauptschalter.set()
-		if self._debug: logging.debug("Feierabend... ")
+		logging.debug("Feierabend... ")
 		readconfig.quit()
 		raise SystemExit
 		return
