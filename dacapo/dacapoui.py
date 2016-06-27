@@ -19,7 +19,7 @@
 
 '''
 	this is the graphical call for the dacapo.
-	it uses Gtk+ and glade as a filechooser with some 
+	it uses Gtk+ as a filechooser with some
 	checkbuttons. 
 	the options are stored in the temporary config.
 	it then calls the dacapo.play() function, which
@@ -44,8 +44,7 @@ except ImportError, err:
 	sys.exit(2)
 
 UI_CHK_BT = {_("Shuffle Mode") : "shuffle" , _("Resume Playlist") : "resume",
-	"Fullscreen Mode" : "fullscreen", "Show Song Lyrics" :
-	"showLyricsAsPics", "Show Synced Lyrics (karaoke)" : "showLyricsSynced"}
+	"Fullscreen Mode" : "fullscreen", "Show Synced Lyrics (karaoke)" : "showLyricsSynced"}
 
 CONFIG = readconfig.getConfigObject()
 
