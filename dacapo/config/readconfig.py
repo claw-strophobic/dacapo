@@ -223,10 +223,16 @@ class Config(object):
 
 
     def saveConfig(self, file=None):
-        from lxml import etree
-        g = self.gui['window']
-        for field in g.fields:
-            print(etree.tostring(g.fields[field].getXMLData(), pretty_print=True))
+		from lxml import etree
+		xmltree = etree.parse(self.XML)
+		root = xmltree.getroot()
+		gui = root.xpath('gui')
+		for child in gui[0] :
+			if ((child.tag == 'window') or (child.tag == 'fullscreen')):
+				gui[0].remove(child)
+		gui[0].append(self.gui['window'].getXMLData())
+		gui[0].append(self.gui['fullscreen'].getXMLData())
+		print(etree.tostring(root, pretty_print=True))
 
     def setDebug(self, Key, Value):
         # if self.debug : print "setDebug() --> Key: %s Value: %s " % (Key, Value)

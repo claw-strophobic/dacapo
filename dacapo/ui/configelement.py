@@ -58,27 +58,31 @@ class ConfigElement(object):
 			else :
 				d[target] = str(value)
 
+	def getVarsName(self, name):
+		for var in self.vars:
+			if not self.vars[var].has_key('target'):
+				continue
+			if self.vars[var]['target'] == name:
+				return var
+		return False
+
 	def getXMLData(self):
 		root = etree.Element(self.name, type='dict')
 		for attr, value in self.__dict__.iteritems():
 			if not callable(attr) and not attr.startswith("__"):
 				attrType = 'text'
-				if attr == 'backgroundColor' or attr == 'fontColor':
-					attrType = 'color'
-				elif isinstance(attr, int):
-					attrType = 'int'
-				elif isinstance(attr, bool):
-					attrType = 'boolean'
-				elif isinstance(attr, float):
-					attrType = 'float'
+				attrName = self.getVarsName(attr)
+				if attrName != False:
+					if self.vars[attrName].has_key('type'):
+						attrType = self.vars[attrName]['type']
+					subel = etree.SubElement(root, attrName, type=attrType)
+					subel.text = str(value)
 				elif isinstance(attr, object):
 					getXML = getattr(attr, 'getXMLData', None)
 					if callable(getXML):
 						etree.SubElement(root, getXML())
 						continue
-				subel = etree.SubElement(root, attr, type=attrType)
-				subel.text = str(value)
-				print('Attribut {!s} type {!s} mit Wert {!s} gefunden'.format(attr, attrType, value))
+				# print('Attribut {!s} type {!s} mit Wert {!s} gefunden'.format(attr, attrType, value))
 		return root
 
 	def setValue(self, key, value):

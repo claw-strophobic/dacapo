@@ -48,6 +48,13 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 				if f.isPicField:
 					self.picField = f
 
+	def getXMLData(self):
+		from lxml import etree
+		root = super(Gui, self).getXMLData()
+		for k,f in self.fields.iteritems():
+			root.append(f.getXMLData())
+		return root
+
 	def printValues(self):
 		print('\nGui: {!s} {!s}x{!s} Background: {!s} Maus: {!s}'.format(self.name, self.height, self.width, self.backgroundColor, self.mouseVisible))
 		self.lyricField.printValues()
