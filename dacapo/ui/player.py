@@ -179,64 +179,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self.doBlitObject(self.screen, blitobj, True)
 		print("Picture-Index: %s - trying to blit object - done\n" % (self.diaIndex))
 		return
-		# Fenstergröße holen
-		picPlace = self._config.getConfig('gui', self.winState, 'pictures')
-		width = picPlace['width']
-		height = picPlace['height']
-		w = picPlace['posH']
-		h = picPlace['posV']
-		picRect = Rect(w, h, width, height)
-		wWidth, wHeight = self.resolution
-		clearRect = Rect(0, 0, wWidth, wHeight)
-
-		# delete the old picture
-		if self.diaIndex > -1:
-			# get the hole screen back, because on slow machines
-			# the time-pos can make trouble
-			tmp = self._saveScreen.subsurface(clearRect).copy()
-			self.blit_rect(
-				tmp,
-				clearRect,
-				text="clear picture area",
-				update=False
-			)
-
-		# if Index bigger than number of pics -> initialize the Index
-		self.diaIndex += 1
-		if self.diaIndex > (len(self.diaShowPics) - 1): self.diaIndex = 0
-
-		## -- Hier kann es passieren, dass die Liste noch nicht aufgebaut ist... deshalb evtl. Fehler abfangen!
-		try:
-			picW, picH = self.diaShowPics[self.diaIndex].get_size()
-			# --> positionieren ---------------------------
-			w += (width - picW) / 2
-			h += (height - picH) / 2
-
-			# <-- positionieren ---------------------------
-			self.blit_rect(
-				self.diaShowPics[self.diaIndex],
-				Rect(w, h, picW, picH),
-				text="slide_show Bild Nr: " + str(self.diaIndex),
-				update=False
-			)
-			##self.blit_sync_lyrics(nextLine=False)
-			self.update_overlay_text()
-			## save the actual without time display
-			self._actScreen = self.screen.copy()
-			self.update_act_time(force=True)
-			pygame.display.update(picRect)
-		except:
-			logging.error( \
-				"Error at slide-show picture (%s). %s " % (
-					self.diaIndex, sys.exc_info()[0]))
-
-		return
-
-	# -------------------- slideshow ----------------------------------------------------------------
-
-
-
-	# -------------------- Timer -----------------------------------------------------------------
 
 	def update_act_time(self, force=False):
 		if self.screen.get_locked(): return
@@ -489,6 +431,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.error('Could not quit pygame.display! ')
 			logging.error(pygame.get_error())
+		g = CONFIG.gui[self.winState]
 		self._config.setConfig('TEMP', 'gui', 'winState', self.winState)
 		self.allwaysOnTop = False
 		if platform.system() == 'Windows':
@@ -522,9 +465,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			logging.warning('Konnte Icon nicht setzen! ')
 			logging.warning(pygame.get_error())
 		logging.debug('hole Konfiguration ')
-		self.resolution = (
-			self._config.getConfig('gui', self.winState, 'width'),
-			self._config.getConfig('gui', self.winState, 'height'))
+		self.resolution = (g.width, g.height)
 
 		logging.debug(u'Angeforderte Größe: %s x %s' %
 					  (self.resolution[0], self.resolution[1]))
@@ -555,7 +496,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 
 		logging.debug('Mouse verstecken. ')
 		try:
-			pygame.mouse.set_visible(self._config.getConfig('gui', self.winState, 'mouseVisible'))
+			pygame.mouse.set_visible(g.mouseVisible)
 		except:
 			logging.warning('Konnte Mouse nicht verstecken! ')
 			logging.warning(pygame.get_error())
@@ -627,66 +568,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 	def getNumberOfSongs(self):
 		return len(self.playlist)
 
-
-	def clearRect(self, array, key):
-		if not isinstance(array, dict): return
-		if not array.has_key(key): return
-		if not isinstance(array.get(key), dict): return
-		if not array.get(key).has_key('blitPos'): return
-
-		image = pygame.Surface(array.get(key)['renderedSize'])
-		image.fill(self._config.getConfig('gui', self.winState, 'backgroundColor'))
-
-		text = ''
-		if array.get(key).has_key('data'):
-			text = array.get(key)['data']
-			if isinstance(array.get(key)['data'], list):
-				text = ' '.join(array.get(key)['data'])
-
-		try:
-			self.blit_rect(
-				image,
-				Rect(
-					array.get(key)['blitPos'],
-					array.get(key)['renderedSize']
-				),
-				text="clear_rect: " + text,
-				update=True
-			)
-		except:
-			pass
-		return
-
-	def clearUpdateRect(self, array, key):
-		if self._actScreen == None:
-			return self.clearRect(array, key)
-		if not isinstance(array, dict): return
-		if not array.has_key(key): return
-		if not isinstance(array.get(key), dict): return
-		if not array.get(key).has_key('blitPos'): return
-
-		picRect = Rect(
-			array.get(key)['blitPos'],
-			array.get(key)['renderedSize']
-		)
-		tmp = self._actScreen.subsurface(picRect).copy()
-
-		text = ''
-		if array.get(key).has_key('data'):
-			text = array.get(key)['data']
-			if isinstance(array.get(key)['data'], list):
-				text = ' '.join(array.get(key)['data'])
-
-		try:
-			self.blit_rect(
-				tmp,
-				picRect,
-				text="clear picture area",
-				update=False
-			)
-		except:
-			pass
-		return
 
 	def getBlitObject( self, update=False ):
 		audio = self.audioFile

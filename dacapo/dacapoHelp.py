@@ -23,7 +23,7 @@ except ImportError, err:
 	sys.exit(2)
 
 oConfig = readconfig.getConfigObject()
-language = oConfig.getConfig('gui', 'misc', 'language')
+# language = oConfig.getConfig('gui', 'misc', 'language')
 
 try : 
 	if not os.path.isdir(os.path.dirname(oConfig.getConfig('debug', ' ', 'logFile'))) :
