@@ -32,24 +32,24 @@ except ImportError, err:
 
 # ----------- Globale Variablen/Objekte ----------------------- #
 HOMEDIR = os.path.expanduser('~')
+CONFIG = readconfig.getConfigObject()
 
 class AudioFile(object):
 
     def __init__(self, filename):
         self.fileOpen = False
         self.syncLyricFile = None
-        self.config = readconfig.getConfigObject()
-        self.guiPlayer = self.config.getConfig('TEMP', Key='PLAYER') 
-        self.LEERCD = HOMEDIR + '/.dacapo/' + self.config.getConfig('gui', 'misc', 'picNoCover')
-        self.debug = self.config.getConfig('debug', ' ', 'debugM')
-        self.mp3Tags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
+        self.guiPlayer = CONFIG.getConfig('TEMP', Key='PLAYER')
+        self.LEERCD = HOMEDIR + '/.dacapo/' + CONFIG.getConfig('gui', 'misc', 'picNoCover')
+        self.debug = CONFIG.getConfig('debug', ' ', 'debugM')
+        self.mp3Tags = CONFIG.getConfig('gui', 'metaData', 'MP3-Tags')
         self.fileOpen = False
         self.filename = filename
         self.clearTags()
         self.tags = dict()
         self.loadFile()
         self.addConditions()
-        self.syncLyrics = self.config.getConfig('gui', 'misc', 'showLyricsSynced')
+        self.syncLyrics = CONFIG.getConfig('gui', 'misc', 'showLyricsSynced')
         # synchronisierte Texte laden?
         if self.syncLyrics == True: self.setSyncLyrics()
 
@@ -96,7 +96,7 @@ class AudioFile(object):
         return s
 
     def addConditions(self):
-        conditions = self.config.getConfig('cond', '')
+        conditions = CONFIG.getConfig('cond', '')
         for key in conditions.iterkeys() :
             cond = conditions[key]
             if self.debug : logging.debug("Condition:  %s Operator: %s Operand: %s Value: %s" % (
@@ -132,8 +132,8 @@ class AudioFile(object):
                 self.syncText[]  und
                 self.syncCount   als counter mit 0
         """
-        syncedTag = self.config.getConfig('gui', 'syncLyrics', 'tag')
-        syncedDir = self.config.getConfig('gui', 'syncLyrics', 'dir')
+        syncedTag = CONFIG.getConfig('gui', 'syncLyrics', 'tag')
+        syncedDir = CONFIG.getConfig('gui', 'syncLyrics', 'dir')
         self.syncLyricFile = None
         # Ersatzvariablen auflösen
         while True :
@@ -276,7 +276,7 @@ class AudioFile(object):
 
     def loadPictures(self) :
         showLyrics = self.guiPlayer.showLyricsAsPics
-        showWhenSynced = self.config.getConfig('gui', 'misc', 'showLyricsWhenSynced')
+        showWhenSynced = CONFIG.getConfig('gui', 'misc', 'showLyricsWhenSynced')
         self.setMiscPic()
         self.loadStoredPictures()
         # Sind Texte vorhanden? Anzeigen als Bild? Dann los!
@@ -303,7 +303,9 @@ class AudioFile(object):
                     logging.warning("Error at lyricFont.render(fontLyrics, (%s, %s)) %s " % (0, 0, err))
 
             image = pygame.Surface([w, h])
-            image.fill(self.config.getConfig('gui', self.guiPlayer.winState, 'backgroundColor'))
+            winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+            g = CONFIG.gui[winstate]
+            image.fill(g.backgroundColor)
             w = 0
             h = 0
             for fontLyrics in renderedLyrics :
@@ -336,7 +338,7 @@ class AudioFile(object):
             if self.debug : logging.debug("Nichts gefunden. Suche Lyrics in Tag: %s" %("lyrics"))
             strLyrics = ''.join(self.getMetaData('lyrics'))
             listLyrics = strLyrics.splitlines()
-        if len(listLyrics) <= 0 and self.config.getConfig('gui', 'misc', 'showSyncedLyricsAsPics'): 
+        if len(listLyrics) <= 0 and CONFIG.getConfig('gui', 'misc', 'showSyncedLyricsAsPics'): 
             if self.debug : logging.debug("Nichts gefunden. Suche Lyrics in %s" %("syncedlyrics"))
             syncTime, listLyrics = self.loadSyncLyrics()
 
@@ -352,88 +354,80 @@ class AudioFile(object):
 
     def preBlitDiaShow(self):
 
-        pics = list(self.getAllPics())
-        scaledPics = list()
+		g = CONFIG.gui[self.guiPlayer.winState]
+		if (g.picField is None): return
 
-        picPlace = self.config.getConfig('gui', self.guiPlayer.winState, 'pictures')
-        winWidth = picPlace['width']
-        winHeight = picPlace['height']
+		pics = list(self.getAllPics())
+		scaledPics = list()
 
-        self.guiPlayer.diaShowPics = []
-        if self.debug : logging.info("Anzahl zu skalierender Bilder: %s" %(len(pics)))
+		picPlace = g.picField
+		winWidth = picPlace.maxWidth
+		winHeight = picPlace.maxHeight
 
-        for i, tP in enumerate(pics):
+		self.guiPlayer.diaShowPics = []
+		if self.debug : logging.info("Anzahl zu skalierender Bilder: %s" %(len(pics)))
 
-            if self.debug : logging.debug("Anzahl Bilder: %s -> aktuelles Bild: Nr %s " % (len(pics), i))
+		for i, tP in enumerate(pics):
 
-            # --> skalieren -------------------------------
-            if self.debug : logging.debug("Bild skalieren: Nr %s  " % (i))
-            picW, picH = pics[i].get_size()
+			if self.debug : logging.debug("Anzahl Bilder: %s -> aktuelles Bild: Nr %s " % (len(pics), i))
 
-            if picW == 0 : picW = 1
-            proz = (winWidth * 100.0) / (picW)
-            h = int(round( (picH * proz) / 100.0))
-            w = int(round(winWidth))
-            if self.debug : logging.debug("Picture skalieren: " \
-                "Originalbreite: %s Hoehe: %s PROZENT: %s " \
-                "-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
-            if h > winHeight :
-                proz = (winHeight * 100.0) / (h)
-                w = int(round( (w * proz) / 100.0 ))
-                h = int(round( (h * proz) / 100.0))
-                if self.debug : logging.debug(\
-                    "NEUSKALIERUNG da Bild zu hoch wurde: "\
-                    "Originalbreite: %s Hoehe: %s PROZENT: %s " \
-                    "-> Neue W: %s H: %s " % (picW, picH, proz, w, h))
-            tmp = pygame.transform.scale(pics[i], (w, h))   
-            # <-- skalieren -------------------------------
-            scaledPics.append(tmp)
+			# --> skalieren -------------------------------
+			if self.debug : logging.debug("Bild skalieren: Nr %s  " % (i))
+			picW, picH = pics[i].get_size()
 
-        if self.debug : logging.info("done.")
-        return scaledPics
+			if picW == 0 : picW = 1
+			proz = (winWidth * 100.0) / (picW)
+			h = int(round( (picH * proz) / 100.0))
+			w = int(round(winWidth))
+			if self.debug : logging.debug("Picture skalieren: " \
+				"Originalbreite: %s Hoehe: %s PROZENT: %s " \
+				"-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
+			if h > winHeight :
+				proz = (winHeight * 100.0) / (h)
+				w = int(round( (w * proz) / 100.0 ))
+				h = int(round( (h * proz) / 100.0))
+				if self.debug : logging.debug(\
+					"NEUSKALIERUNG da Bild zu hoch wurde: "\
+					"Originalbreite: %s Hoehe: %s PROZENT: %s " \
+					"-> Neue W: %s H: %s " % (picW, picH, proz, w, h))
+			tmp = pygame.transform.scale(pics[i], (w, h))
+			# <-- skalieren -------------------------------
+			scaledPics.append(tmp)
+
+		if self.debug : logging.info("done.")
+		return scaledPics
 ## --------------- Getter -----------------------------------
 
     def preBlitLogo(self, key):
-        self._winState = self.config.getConfig('TEMP', 'gui', 'winState')
-        self.__metaFields = self.config.getConfig(
-                'gui',
-                self._winState,
-                'fields'
-                )
-        self.loadLogo()
-        if self.debug : logging.debug("Try to blit bandlogo ")
-        logo = self.getLogo()
-        if (logo == None):
-            if self.debug: logging.debug("Bandlogo skalieren: Kein: Logo gefunden ")
-            return None
-        if (not self.__metaFields.has_key(key)):
-            if self.debug: logging.debug("Bandlogo skalieren: self.__metaFields hat kein Key: %s " % (key))
-            return None
-        picPlace = self.__metaFields[key]
-        self.guiPlayer.logoPic = None
-
-        if (not picPlace.has_key('maxWidth')):
-            if self.debug: logging.debug("Bandlogo skalieren: picPlace hat kein Key: maxWidth ")
-            return None
-        if (not picPlace.has_key('maxHeight')):
-            if self.debug: logging.debug("Bandlogo skalieren: picPlace hat kein Key: maxHeight ")
-            return None
-
-        winWidth = picPlace['maxWidth']
-        winHeight = picPlace['maxHeight']
-        picW, picH = logo.get_size()
-        if picW == 0 : picW = 1
-        proz = (winWidth * 100.0) / (picW)
-        h = int(round( (picH * proz) / 100.0))
-        w = int(round(winWidth))
-        if h > winHeight :
-            proz = (winHeight * 100.0) / (h)
-            w = int(round( (w * proz) / 100.0 ))
-            h = int(round( (h * proz) / 100.0))
-        if self.debug : logging.debug("Bandlogo skalieren: " \
-            "Originalbreite: %s Hoehe: %s PROZENT: %s " \
-            "-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
-        return pygame.transform.scale(logo, (w, h))
+		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+		g = CONFIG.gui[winstate]
+		self.__metaFields = g.fields
+		self.loadLogo()
+		logging.debug("Try to blit bandlogo ")
+		logo = self.getLogo()
+		if (logo == None):
+			logging.debug("Bandlogo skalieren: Kein: Logo gefunden ")
+			return None
+		if (not self.__metaFields.has_key(key)):
+			logging.debug("Bandlogo skalieren: self.__metaFields hat kein Key: %s " % (key))
+			return None
+		picPlace = self.__metaFields[key]
+		self.guiPlayer.logoPic = None
+		winWidth = picPlace.maxWidth
+		winHeight = picPlace.maxHeight
+		picW, picH = logo.get_size()
+		if picW == 0 : picW = 1
+		proz = (winWidth * 100.0) / (picW)
+		h = int(round( (picH * proz) / 100.0))
+		w = int(round(winWidth))
+		if h > winHeight :
+			proz = (winHeight * 100.0) / (h)
+			w = int(round( (w * proz) / 100.0 ))
+			h = int(round( (h * proz) / 100.0))
+		if self.debug : logging.debug("Bandlogo skalieren: " \
+			"Originalbreite: %s Hoehe: %s PROZENT: %s " \
+			"-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
+		return pygame.transform.scale(logo, (w, h))
 
     def getTempPic(self, data):
         datei = StringIO.StringIO()

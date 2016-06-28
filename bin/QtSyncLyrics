@@ -141,7 +141,8 @@ class Ui_Dialog(QtGui.QMainWindow):
             lyricFont.name, \
             lyricFont.fontSize)
         self.lyricFontColor = lyricFont.fontColor
-        self.screenWidth = self.oDacapoConfig.getConfig('gui', 'fullscreen', 'width')
+        g = self.oDacapoConfig.gui['fullscreen']
+        self.screenWidth = g.width
         self.textEdit.setFocus()
 
 

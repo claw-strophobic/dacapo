@@ -111,9 +111,10 @@ class Config(object):
                 g = MetaGUI.Gui(child.tag)
                 g.grabXMLData(child)
                 self.gui[child.tag] = g
+            else:
+                d = self.readChild(child)
+                self.__dConfigGUI[child.tag] = d
             if self.debug : print child.tag, child.attrib
-            d = self.readChild(child)
-            self.__dConfigGUI[child.tag] = d
 
     def loadConfig(self):
         self.__dConfigGUI = {}

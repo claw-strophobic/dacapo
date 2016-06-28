@@ -124,7 +124,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			try: self.doFillBackground(self.screen, g.backgroundColor, True)
 			except:
 				print(pygame.get_error())
-				return
+				self.quit()
 			logging.debug("going to get blit object... ")
 			obj = self.getBlitObject()
 			sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
@@ -133,6 +133,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.error("Error at blit-object %s " % (sys.exc_info()[0]))
 			errorhandling.Error.show()
+			self.quit()
 
 
 		self._saveScreen = self.screen.copy()
@@ -208,6 +209,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 				except:
 					logging.error("Error at blit-object %s " % (sys.exc_info()[0]))
 					errorhandling.Error.show()
+					self.quit()
 
 			self.timerIndex = seconds
 			obj = g.lyricField.getBlitObject()
@@ -316,6 +318,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 				fpsClock.tick(FPS)
 			except Exception, err:
 				errorhandling.Error.show()
+				self.quit()
 				sys.exit(2)
 		return
 
@@ -431,6 +434,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.error('Could not quit pygame.display! ')
 			logging.error(pygame.get_error())
+			self.quit()
 		g = CONFIG.gui[self.winState]
 		self._config.setConfig('TEMP', 'gui', 'winState', self.winState)
 		self.allwaysOnTop = False
@@ -452,6 +456,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.error('Konnte Ueberschrift nicht setzen! ')
 			logging.error(pygame.get_error())
+			self.quit()
 
 		logging.debug('setze Icon ')
 		iconfile = CONFIG_DIR + self._config.getConfig('gui', 'misc', 'icon')
@@ -464,6 +469,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.warning('Konnte Icon nicht setzen! ')
 			logging.warning(pygame.get_error())
+			self.quit()
 		logging.debug('hole Konfiguration ')
 		self.resolution = (g.width, g.height)
 
@@ -500,6 +506,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		except:
 			logging.warning('Konnte Mouse nicht verstecken! ')
 			logging.warning(pygame.get_error())
+			self.quit()
 
 		self.diaShowTime = self._config.getConfig('gui', 'misc', 'diaShowTime')
 		# if self._debug : logging.debug("has focus?: %s " % (pygame.key.get_focused()))

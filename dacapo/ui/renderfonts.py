@@ -19,18 +19,19 @@ except ImportError, err:
     errorhandling.Error.show()
     sys.exit(2)
 
+CONFIG = readconfig.getConfigObject()
+
 class MetaFonts(object):
     """
     Documentation
     """
     def __init__(self):
-        self._config = readconfig.getConfigObject()
-        self._debug = self._config.getConfig('debug', ' ', 'debugGUI')
-        self._player = self._config.getConfig('TEMP', Key='PLAYER')
+        self._debug = CONFIG.getConfig('debug', ' ', 'debugGUI')
+        self._player = CONFIG.getConfig('TEMP', Key='PLAYER')
         assert isinstance(self._player.gstPlayer, object)
         self._gstPlayer = self._player.gstPlayer
-        self._winState = self._config.getConfig('TEMP', 'gui', 'winState')
-        self._isPlaylist = self._config.getConfig(
+        self._winState = CONFIG.getConfig('TEMP', 'gui', 'winState')
+        self._isPlaylist = CONFIG.getConfig(
                     'TEMP', Key='PLAYLIST').isPlaylist()
         self._audioFile = None
         pygame.init()
@@ -47,13 +48,13 @@ class MetaFonts(object):
         
         ## Ein Dictionary anlegen mit den anzuzeigenen Feldern
         ## und den Schritfattributen dazu
-        self._winState = self._config.getConfig('TEMP', 'gui', 'winState')
-        self.__metaFields = self._config.getConfig(
+        self._winState = CONFIG.getConfig('TEMP', 'gui', 'winState')
+        self.__metaFields = CONFIG.getConfig(
                 'gui', 
                 self._winState,
                 'fields'
                 )
-        self.__lyricFont = self._config.getConfig(
+        self.__lyricFont = CONFIG.getConfig(
                 'gui',
                 self._winState,
                 'lyricFont'
@@ -116,11 +117,11 @@ class MetaFonts(object):
                 - ['renderedData'] -> die gerenderten Daten
         """
         # metadata holen und aufbereiten
-        self._audioFile = self._config.getConfig('TEMP', Key='AUDIOFILE')
+        self._audioFile = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 
         if self._debug: logging.debug(\
                 'rendere Texte: {0}'.format(
-                self._config.getConfig('TEMP', Key='FILENAME')
+                CONFIG.getConfig('TEMP', Key='FILENAME')
                 ))
 
         posActTime = -1
@@ -128,12 +129,12 @@ class MetaFonts(object):
         self.__metaFields.pop('posActTime', None)            
 
         textMetaVar = {}
-        textMetaVar['if_playlist'] = self._config.getConfig(
+        textMetaVar['if_playlist'] = CONFIG.getConfig(
             'gui', 
             'metaData', 
             'if_playlist'
             )
-        textMetaVar['if_discNr'] = self._config.getConfig(
+        textMetaVar['if_discNr'] = CONFIG.getConfig(
             'gui', 
             'metaData', 
             'if_discNr'
@@ -302,8 +303,9 @@ class MetaFonts(object):
             lineH = hT
 
         image = pygame.Surface([w, h])
-        image.set_colorkey(self._config.getConfig('gui', self._winState, 'backgroundColor'))
-        image.fill(self._config.getConfig('gui', self._winState, 'backgroundColor'))
+        g = CONFIG.gui[self._winState]
+        image.set_colorkey(g.backgroundColor)
+        image.fill(g.backgroundColor)
         array.get(key)['savedRect'] = image
         hT = 0
         for r in rList:

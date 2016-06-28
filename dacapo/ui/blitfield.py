@@ -12,6 +12,7 @@ import dacapo.ui.interface_blitobject
 import dacapo.ui.blitobject
 import pygame
 import sys
+from dacapo import errorhandling
 
 class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -121,9 +122,10 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 	def get_rendered_maxwidth(self):
 		from dacapo.config.gui import *
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+		g = CONFIG.gui[winstate]
 		maxwidth = self.maxWidth
 		if maxwidth == 0:
-			maxwidth = CONFIG.getConfig('gui', winstate, 'width')
+			maxwidth = g.width
 		logging.debug('Rendering Metadata with Max-Width: %s %s: %s -> %s' % (maxwidth, self.name, self.content, self.data))
 		rList = list()
 		w = 0
@@ -159,8 +161,8 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			lineH = hT
 
 		image = pygame.Surface([w, h])
-		image.set_colorkey(CONFIG.getConfig('gui', winstate, 'backgroundColor'))
-		image.fill(CONFIG.getConfig('gui', winstate, 'backgroundColor'))
+		image.set_colorkey(g.backgroundColor)
+		image.fill(g.backgroundColor)
 		self.savedRect = image
 		hT = 0
 		for r in rList:
@@ -189,9 +191,9 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				return blitObj
 			renderedSize = self.renderedSize
 			winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
-			width = CONFIG.getConfig('gui', winstate, 'width')
-			height = CONFIG.getConfig('gui', winstate, 'height')
 			g = CONFIG.gui[winstate]
+			width = g.width
+			height = g.height
 			mW = self.pos.posH
 			mH = self.pos.posV
 			textWidth, textHeight = renderedSize
@@ -236,6 +238,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			return blitObj
 		except: # catch *all* exceptions
 			print(sys.exc_info())
+			errorhandling.Error.show()
 			##event = pygame.event.Event(pygame.event.EventType(pygame.QUIT))
 			##pygame.event.post(event)
 			pygame.quit()

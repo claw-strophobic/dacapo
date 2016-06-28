@@ -41,7 +41,7 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		h = int(round( (picH * proz) / 100.0))
 		w = int(round(winWidth))
 		logging.debug("Scale picture: " \
-			"Original width: %s height: %s PROCENT: %s " \
+			"Original width: %s height: %s PERCENT: %s " \
 			"-> New W: %s H: %s" % (picW, picH, proz, w, h))
 		if h > winHeight :
 			proz = (winHeight * 100.0) / (h)
@@ -49,7 +49,7 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 			h = int(round( (h * proz) / 100.0))
 			logging.debug(\
 				"Scale picture again because it was to high: "\
-				"Original width: %s height: %s PROCENT: %s " \
+				"Original width: %s height: %s PERCENT: %s " \
 				"-> New W: %s H: %s " % (picW, picH, proz, w, h))
 		result = pygame.transform.scale(pic, (w, h))
 		# <-- skalieren -------------------------------
