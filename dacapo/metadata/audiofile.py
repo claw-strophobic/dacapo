@@ -350,54 +350,6 @@ class AudioFile(object):
         return listLyrics
 
 
-# -------------------- preBlitDiaShow ----------------------------------------------------------------
-
-    def preBlitDiaShow(self):
-
-		g = CONFIG.gui[self.guiPlayer.winState]
-		if (g.picField is None): return
-
-		pics = list(self.getAllPics())
-		scaledPics = list()
-
-		picPlace = g.picField
-		winWidth = picPlace.maxWidth
-		winHeight = picPlace.maxHeight
-
-		self.guiPlayer.diaShowPics = []
-		if self.debug : logging.info("Anzahl zu skalierender Bilder: %s" %(len(pics)))
-
-		for i, tP in enumerate(pics):
-
-			if self.debug : logging.debug("Anzahl Bilder: %s -> aktuelles Bild: Nr %s " % (len(pics), i))
-
-			# --> skalieren -------------------------------
-			if self.debug : logging.debug("Bild skalieren: Nr %s  " % (i))
-			picW, picH = pics[i].get_size()
-
-			if picW == 0 : picW = 1
-			proz = (winWidth * 100.0) / (picW)
-			h = int(round( (picH * proz) / 100.0))
-			w = int(round(winWidth))
-			if self.debug : logging.debug("Picture skalieren: " \
-				"Originalbreite: %s Hoehe: %s PROZENT: %s " \
-				"-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
-			if h > winHeight :
-				proz = (winHeight * 100.0) / (h)
-				w = int(round( (w * proz) / 100.0 ))
-				h = int(round( (h * proz) / 100.0))
-				if self.debug : logging.debug(\
-					"NEUSKALIERUNG da Bild zu hoch wurde: "\
-					"Originalbreite: %s Hoehe: %s PROZENT: %s " \
-					"-> Neue W: %s H: %s " % (picW, picH, proz, w, h))
-			tmp = pygame.transform.scale(pics[i], (w, h))
-			# <-- skalieren -------------------------------
-			scaledPics.append(tmp)
-
-		if self.debug : logging.info("done.")
-		return scaledPics
-## --------------- Getter -----------------------------------
-
     def preBlitLogo(self, key):
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]

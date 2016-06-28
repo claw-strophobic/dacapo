@@ -32,7 +32,6 @@ try:
 	from pygame.locals import *
 	import pygame
 	import operator
-	from dacapo.ui import renderfonts
 	from dacapo.metadata import *
 	from dacapo.dacapoGST import GstPlayer
 	from dacapo.config import readconfig
