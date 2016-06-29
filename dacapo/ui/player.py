@@ -175,11 +175,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		blitobj = pic.getBlitObject()
 		return blitobj
 
-		print("Picture-Index: %s - trying to blit object" % (self.diaIndex))
-		self.doBlitObject(self.screen, blitobj, True)
-		print("Picture-Index: %s - trying to blit object - done\n" % (self.diaIndex))
-		return
-
 	def update_act_time(self, force=False):
 		if self.screen.get_locked(): return
 
