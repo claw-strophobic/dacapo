@@ -19,6 +19,7 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.name = name
 		self.comments = ''
 		self.content = ''
+		self.convert = ''
 		self.multiLine = False
 		self.overlay = False
 		self.splitSpaces = False
@@ -64,6 +65,10 @@ class Field(dacapo.ui.configelement.ConfigElement):
 			'maxHeight': {
 				'target': 'maxHeight',
 				'type': 'int',
+			},
+			'convert': {
+				'target': 'convert',
+				'type': 'text',
 			},
 		}
 		self.vars.update(extendvars)

@@ -82,6 +82,10 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 				s = s.replace('#time#', gstPlayer.queryPosition())
 				s = s.replace('#duration#', gstPlayer.getDuration())
+				if self.convert == 'lower':
+					s = s.lower()
+				elif self.convert == 'upper':
+					s = s.upper()
 
 				if '#bandlogo#' in s:
 					logging.debug('Try to get Bandlogo: %s: %s -> %s' % (self.name, self.content, self.data))
