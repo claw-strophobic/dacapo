@@ -77,9 +77,10 @@ class ConfigElement(object):
 						attrType = self.vars[attrName]['type']
 					subel = etree.SubElement(root, attrName, type=attrType)
 					subel.text = str(value)
-				elif isinstance(attr, object):
-					getXML = getattr(attr, 'getXMLData', None)
+				elif isinstance(value, object):
+					getXML = getattr(value, 'getXMLData', None)
 					if callable(getXML):
+						continue
 						etree.SubElement(root, getXML())
 						continue
 				# print('Attribut {!s} type {!s} mit Wert {!s} gefunden'.format(attr, attrType, value))
