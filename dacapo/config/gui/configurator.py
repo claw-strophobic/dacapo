@@ -167,8 +167,8 @@ class Configurator(Gtk.Window):
 		return
 
 	def on_menu_save(self, widget):
-		CONFIG.saveConfig()
-
+		text = CONFIG.saveConfig()
+		return
 
 	def on_menu_file_new_generic(self, widget):
 		print("A File|New menu item ({!s}) was selected.".format(widget.get_name()))

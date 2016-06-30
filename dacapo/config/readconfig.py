@@ -223,17 +223,29 @@ class Config(object):
 
 
     def saveConfig(self, file=None):
-        from lxml import etree
-        parser = etree.XMLParser(remove_blank_text=True)
-        xmltree = etree.parse(self.XML, parser)
-        root = xmltree.getroot()
-        gui = root.xpath('gui')
-        for child in gui[0] :
-            if ((child.tag == 'window') or (child.tag == 'fullscreen')):
-                gui[0].remove(child)
-        gui[0].append(self.gui['window'].getXMLData())
-        gui[0].append(self.gui['fullscreen'].getXMLData())
-        print(etree.tostring(root, pretty_print=True).decode())
+		global CONFIG_DIR, XML_CONFIG
+		from lxml import etree
+		parser = etree.XMLParser(remove_blank_text=True)
+		xmltree = etree.parse(self.XML, parser)
+		root = xmltree.getroot()
+		gui = root.xpath('gui')
+		for child in gui[0] :
+			if ((child.tag == 'window') or (child.tag == 'fullscreen')):
+				gui[0].remove(child)
+		gui[0].append(self.gui['window'].getXMLData())
+		gui[0].append(self.gui['fullscreen'].getXMLData())
+		if file is None:
+			file = CONFIG_DIR + XML_CONFIG
+		filedata = etree.tostring(root, pretty_print=True).decode()
+		try:
+			f = open(file, 'w')
+			f.write(filedata)
+			f.close()
+		except:
+			print  >> sys.stderr, "ERROR saving configuration! "
+			errorhandling.Error.show()
+		return filedata
+
 
     def setDebug(self, Key, Value):
         # if self.debug : print "setDebug() --> Key: %s Value: %s " % (Key, Value)
