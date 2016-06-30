@@ -50,9 +50,10 @@ class ConfigElement(object):
 			elif elementTyp == "tuple" :
 				d[target] = tuple(value)
 			elif elementTyp == "color" :
-				tmp = tuple(value.split(','))
-				color = (int(tmp[0]), int(tmp[1]), int(tmp[2]))
-				d[target] = tuple(color)
+				if value is not None:
+					tmp = tuple(str(value).split(','))
+					color = (int(tmp[0]), int(tmp[1]), int(tmp[2]))
+					d[target] = tuple(color)
 			elif elementTyp == "boolean" :
 				d[target] = self.checkBool(value)
 			else :
@@ -75,6 +76,11 @@ class ConfigElement(object):
 				if attrName != False:
 					if self.vars[attrName].has_key('type'):
 						attrType = self.vars[attrName]['type']
+					if attrType == 'color':
+						value = str(value)
+						value = value.replace('(', '')
+						value = value.replace(')', '')
+						value = value.replace(' ', '')
 					subel = etree.SubElement(root, attrName, type=attrType)
 					subel.text = str(value)
 		return root
@@ -87,6 +93,11 @@ class ConfigElement(object):
 				if attrName != False and not (attr == 'name' and value == ''):
 					if self.vars[attrName].has_key('type'):
 						attrType = self.vars[attrName]['type']
+					if attrType == 'color':
+						value = str(value)
+						value = value.replace('(', '')
+						value = value.replace(')', '')
+						value = value.replace(' ', '')
 					subel = etree.SubElement(root, attrName, type=attrType)
 					subel.text = str(value)
 		return root
