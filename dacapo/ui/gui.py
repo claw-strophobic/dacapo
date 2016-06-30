@@ -49,7 +49,6 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 					self.picField = f
 
 	def getXMLData(self):
-		from lxml import etree
 		root = super(Gui, self).getXMLData()
 		for k,f in self.fields.iteritems():
 			root.append(f.getXMLData())

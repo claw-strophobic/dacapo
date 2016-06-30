@@ -26,6 +26,7 @@ class Position(dacapo.ui.configelement.ConfigElement):
 		self.posRefV = ''
 		self.maxHeight = 0
 
+
 	def printValues(self):
 		print('\nPicture-Area H: align {!s} pos {!s} posRef {!s} maxWidth: {!s}'.format(self.alignH, self.posH, self.posRefH, self.maxWidth))
 		print('\nPicture-Area V: align {!s} pos {!s} posRef {!s} maxHeight: {!s}'.format(self.alignV, self.posV, self.posRefV, self.maxHeight))

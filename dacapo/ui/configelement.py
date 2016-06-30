@@ -77,13 +77,18 @@ class ConfigElement(object):
 						attrType = self.vars[attrName]['type']
 					subel = etree.SubElement(root, attrName, type=attrType)
 					subel.text = str(value)
-				elif isinstance(value, object):
-					getXML = getattr(value, 'getXMLData', None)
-					if callable(getXML):
-						continue
-						etree.SubElement(root, getXML())
-						continue
-				# print('Attribut {!s} type {!s} mit Wert {!s} gefunden'.format(attr, attrType, value))
+		return root
+
+	def addXMLData(self, root):
+		for attr, value in self.__dict__.iteritems():
+			if not callable(attr) and not attr.startswith("__"):
+				attrType = 'text'
+				attrName = self.getVarsName(attr)
+				if attrName != False and not (attr == 'name' and value == ''):
+					if self.vars[attrName].has_key('type'):
+						attrType = self.vars[attrName]['type']
+					subel = etree.SubElement(root, attrName, type=attrType)
+					subel.text = str(value)
 		return root
 
 	def setValue(self, key, value):

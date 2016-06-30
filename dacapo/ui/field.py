@@ -32,6 +32,12 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.isLyricField = False
 		self.isPicField = False
 
+	def getXMLData(self):
+		root = super(Field, self).getXMLData()
+		root = self.pos.addXMLData(root)
+		root = self.font.addXMLData(root)
+		return root
+
 	def setVars(self):
 		extendvars = {
 			'comments': {
