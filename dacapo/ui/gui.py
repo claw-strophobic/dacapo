@@ -34,7 +34,6 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)
-		from lxml import etree
 		fields = xml.xpath('fields')
 		for child in fields[0]:
 			f = dacapo.ui.blitfield.BlitField(child.tag)
@@ -49,9 +48,11 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 					self.picField = f
 
 	def getXMLData(self):
+		from lxml import etree
 		root = super(Gui, self).getXMLData()
+		fields = etree.SubElement(root, 'fields', type='dict')
 		for k,f in self.fields.iteritems():
-			root.append(f.getXMLData())
+			fields.append(f.getXMLData())
 		return root
 
 	def printValues(self):
