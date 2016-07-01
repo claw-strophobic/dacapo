@@ -311,7 +311,9 @@ class GuiTab(Gtk.Box):
 		self.page_background = BackgroundTab(type)
 		self.notebook.append_page(self.page_background, Gtk.Label(_("Pictures & Background")))
 
-		# 2nd tab -> Lyricfont settings
+		# 2nd tab -> Field settings
 		# self.page_font = LyricfontTab(type)
 		# self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
+		self.page_fields = FieldTab(type)
+		self.notebook.append_page(self.page_fields, Gtk.Label(_("Fields")))
 

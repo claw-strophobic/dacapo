@@ -62,18 +62,9 @@ class Configurator(Gtk.Window):
 		self.page_window = GuiTab('window')
 		self.notebook.append_page(self.page_window, Gtk.Label(_("GUI Window")))
 
-
-		# 2nd tab -> Window-Fields
-		self.page_fields_window = FieldTab('window')
-		self.notebook.append_page(self.page_fields_window, Gtk.Label(_("Window fields")))
-
-		# 3rd tab -> Fullscreen settings
+		# 2nd tab -> Fullscreen settings
 		self.page_fullscreen = GuiTab('fullscreen')
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
-
-		# 4th tab -> Fullscreen-Fields
-		self.page_fields_fullscreen = FieldTab('fullscreen')
-		self.notebook.append_page(self.page_fields_fullscreen, Gtk.Label(_("Fullscreen fields")))
 
 		self.page_metadata = Gtk.Box()
 		self.page_metadata.set_border_width(10)
