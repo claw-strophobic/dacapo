@@ -220,13 +220,13 @@ class FieldTab(PreviewTab):
 		model = combo.get_model()
 		fieldName = model.get_value(combo_iter, 0)
 		field = model.get_value(combo_iter, 1)
+		self.field = field
 		font_chooser = combo.font_chooser
 		font_chooser.setBGcolor(combo.type)
 		font = '{!s} {!s}'.format(field.font.name, field.font.fontSize)
 		## print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
 		font_chooser.set_font(field.font.name, field.font.fontSize)
 		font_chooser.setFGcolor(field.font.getRGBAColor())
-		self.field = field
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 		if audio is not None:
 			self.prev_button.set_sensitive(True)
@@ -243,7 +243,7 @@ class FieldTab(PreviewTab):
 
 	def onColorChanged(self, obj, colorchooser):
 		color = colorchooser.get_rgba()
-		print("Setze Farbe für Feld {!s}".format(self.field.name))
+		# print("Setze Farbe für Feld {!s}".format(self.field.name))
 		self.field.font.setValue('fontColor', color)
 
 
