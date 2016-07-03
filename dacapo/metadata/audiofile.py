@@ -57,7 +57,7 @@ class AudioFile(object):
         try:
             start = s.index( first ) + len( first )
             end = s.index( last, start )
-            return s[start:end]
+            return s[start:end].lower()
         except ValueError:
             return ""
 
@@ -66,33 +66,36 @@ class AudioFile(object):
         self.syncTime, self.syncText = self.loadSyncLyrics()
 
     def replaceTags(self, s):
-        while True :
-            text = self.find_between(s, '%', '%')
-            if not isinstance(text, basestring):
-                break
-            if not isinstance(s, basestring):
-                break
+		import re
+		while True :
+			text = self.find_between(s, '%', '%')
+			if not isinstance(text, basestring):
+				break
+			if not isinstance(s, basestring):
+				break
 
-            if text == '' : break
-            if (text == 'time') or (text == 'duration') or (text == 'bandlogo') :
-                    s = s.replace('%' + text + '%', '#' + text + '#')
-                    if self.debug : logging.debug(u'FIXDATEN zurück (%s) = %s' % (s, type(s)))
-            res = self.getMetaData(text)
-            if self.debug : logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
-            if isinstance(res, list) :
-                t = '\\n'.join(res)
-                if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
-            else:
-                t = res
+			if text == '' : break
+			if (text == 'time') or (text == 'duration') or (text == 'bandlogo') :
+					s = s.replace('%' + text + '%', '#' + text + '#')
+					if self.debug : logging.debug(u'FIXDATEN zurück (%s) = %s' % (s, type(s)))
+			res = self.getMetaData(text)
+			if self.debug : logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
+			if isinstance(res, list) :
+				t = '\\n'.join(res)
+				if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
+			else:
+				t = res
 
-            if not isinstance(t, basestring):
-                t = ''
-            try:
-                s = s.replace('%' + text + '%', t)
-            except:
-                pass
-            ## s = s.replace('#NEWLINE#', '\\n')
-        return s
+			if not isinstance(t, basestring):
+				t = ''
+			try:
+				insensitive_text = re.compile(re.escape('%' + text + '%'), re.IGNORECASE)
+				s = insensitive_text.sub(t, s)
+				# s = s.replace('%' + text + '%', t)
+			except:
+				pass
+			## s = s.replace('#NEWLINE#', '\\n')
+		return s
 
     def addConditions(self):
         conditions = CONFIG.getConfig('cond', '')
@@ -108,17 +111,15 @@ class AudioFile(object):
             if self.debug : logging.debug("Condition:  Operand is Type: %s " % (type(operand)))
 
             if cond.checkOperand(operand) == True:
-                if self.debug : logging.debug("Replace  %s " % (
-                    cond.content
-                ))
+                logging.debug("Replace  %s " % (cond.content))
                 s = self.replaceTags(cond.content)
                 if self.debug : logging.debug("Adding:  %s zu den Tags mit Wert: %s" % (
                     cond.name,
                     s
                 ))
-                self.tags[cond.name] = [s]
+                self.tags[cond.name.lower()] = [s]
         del cond
-        if self.debug : logging.debug("TAGS:  %s " % (self.tags))
+        logging.debug("TAGS:  %s " % (self.tags))
         return
 
     def loadSyncLyrics(self):
@@ -239,6 +240,7 @@ class AudioFile(object):
         """
         # Besonderheit, da auch gerne mal tracknumber = "5/7"
         # gespeichert wird... (gerade bei MP3)
+        key = key.lower()
         if self.debug : logging.debug("Angeforderter Key: %s" % (key))
         if key == "tracknumber" :
             if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrack(), type(self.getTrack())))

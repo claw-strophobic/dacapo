@@ -23,7 +23,7 @@ class Condition(object):
 	def grabXMLData(self, xml):
 		self.name = xml.tag
 		self.operator = xml.get("operator", "ne")
-		self.operand = xml.get("operand", " ")
+		self.operand = xml.get("operand", " ").lower()
 		self.content = xml.text
 
 	def checkOperand(self, operand):
