@@ -48,7 +48,7 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 	# callback function:
 	def font_cb(self, event, user_data):
 		# print in the terminal
-		print("You chose the font " + self.get_font())
+		#print("You chose the font " + self.get_font())
 		return
 
 	# callback function:
@@ -56,14 +56,28 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		self.setFGcolor(self.colorchooser.get_rgba())
 		return
 
-	def set_font(self, fontName, fontSize):
-		super(MyFontChooserWidget, self).set_font('{!s} {!s}'.format(fontName, fontSize))
-		self.searchEntry.set_text(fontName)
+	def set_font(self, fontName, fontWeight, fontStyle, fontSize):
+		from gi.repository import Pango
+		pangoFontDesc = Pango.FontDescription()
+		pangoFontDesc.set_family(fontName)
+		pangoFontDesc.set_size(fontSize * 1024)
+		try:
+			w = getattr(Pango.Weight, fontWeight.upper())
+			pangoFontDesc.set_weight(w)
+		except: pass
+		try:
+			s = getattr(Pango.Style, fontStyle.upper())
+			pangoFontDesc.set_style(s)
+		except: pass
+		super(MyFontChooserWidget, self).set_font_desc(pangoFontDesc)
+		return
+		super(MyFontChooserWidget, self).set_font('{!s} {!s} {!s}'.format(fontName, fontFace, fontSize))
+		self.searchEntry.set_text('{!s} {!s}'.format(fontName, fontFace))
 		return
 
 	def setBGcolor(self, type):
 		g = CONFIG.gui[type]
-		print('Background-Color: {!s}'.format(g.getRGBABackgroundColor().to_string()))
+		#print('Background-Color: {!s}'.format(g.getRGBABackgroundColor().to_string()))
 		self.entry.override_background_color(Gtk.StateFlags.NORMAL, g.getRGBABackgroundColor())
 		return
 

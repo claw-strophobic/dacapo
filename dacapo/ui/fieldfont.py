@@ -16,6 +16,8 @@ class FieldFont(dacapo.ui.configelement.ConfigElement):
 		self.name = ''
 		self.fontSize = 0
 		self.fontColor = ''
+		self.fontStyle = ''
+		self.fontWeight = ''
 
 	def printValues(self):
 		print('\nFont: {!s} Größe: {!s} Farbe: {!s}'.format(self.name, self.fontSize, self.fontColor))
@@ -34,6 +36,14 @@ class FieldFont(dacapo.ui.configelement.ConfigElement):
 		self.vars = {
 			'font': {
 				'target': 'name',
+				'type': 'text',
+			},
+			'fontStyle': {
+				'target': 'fontStyle',
+				'type': 'text',
+			},
+			'fontWeight': {
+				'target': 'fontWeight',
 				'type': 'text',
 			},
 			'fontSize': {

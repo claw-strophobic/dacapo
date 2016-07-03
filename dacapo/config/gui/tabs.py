@@ -10,6 +10,8 @@
 from dacapo.config.gui import *
 from dacapo.config.gui.fontchooser import MyFontChooserWidget
 from dacapo.config.gui.colorchooser import MyColorChooserWidget
+# from  gi.repository.GObject import GEnum
+
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -230,9 +232,10 @@ class FieldTab(PreviewTab):
 		self.field = field
 		font_chooser = combo.font_chooser
 		font_chooser.setBGcolor(combo.type)
-		font = '{!s} {!s}'.format(field.font.name, field.font.fontSize)
+		fontFace = '{!s} {!s}'.format(field.font.fontWeight, field.font.fontStyle)
 		## print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
-		font_chooser.set_font(field.font.name, field.font.fontSize)
+		font_chooser.set_font(field.font.name, field.font.fontWeight, field.font.fontStyle, field.font.fontSize)
+		# font_chooser.set_font(field.font.name, fontFace, field.font.fontSize)
 		font_chooser.setFGcolor(field.font.getRGBAColor())
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 		self.apply_button.set_sensitive(True)
@@ -281,17 +284,19 @@ class FieldFontTab(Gtk.Box):
 
 	def apply(self):
 		color = self.fieldTab.font_chooser.colorchooser.get_rgba()
-		fontFace = self.fieldTab.font_chooser.get_font_face()
-		fontFamily = self.fieldTab.font_chooser.get_font_family()
-		font = fontFace.get_face_name()
-		print(font)
-		font = fontFamily.get_name()
-		print(font)
-		size = self.fieldTab.font_chooser.get_font_size() / 1024
-		print(font + " Size: " + str(size))
-		self.fieldTab.field.font.setValue('font', font)
-		self.fieldTab.field.font.setValue('fontSize', size)
 		self.fieldTab.field.font.setValue('fontColor', color)
+
+		pangoFontDesc = self.fieldTab.font_chooser.get_font_desc()
+		if pangoFontDesc is not None:
+			font = pangoFontDesc.get_family()
+			size = pangoFontDesc.get_size() / 1024
+			weight = pangoFontDesc.get_weight()
+			style = pangoFontDesc.get_style()
+			# pprint(GEnum.__dict__,None,2)
+			self.fieldTab.field.font.setValue('font', font)
+			self.fieldTab.field.font.setValue('fontSize', size)
+			self.fieldTab.field.font.setValue('fontWeight', weight.value_nick)
+			self.fieldTab.field.font.setValue('fontStyle', style.value_nick)
 
 class FieldPosTab(Gtk.Box):
 
