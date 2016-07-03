@@ -37,15 +37,24 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 	def getRenderedData(self):
 		from dacapo.config.gui import *
+		logging.debug('Rendering Field: {!s}'.format(self.name))
 		if (self.sysFont is None):
 			if (not pygame.font.get_init()):
 				pygame.font.init()
+			logging.debug('Creating font {!s} {!s} {!s} {!s}'.format(self.font.name, self.font.fontSize, self.font.fontWeight, self.font.fontStyle))
 			try: self.sysFont = pygame.font.SysFont(self.font.name, self.font.fontSize)
 			except pygame.error, err:
-				print(u"Error at pygame.font.SysFont(%s, %s) . %s " % (
+				logging.error(u"Error at pygame.font.SysFont(%s, %s) . %s " % (
 						self.font.name, self.font.fontSize, err))
 				return None
+			if 'bold' in self.font.fontWeight.lower():
+				self.sysFont.set_bold(True)
+			if 'italic' in self.font.fontStyle.lower():
+				self.sysFont.set_italic(True)
+			if 'oblique' in self.font.fontStyle.lower():
+				self.sysFont.set_italic(True)
 
+		logging.debug('Font created. Rendering Field: {!s} with content {!s}'.format(self.name, self.content))
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 		player = CONFIG.getConfig('TEMP', Key='PLAYER')
 		assert isinstance(player.gstPlayer, object)
