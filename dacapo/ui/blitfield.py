@@ -107,22 +107,20 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 						return self.renderedData
 
 				if multi == False:
-					if (s != ''):
-						self.data =  s
-						logging.debug('Rendering Metadata: %s: %s -> %s' % (self.name, self.content, self.data))
-						self.renderedData = self.sysFont.render(self.data, True, self.font.fontColor)
-						self.renderedSize = self.renderedData.get_size()
+					self.data =  s
+					logging.debug('Rendering Metadata: %s: %s -> %s' % (self.name, self.content, self.data))
+					self.renderedData = self.sysFont.render(self.data, True, self.font.fontColor)
+					self.renderedSize = self.renderedData.get_size()
 				else:
 					logging.debug('Multiline: %s:' % (s))
 					if (self.splitSpaces == True):
 						logging.debug('Split Spaces')
 						s = s.replace(' ', '\n')
 					vList = s.splitlines(True)
-					if (len(vList) > 0):
-						self.data =  vList
-						image = self.getRenderedMultiline(vList)
-						self.renderedData = image
-						self.renderedSize = image.get_size()
+					self.data =  vList
+					image = self.getRenderedMultiline(vList)
+					self.renderedData = image
+					self.renderedSize = image.get_size()
 
 			except pygame.error, err:
 				logging.warning("Can't render Metadata: %s: %s -> %s" % (self.name, self.content, self.data))
@@ -272,6 +270,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				refPosW, refPosH = posRefV.blitPos
 				refWidth, refHeight = posRefV.renderedSize
 				mH = refPosH + refHeight
+				logging.debug("V-Position of {!s} is relative to {!s}: {!s} + height: {!s}".format(self.name, posRefV.name, refPosH, refHeight))
 
 			## align left or right or center
 			if self.pos.alignH == 'left':
