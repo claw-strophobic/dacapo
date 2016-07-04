@@ -66,36 +66,39 @@ class AudioFile(object):
         self.syncTime, self.syncText = self.loadSyncLyrics()
 
     def replaceTags(self, s):
-		import re
-		while True :
-			text = self.find_between(s, '%', '%')
-			if not isinstance(text, basestring):
-				break
-			if not isinstance(s, basestring):
-				break
+        import re
+        while True :
+            text = self.find_between(s, '%', '%')
+            if not isinstance(text, basestring):
+                break
+            if not isinstance(s, basestring):
+                break
 
-			if text == '' : break
-			if (text == 'time') or (text == 'duration') or (text == 'bandlogo') :
-					s = s.replace('%' + text + '%', '#' + text + '#')
-					logging.debug(u'FIXDATEN zurück (%s) = %s' % (s, type(s)))
-			res = self.getMetaData(text)
-			logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
-			if isinstance(res, list) :
-				t = '\\n'.join(res)
-				if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
-			else:
-				t = res
+            if text == '' : break
+            if (text.lower() == 'time') or (text.lower() == 'duration') or (text.lower() == 'bandlogo') :
+                try:
+                    insensitive_text = re.compile(re.escape('%' + text + '%'), re.IGNORECASE)
+                    t = '#' + text.lower() + '#'
+                    s = insensitive_text.sub(t, s)
+                except:
+                    pass
+                logging.debug(u'Returning FIX DATA (%s) = %s' % (s, type(s)))
+            res = self.getMetaData(text)
+            logging.debug(u'Returning Metadata (%s) = %s' % (res, type(res)))
+            if isinstance(res, list) :
+                t = '\n'.join(res)
+                logging.debug(u'Returning value is a list: %s:' % (t))
+            else:
+                t = res
 
-			if not isinstance(t, basestring):
-				t = ''
-			try:
-				insensitive_text = re.compile(re.escape('%' + text + '%'), re.IGNORECASE)
-				s = insensitive_text.sub(t, s)
-				# s = s.replace('%' + text + '%', t)
-			except:
-				pass
-			## s = s.replace('#NEWLINE#', '\\n')
-		return s
+            if not isinstance(t, basestring):
+                t = ''
+            try:
+                insensitive_text = re.compile(re.escape('%' + text + '%'), re.IGNORECASE)
+                s = insensitive_text.sub(t, s)
+            except:
+                pass
+        return s
 
     def addConditions(self):
         conditions = CONFIG.getConfig('cond', '')
