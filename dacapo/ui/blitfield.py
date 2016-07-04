@@ -94,12 +94,14 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				elif self.convert == 'upper':
 					s = s.upper()
 
-				if '#bandlogo#' in s:
+				if '#bandlogo#' in s.lower():
 					logging.debug('Try to get Bandlogo: %s: %s -> %s' % (self.name, self.content, self.data))
 					logo = audio.preBlitLogo(self.name)
 					if logo == None:
+						logging.debug('Got no Bandlogo')
 						pass
 					else:
+						logging.debug('Rendering Bandlogo')
 						self.renderedData = logo
 						self.renderedSize = self.renderedData.get_size()
 						return self.renderedData
@@ -114,23 +116,76 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 					logging.debug('Multiline: %s:' % (s))
 					if (self.splitSpaces == True):
 						logging.debug('Split Spaces')
-						s = s.replace(' ', '\\n')
-					vList = s.split('\\n')
+						s = s.replace(' ', '\n')
+					vList = s.splitlines(True)
 					if (len(vList) > 0):
 						self.data =  vList
-						image = self.get_rendered_maxwidth()
+						image = self.getRenderedMultiline(vList)
 						self.renderedData = image
 						self.renderedSize = image.get_size()
 
 			except pygame.error, err:
-				print("Autsch! Konnte Metadaten %s nicht rendern: %s" % (
-					self.name, self.data))
 				logging.warning("Can't render Metadata: %s: %s -> %s" % (self.name, self.content, self.data))
 				logging.warning(err)
 
 		return self.renderedData
 
-	def get_rendered_maxwidth(self):
+	def getRenderedMultiline(self, vList):
+		from dacapo.config.gui import *
+		import re
+
+		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+		g = CONFIG.gui[winstate]
+		logging.debug('Rendering Multiline Metadata: %s: %s -> %s' % (self.name, self.content, vList))
+		rList = list()
+		maxwidth = self.maxWidth
+		if maxwidth == 0:
+			maxwidth = g.width
+		w = maxwidth
+		h = 0
+		lineH = 0
+		counter = 0
+		for s in vList:
+			try:
+				insensitive_text = re.compile(re.escape('\n'), re.IGNORECASE)
+				s = insensitive_text.sub('', s)
+			except:
+				pass
+			counter += 1
+			logging.debug('Trying Text: %s ' % (s))
+			rData = self.sysFont.render(s, True, self.font.fontColor)
+			wT, hT = rData.get_size()
+			logging.debug('List-Append Text: {!s} Text-Height: {!s}'.format(s, hT))
+			rList.append(rData)
+			h += hT
+			lineH = hT
+
+		logging.debug('Found {!s} Lines with Line-Height: {!s}'.format(len(rList), lineH))
+		image = pygame.Surface([w, h])
+		image.set_colorkey(g.backgroundColor)
+		image.fill(g.backgroundColor)
+		self.savedRect = image
+		hT = 0
+		i = 0
+		for r in rList:
+			i += 1
+			mW = 0
+			wT,htT = r.get_size()
+			if self.pos.alignH == 'right':
+				mW = w - wT
+			elif self.pos.alignH == 'center':
+				mW = (w - wT) / 2
+
+			logging.debug('Blitting line {!s} position: {!s}, {!s}'.format(i, mW, hT))
+			image.blit(r, (mW, hT))
+			hT += lineH
+
+		self.renderedData = image
+		return image
+
+
+
+	def getRenderedMaxwidth(self):
 		from dacapo.config.gui import *
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
@@ -151,17 +206,14 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				lineTest = lineTest + ' ' + s
 			else:
 				lineTest = s
-			rData = self.sysFont.render(
-						lineTest,
-						True,
-						self.font.fontColor
-					)
+			logging.debug('Trying Text: %s ' % (lineTest))
+			rData = self.sysFont.render(lineTest,True,self.font.fontColor)
 			wT,hT = rData.get_size()
-			logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
+			#logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
 			if wT < maxwidth and counter < len(self.data):
 				lineSave = rData
 				continue
-			if lineSave == None:
+			if lineSave is None:
 				lineSave = rData
 			logging.debug('List-Append Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
 			rList.append(rData)

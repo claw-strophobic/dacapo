@@ -18,8 +18,8 @@ class BlitObject(object):
 		self.name = name
 		self.rect = pygame.Rect(0, 0, 0, 0)
 		self.renderedData = None
-		self.blitPos = 0
-		self.renderedSize = 0
+		self.blitPos = (0, 0)
+		self.renderedSize = (0, 0)
 		self.zIndex = zIndex
 		self.blitField = None
 		self.backup = False
