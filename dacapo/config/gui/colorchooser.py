@@ -12,8 +12,9 @@ import pprint
 
 class MyColorChooserWidget(Gtk.ColorChooserWidget):
 
-	def __init__(self):
+	def __init__(self, guiType=" "):
 		super(MyColorChooserWidget, self).__init__()
+		self.guiType = guiType
 		self.set_property("show-editor", True)
 		self.colorEditor = None
 		self.entryField = None
@@ -32,6 +33,11 @@ class MyColorChooserWidget(Gtk.ColorChooserWidget):
 
 	def color_activated(self, entry):
 		color = self.get_rgba()
+
+	def set_rgba(self, rgba):
+		super(MyColorChooserWidget, self).set_rgba(rgba)
+		color = self.get_rgba()
+		self.set_property("show-editor", True)
 
 	def connect_color_activated(self, method):
 		self.entryField.connect("changed", method, self)
