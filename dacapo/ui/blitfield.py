@@ -83,9 +83,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 					s = s.replace('%tracktotallist%', str(
 							player.getNumberOfSongs()))
 
-				multi = False
-				if (self.multiLine == True):
-					multi = True
+				multi = self.multiLine
 
 				s = audio.replaceTags(s)
 
@@ -115,7 +113,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				else:
 					logging.debug('Multiline: %s:' % (s))
 					if (self.splitSpaces == True):
-						if self.debug: logging.debug('Split Spaces')
+						logging.debug('Split Spaces')
 						s = s.replace(' ', '\\n')
 					vList = s.split('\\n')
 					if (len(vList) > 0):

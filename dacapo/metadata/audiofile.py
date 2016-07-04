@@ -77,9 +77,9 @@ class AudioFile(object):
 			if text == '' : break
 			if (text == 'time') or (text == 'duration') or (text == 'bandlogo') :
 					s = s.replace('%' + text + '%', '#' + text + '#')
-					if self.debug : logging.debug(u'FIXDATEN zurück (%s) = %s' % (s, type(s)))
+					logging.debug(u'FIXDATEN zurück (%s) = %s' % (s, type(s)))
 			res = self.getMetaData(text)
-			if self.debug : logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
+			logging.debug(u'Metadaten zurück (%s) = %s' % (res, type(res)))
 			if isinstance(res, list) :
 				t = '\\n'.join(res)
 				if self.debug: logging.debug(u'Rückgabewert ist Liste: %s:' % (t))
@@ -101,19 +101,19 @@ class AudioFile(object):
         conditions = CONFIG.getConfig('cond', '')
         for key in conditions.iterkeys() :
             cond = conditions[key]
-            if self.debug : logging.debug("Condition:  %s Operator: %s Operand: %s Value: %s" % (
+            logging.debug("Condition:  %s Operator: %s Operand: %s Value: %s" % (
                 cond.name,
                 cond.operator,
                 cond.operand,
                 cond.content
                 ))
             operand = self.getMetaData(cond.operand)
-            if self.debug : logging.debug("Condition:  Operand is Type: %s " % (type(operand)))
+            logging.debug("Condition:  Operand is Type: %s " % (type(operand)))
 
             if cond.checkOperand(operand) == True:
                 logging.debug("Replace  %s " % (cond.content))
                 s = self.replaceTags(cond.content)
-                if self.debug : logging.debug("Adding:  %s zu den Tags mit Wert: %s" % (
+                logging.debug("Adding:  %s zu den Tags mit Wert: %s" % (
                     cond.name,
                     s
                 ))
@@ -149,12 +149,12 @@ class AudioFile(object):
         fileName, fileExtension = os.path.splitext(fullFileName)
         lrcFile = fileName + ".lrc"
         # 1. In der Audio-Datei im TAG lt. config
-        if self.debug : logging.debug("Versuche LRC-Text aus Tag zu laden -> %s " % (syncedTag))
+        logging.debug("Versuche LRC-Text aus Tag zu laden -> %s " % (syncedTag))
         text = self.getMetaData(syncedTag)
 
         # 2. In der Audio-Datei im TAG "syncedlyrics"
         if len(text) <= 0 and syncedTag <> "syncedlyrics":
-            if self.debug : logging.debug("Versuche LRC-Text aus Tag zu laden -> %s " % ("syncedlyrics"))
+            logging.debug("Versuche LRC-Text aus Tag zu laden -> %s " % ("syncedlyrics"))
             text = self.getMetaData("syncedlyrics")
 
         # 3. Im Verzeichnis lt. config mit selben Namen wie Audio-Datei aber der Erweiterung *.lrc
@@ -163,7 +163,7 @@ class AudioFile(object):
                 # testPath = os.path.normpath(os.path.join(pathName, syncedDir))
                 testPath = os.path.join(pathName, syncedDir)
                 testFile = testPath + "/" + lrcFile
-                if self.debug : logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
+                logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
                 if os.path.isfile(testFile) :
                     f = codecs.open(testFile, 'r', 'utf-8')
                     self.syncLyricFile = testFile
@@ -183,7 +183,7 @@ class AudioFile(object):
         # 4. Im Verzeichnis der Audio-Datei mit selben Namen aber der Erweiterung *.lrc
         if len(text) <= 0:
             testFile = pathName + "/" + lrcFile
-            if self.debug : logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
+            logging.debug("Versuche LRC-Datei zu laden -> %s " % (testFile))
             if os.path.isfile(testFile) :
                 f = codecs.open(testFile, 'r', 'utf-8')
                 self.syncLyricFile = testFile
@@ -224,7 +224,7 @@ class AudioFile(object):
                         syncText.append(lineText)
                     else :
                         syncText.append("  ")
-                    if self.debug : logging.debug("Sekunden: %s lineTime: %s Text: %s " % (seconds, lineTime, lineText))
+                    logging.debug("Sekunden: %s lineTime: %s Text: %s " % (seconds, lineTime, lineText))
         return (syncTime, syncText)
 
     def getMetaData(self, key):
@@ -241,16 +241,16 @@ class AudioFile(object):
         # Besonderheit, da auch gerne mal tracknumber = "5/7"
         # gespeichert wird... (gerade bei MP3)
         key = key.lower()
-        if self.debug : logging.debug("Angeforderter Key: %s" % (key))
+        logging.debug("Angeforderter Key: %s" % (key))
         if key == "tracknumber" :
-            if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrack(), type(self.getTrack())))
+            logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrack(), type(self.getTrack())))
             return self.getTrack()
         if key == "tracktotal" :
-            if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrackTotal(), type(self.getTrackTotal())))
+            logging.debug("Angeforderter Key %s (%s) = %s" % (key, self.getTrackTotal(), type(self.getTrackTotal())))
             return self.getTrackTotal()
         if "comment" in key : return self.getComments()
         if key == "bandlogo" :
-            if self.debug : logging.debug("Angeforderter Key %s = %s" % (key, type(self.getLogo())))
+            logging.debug("Angeforderter Key %s = %s" % (key, type(self.getLogo())))
             return self.getLogo()
         value = ""
         valueList = list()
@@ -258,7 +258,7 @@ class AudioFile(object):
         if self.tags.has_key(key) :
             try : 
                 for text in self.tags[key]:
-                    if self.debug : logging.debug("Angeforderter Key %s (%s) = %s" % (key, text, type(text)))
+                    logging.debug("Angeforderter Key %s (%s) = %s" % (key, text, type(text)))
                     if isinstance(text, str) or isinstance(text, unicode):
                         if bFirst : value = text
                         else: value += '\n' + text
@@ -269,7 +269,7 @@ class AudioFile(object):
                         valueList.append(text.get_text())
                     bFirst = False
             except : pass
-        if self.debug : logging.debug("Zurueck Key: %s Value %s" % (key, value))
+        logging.debug("Zurueck Key: %s Value %s" % (key, value))
         return valueList
 
 
@@ -283,7 +283,7 @@ class AudioFile(object):
         # Sind Texte vorhanden? Anzeigen als Bild? Dann los!
         if (len(self.syncTime) > 0) and (showWhenSynced == False) :
             showLyrics = False
-        if self.debug : logging.debug("Texte als Bild anzeigen? %s" % (showLyrics))        
+        logging.debug("Texte als Bild anzeigen? %s" % (showLyrics))
         listLyrics = list()
         if showLyrics == True :
             listLyrics = self.getLyrics()
@@ -323,7 +323,7 @@ class AudioFile(object):
 
     def getFrontCover(self):
         self.loadFrontCover()
-        if self.debug : logging.info("done.")
+        logging.info("done.")
         return self.cover
 
         
@@ -332,21 +332,21 @@ class AudioFile(object):
 
     def getLyrics(self):
         listLyrics = list()
-        if self.debug : logging.debug("Suche Lyrics in Tag: %s" %("unsyncedlyrics"))
+        logging.debug("Suche Lyrics in Tag: %s" %("unsyncedlyrics"))
         strLyrics = ''.join(self.getMetaData('unsyncedlyrics'))
         listLyrics = strLyrics.splitlines()
         if len(listLyrics) <= 0 : 
-            if self.debug : logging.debug("Nichts gefunden. Suche Lyrics in Tag: %s" %("lyrics"))
+            logging.debug("Nichts gefunden. Suche Lyrics in Tag: %s" %("lyrics"))
             strLyrics = ''.join(self.getMetaData('lyrics'))
             listLyrics = strLyrics.splitlines()
         if len(listLyrics) <= 0 and CONFIG.getConfig('gui', 'misc', 'showSyncedLyricsAsPics'): 
-            if self.debug : logging.debug("Nichts gefunden. Suche Lyrics in %s" %("syncedlyrics"))
+            logging.debug("Nichts gefunden. Suche Lyrics in %s" %("syncedlyrics"))
             syncTime, listLyrics = self.loadSyncLyrics()
 
         if len(listLyrics) > 0 :
-            if self.debug : logging.debug("Fündig geworden:  %s" %(listLyrics))
+            logging.debug("Fündig geworden:  %s" %(listLyrics))
         else:       
-            if self.debug : logging.debug("Keine Texte gefunden. :-(")
+            logging.debug("Keine Texte gefunden. :-(")
 
         return listLyrics
 
@@ -377,7 +377,7 @@ class AudioFile(object):
 			proz = (winHeight * 100.0) / (h)
 			w = int(round( (w * proz) / 100.0 ))
 			h = int(round( (h * proz) / 100.0))
-		if self.debug : logging.debug("Bandlogo skalieren: " \
+		logging.debug("Bandlogo skalieren: " \
 			"Originalbreite: %s Hoehe: %s PROZENT: %s " \
 			"-> Neue W: %s H: %s" % (picW, picH, proz, w, h))
 		return pygame.transform.scale(logo, (w, h))
@@ -441,7 +441,7 @@ class AudioFile(object):
 
     def getDiscNo(self):
         if type(self.discNo) is str :
-            if self.debug : logging.debug('DiscNo ist Typ Str()  %s' % (self.discNo))
+            logging.debug('DiscNo ist Typ Str()  %s' % (self.discNo))
             if self.discNo == "1" :
                 return "0"
             elif self.discNo == "0" :
@@ -449,7 +449,7 @@ class AudioFile(object):
             else :
                 return self.discNo
         elif type(self.discNo) is not None :
-            if self.debug : logging.debug('DiscNo ist nicht None %s' % (self.discNo))
+            logging.debug('DiscNo ist nicht None %s' % (self.discNo))
             return str(self.discNo)
         else :
             return "0"
