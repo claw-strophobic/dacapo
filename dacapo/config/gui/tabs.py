@@ -15,23 +15,23 @@ from dacapo.config.gui.colorchooser import MyColorChooserWidget
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
-	def __init__(self, type):
+	def __init__(self, guiType):
 		Gtk.Box.__init__(self)
-		self.type = type
+		self.guiType = guiType
 		self.screen = None
 
 	def on_preview(self, *data):
 		import types
 		import operator
-		g = CONFIG.gui[self.type]
-		CONFIG.setConfig('TEMP', 'gui', 'winState', self.type)
+		g = CONFIG.gui[self.guiType]
+		CONFIG.setConfig('TEMP', 'gui', 'winState', self.guiType)
 		resolution = (g.width, g.height)
 		FPS = 30
 		fpsClock = pygame.time.Clock()
 		fpsClock.tick(FPS)
-		print("going to set pygame.display to: {!s}".format(self.type))
+		print("going to set pygame.display to: {!s}".format(self.guiType))
 		try:
-			if self.type == "fullscreen":
+			if self.guiType == "fullscreen":
 				self.screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
 			else:
 				self.screen = pygame.display.set_mode(resolution)
@@ -71,17 +71,18 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
 class BackgroundTab(PreviewTab):
 
-	def __init__(self, type):
-		super(BackgroundTab, self).__init__(type)
+	def __init__(self, guiType):
+		super(BackgroundTab, self).__init__(guiType)
+		backcolorchooser = MyColorChooserWidget(guiType)
 		s = Gdk.Screen.get_default()
-		g = CONFIG.gui[type]
+		g = CONFIG.gui[guiType]
 		self.set_border_width(10)
 		vbox = Gtk.VBox()
 		grid = Gtk.Grid()
 		grid.set_column_homogeneous(False)
 		grid.set_column_spacing(6)
 
-		if type == 'window':
+		if guiType == 'window':
 			labelWidth = Gtk.Label(_('Window width'))
 			labelHeight = Gtk.Label(_('Window height'))
 		else:
@@ -117,10 +118,10 @@ class BackgroundTab(PreviewTab):
 
 		labelBackground = Gtk.Label(_('Background colour'))
 		grid.attach_next_to(labelBackground, self.width_spinbutton, Gtk.PositionType.RIGHT, 1, 1)
-		self.colorchooser = MyColorChooserWidget()
-		self.colorchooser.set_rgba(g.getRGBABackgroundColor())
-		self.colorchooser.connect_color_activated(self.onColorSet)
-		grid.attach_next_to(self.colorchooser, labelBackground, Gtk.PositionType.BOTTOM, 1, 10)
+		color = g.getRGBABackgroundColor()
+		backcolorchooser.set_rgba(color)
+		backcolorchooser.connect_color_activated(self.onColorSet)
+		grid.attach_next_to(backcolorchooser, labelBackground, Gtk.PositionType.BOTTOM, 1, 10)
 
 		self.prev_button = Gtk.Button(_("Preview"))
 		self.prev_button.set_sensitive(True)
@@ -132,13 +133,13 @@ class BackgroundTab(PreviewTab):
 
 	def getBlitObject( self ):
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
-		CONFIG.setConfig('TEMP', 'gui', 'winState', self.type)
+		CONFIG.setConfig('TEMP', 'gui', 'winState', self.guiType)
 		if audio is None:
 			return None
 		else:
 			a = list()
 			CONFIG.readConfig()
-			g = CONFIG.gui[self.type]
+			g = CONFIG.gui[self.guiType]
 			g.initFields()
 			for field in g.fields:
 				if not g.fields[field].isPicField and hasattr(g.fields[field], 'zIndex'):
@@ -148,21 +149,21 @@ class BackgroundTab(PreviewTab):
 			return a
 
 	def onColorSet( self, obj, colorchooser):
-		color = self.colorchooser.get_rgba()
-		g = CONFIG.gui[self.type]
+		color = colorchooser.get_rgba()
+		g = CONFIG.gui[self.guiType]
 		g.setValue('backgroundColor', color)
 
 
 	def onToggled(self, obj, data):
 		v = obj.get_active()
 		print('New {!s}: {!s}'.format(data, v))
-		g = CONFIG.gui[self.type]
+		g = CONFIG.gui[self.guiType]
 		g.setValue(data, v)
 
 	def onValueChanged(self, obj, data):
 		v = obj.get_value_as_int()
 		print('New {!s}: {!s}'.format(data, v))
-		g = CONFIG.gui[self.type]
+		g = CONFIG.gui[self.guiType]
 		g.setValue(data, v)
 
 
@@ -309,7 +310,7 @@ class FieldPosTab(Gtk.Box):
 		grid = Gtk.Grid()
 		grid.set_column_homogeneous(False)
 		grid.set_column_spacing(6)
-		g = CONFIG.gui[self.fieldTab.type]
+		g = CONFIG.gui[self.fieldTab.guiType]
 
 		labelWidth = Gtk.Label(_('Maximal field width'))
 		labelHeight = Gtk.Label(_('Maximal field height'))
@@ -343,18 +344,18 @@ class FieldPosTab(Gtk.Box):
 
 class GuiTab(Gtk.Box):
 
-	def __init__(self, type):
+	def __init__(self, guiType):
 		Gtk.Box.__init__(self)
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
 
 		# 1st tab -> Background settings
-		self.page_background = BackgroundTab(type)
-		self.notebook.append_page(self.page_background, Gtk.Label(_("Pictures & Background")))
+		self.page_background = BackgroundTab(guiType)
+		self.notebook.append_page(self.page_background, Gtk.Label(_("Background")))
 
 		# 2nd tab -> Field settings
 		# self.page_font = LyricfontTab(type)
 		# self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
-		self.page_fields = FieldTab(type)
+		self.page_fields = FieldTab(guiType)
 		self.notebook.append_page(self.page_fields, Gtk.Label(_("Fields")))
 
