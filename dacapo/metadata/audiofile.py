@@ -67,7 +67,12 @@ class AudioFile(object):
 
     def replaceTags(self, s):
         import re
+        i = 0
         while True :
+            i += 1
+            if i > 99:
+                logging.warning(u'Maximal recursion reached. Giving up on {!s}'.format(s))
+                break
             text = self.find_between(s, '%', '%')
             if not isinstance(text, basestring):
                 break
