@@ -49,11 +49,6 @@ parser = myArg.ArgumentParser(description=_('Lightweight-Music-Player, who plays
 parser.add_argument("-R", "--resume", help=_('start on the last position from the last playlist'), action="store_true")
 parser.add_argument("-NG", "--nogui", help=_('show no metadata, pictures etc.'), action="store_true")
 parser.add_argument("-pl", "--playlist", help=_('the given file is a playlist'), action="store_true")
-parser.add_argument("-d", "--debug", help=_('print all debug messages to the logfile - from all modules'), action="store_true")
-parser.add_argument("-dP", "--debugPL", help=_('print debug messages to the logfile from the playlist modules'), action="store_true")
-parser.add_argument("-dG", "--debugGUI", help=_('print debug messages to the logfile from the GUI modules'), action="store_true")
-parser.add_argument("-dS", "--debugS", help=_('print debug messages to the logfile from the GStreamer modules'), action="store_true")
-parser.add_argument("-dM", "--debugMETA", help=_('print debug messages to the logfile from the metadata modules'), action="store_true")
 
 windowGroup = parser.add_mutually_exclusive_group()
 windowGroup.add_argument("-fs", "--fullscreen", help=_('show the ui in fullscreen mode'), action="store_true")
