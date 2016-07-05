@@ -100,7 +100,7 @@ setup(
     packages = ['dacapo', 'dacapo.ui', 'dacapo.config', 'dacapo.config.gui','dacapo.data',
     'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist',
     'dacapo.qtflac2mp3'],
-    scripts = ["bin/dacapo", "bin/dacapoui", "bin/QtSyncLyrics",
+    scripts = ["bin/dacapo", "bin/QtSyncLyrics",
     "bin/QtFlac2Mp3"],
 
     # Project uses reStructuredText, so ensure that the docutils get
