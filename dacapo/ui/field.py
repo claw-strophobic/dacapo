@@ -24,8 +24,6 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.overlay = False
 		self.splitSpaces = False
 		self.zIndex = 0
-		self.maxWidth = 0
-		self.maxHeight = 0
 		self.pos = dacapo.ui.position.Position()
 		self.font = dacapo.ui.fieldfont.FieldFont()
 		self.isTimeField = False
@@ -62,14 +60,6 @@ class Field(dacapo.ui.configelement.ConfigElement):
 			},
 			'zIndex': {
 				'target': 'zIndex',
-				'type': 'int',
-			},
-			'maxWidth': {
-				'target': 'maxWidth',
-				'type': 'int',
-			},
-			'maxHeight': {
-				'target': 'maxHeight',
 				'type': 'int',
 			},
 			'convert': {

@@ -136,7 +136,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		g = CONFIG.gui[winstate]
 		logging.debug('Rendering Multiline Metadata: %s: %s -> %s' % (self.name, self.content, vList))
 		rList = list()
-		maxwidth = self.maxWidth
+		maxwidth = self.pos.maxWidth
 		if maxwidth == 0:
 			maxwidth = g.width
 		w = maxwidth
@@ -187,7 +187,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		from dacapo.config.gui import *
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
-		maxwidth = self.maxWidth
+		maxwidth = self.pos.maxWidth
 		if maxwidth == 0:
 			maxwidth = g.width
 		logging.debug('Rendering Metadata with Max-Width: %s %s: %s -> %s' % (maxwidth, self.name, self.content, self.data))
