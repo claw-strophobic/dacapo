@@ -78,8 +78,9 @@ parser.parse_args()
 if __name__ == "__main__":
 
 	if len(sys.argv) < 2:
-		parser.print_help()
-		sys.exit(1)
+		from dacapo import dacapoui
+		dacapoui.main()
+		exit()
 	from dacapo import dacapo
 	dacapo.play()
 
