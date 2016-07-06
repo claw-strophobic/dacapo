@@ -13,6 +13,7 @@ import dacapo.ui.blitobject
 import pygame
 import sys
 from dacapo import errorhandling
+import re
 
 class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -121,6 +122,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 					if (self.splitSpaces == True):
 						logging.debug('Split Spaces')
 						s = s.replace(' ', '\n')
+					try:
+						insensitive_text = re.compile(re.escape('\\n'), re.IGNORECASE)
+						s = insensitive_text.sub('\n', s)
+					except:
+						pass
 					vList = s.splitlines(True)
 					self.data =  vList
 					image = self.getRenderedMultiline(vList)
@@ -135,7 +141,6 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 
 	def getRenderedMultiline(self, vList):
 		from dacapo.config.gui import *
-		import re
 
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
@@ -285,7 +290,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				mW += self.pos.posH + textWidth
 				mW = width - mW
 			elif self.pos.alignH == 'center':
-				mW = (width - textWidth) / 2
+				mW += (width - textWidth) / 2
 
 			## align top or bottom or middle
 			if self.pos.alignV == 'top':
@@ -294,7 +299,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				mH += self.pos.posV + textHeight
 				mH = height - mH
 			elif self.pos.alignV == 'center':
-				mH = (height - textHeight) / 2
+				mH += (height - textHeight) / 2
 
 			blitPos = (mW, mH)
 			blitObj.setBlitRect(blitPos, renderedSize)

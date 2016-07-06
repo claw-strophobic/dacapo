@@ -13,7 +13,7 @@ from dacapo.config.gui.colorchooser import MyColorChooserWidget
 # from  gi.repository.GObject import GEnum
 
 UI_ALIGN_H = {_("Left") : "left" , _("Right") : "right",	"Center" : "center"}
-UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "middle"}
+UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "center"}
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -217,6 +217,8 @@ class FieldTab(PreviewTab):
 		model = combo.get_model()
 		fieldName = model.get_value(combo_iter, 0)
 		field = model.get_value(combo_iter, 1)
+		if field is None:
+			return
 		self.field = field
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 		self.apply_button.set_sensitive(True)
@@ -367,19 +369,19 @@ class FieldPosTab(FieldChildTab):
 	def fillFields(self):
 		g = CONFIG.gui[self.fieldTab.guiType]
 		fieldpos = self.fieldTab.field.pos
-		adjustment = Gtk.Adjustment(fieldpos.posH, 0, int(g.width), 1, 10, 0)
+		adjustment = Gtk.Adjustment(fieldpos.posH, (g.width * -1), g.width, 1, 10, 0)
 		self.posH_spinbutton.set_adjustment(adjustment)
 		self.posH_spinbutton.set_value(fieldpos.posH)
 
-		adjustment = Gtk.Adjustment(fieldpos.posV, 0, int(g.width), 1, 10, 0)
+		adjustment = Gtk.Adjustment(fieldpos.posV, (g.width * -1), g.width, 1, 10, 0)
 		self.posV_spinbutton.set_adjustment(adjustment)
 		self.posV_spinbutton.set_value(fieldpos.posV)
 
-		adjustment = Gtk.Adjustment(fieldpos.maxWidth, 0, int(g.width), 1, 10, 0)
+		adjustment = Gtk.Adjustment(fieldpos.maxWidth, 0, g.width, 1, 10, 0)
 		self.width_spinbutton.set_adjustment(adjustment)
 		self.width_spinbutton.set_value(fieldpos.maxWidth)
 
-		adjustment = Gtk.Adjustment(fieldpos.maxHeight, 0, int(g.width), 1, 10, 0)
+		adjustment = Gtk.Adjustment(fieldpos.maxHeight, 0, g.width, 1, 10, 0)
 		self.height_spinbutton.set_adjustment(adjustment)
 		self.height_spinbutton.set_value(fieldpos.maxHeight)
 
