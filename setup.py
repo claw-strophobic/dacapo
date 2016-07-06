@@ -101,7 +101,7 @@ setup(
     'dacapo.errorhandling', 'dacapo.metadata', 'dacapo.playlist',
     'dacapo.qtflac2mp3'],
     scripts = ["bin/dacapo", "bin/QtSyncLyrics",
-    "bin/QtFlac2Mp3"],
+    "bin/QtFlac2Mp3", "bin/dacapoconfig",],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

@@ -427,7 +427,6 @@ class FieldLayoutTab(FieldChildTab):
 		labelOverlay = Gtk.Label(_('Overlay over other elements'), xalign=0)
 		labelMulti = Gtk.Label(_('Field has multi lines'), xalign=0)
 		labelSplit = Gtk.Label(_('Split the field at spaces'), xalign=0)
-		labelDummy = Gtk.Label(' ')
 
 		self.grid.add(labelOverlay)
 		self.overlaySwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
