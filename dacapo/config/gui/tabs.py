@@ -113,6 +113,7 @@ class BackgroundTab(PreviewTab):
 		labelMouseVisible = Gtk.Label(_('Show the mouse cursor'))
 		grid.attach_next_to(labelMouseVisible, labelHeight, Gtk.PositionType.BOTTOM, 1, 1)
 		self.mouseVisible = Gtk.CheckButton()
+		self.mouseVisible.set_active(g.mouseVisible)
 		self.mouseVisible.connect("toggled", self.onToggled, 'mouseVisible')
 		grid.attach_next_to(self.mouseVisible, labelMouseVisible, Gtk.PositionType.RIGHT, 1, 1)
 
@@ -158,13 +159,11 @@ class BackgroundTab(PreviewTab):
 
 	def onToggled(self, obj, data):
 		v = obj.get_active()
-		print('New {!s}: {!s}'.format(data, v))
 		g = CONFIG.gui[self.guiType]
 		g.setValue(data, v)
 
 	def onValueChanged(self, obj, data):
 		v = obj.get_value_as_int()
-		print('New {!s}: {!s}'.format(data, v))
 		g = CONFIG.gui[self.guiType]
 		g.setValue(data, v)
 
@@ -207,6 +206,8 @@ class FieldTab(PreviewTab):
 		self.notebook.append_page(page_font, Gtk.Label(_("Font settings")))
 		self.page_pos = FieldPosTab(self)
 		self.notebook.append_page(self.page_pos, Gtk.Label(_("Position settings")))
+		self.page_layout = FieldLayoutTab(self)
+		self.notebook.append_page(self.page_layout, Gtk.Label(_("Layout settings")))
 		vbox.add(self.notebook)
 		self.add(vbox)
 
@@ -309,14 +310,14 @@ class FieldPosTab(FieldChildTab):
 		super(FieldPosTab, self).__init__(fieldTab)
 		g = CONFIG.gui[self.fieldTab.guiType]
 
-		labelPosH = Gtk.Label(_('The horizontal position'))
-		labelPosV = Gtk.Label(_('The vertical position'))
-		labelRefH = Gtk.Label(_('The horizontal reference position'))
-		labelRefV = Gtk.Label(_('The vertical reference position'))
-		labelAlignH = Gtk.Label(_('The horizontal alignment'))
-		labelAlignV = Gtk.Label(_('The vertical alignment'))
-		labelWidth = Gtk.Label(_('Maximal field width'))
-		labelHeight = Gtk.Label(_('Maximal field height'))
+		labelPosH = Gtk.Label(_('The horizontal position'), xalign=0)
+		labelPosV = Gtk.Label(_('The vertical position'), xalign=0)
+		labelRefH = Gtk.Label(_('The horizontal reference position'), xalign=0)
+		labelRefV = Gtk.Label(_('The vertical reference position'), xalign=0)
+		labelAlignH = Gtk.Label(_('The horizontal alignment'), xalign=0)
+		labelAlignV = Gtk.Label(_('The vertical alignment'), xalign=0)
+		labelWidth = Gtk.Label(_('Maximal field width'), xalign=0)
+		labelHeight = Gtk.Label(_('Maximal field height'), xalign=0)
 		labelDummy = Gtk.Label(' ')
 
 		# Horizontal Position
@@ -417,6 +418,51 @@ class FieldPosTab(FieldChildTab):
 		fieldpos.setValue('maxWidth', maxW)
 		fieldpos.setValue('maxHeight', maxH)
 
+class FieldLayoutTab(FieldChildTab):
+
+	def __init__(self, fieldTab):
+		super(FieldLayoutTab, self).__init__(fieldTab)
+		g = CONFIG.gui[self.fieldTab.guiType]
+
+		labelOverlay = Gtk.Label(_('Overlay over other elements'), xalign=0)
+		labelMulti = Gtk.Label(_('Field has multi lines'), xalign=0)
+		labelSplit = Gtk.Label(_('Split the field at spaces'), xalign=0)
+		labelDummy = Gtk.Label(' ')
+
+		self.grid.add(labelOverlay)
+		self.overlaySwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
+		self.overlaySwitch.set_tooltip_text(_("Should this field overlay other elements?"))
+		self.grid.attach_next_to(self.overlaySwitch, labelOverlay, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelMulti, labelOverlay, Gtk.PositionType.BOTTOM, 1, 1)
+		self.MultiSwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
+		self.MultiSwitch.set_tooltip_text(_("Should this field be displayed with multi lines?"))
+		self.grid.attach_next_to(self.MultiSwitch, labelMulti, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelSplit, labelMulti, Gtk.PositionType.BOTTOM, 1, 1)
+		self.SpltSwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
+		self.SpltSwitch.set_tooltip_text(_("Should this field get line breaks at spaces?"))
+		self.grid.attach_next_to(self.SpltSwitch, labelSplit, Gtk.PositionType.RIGHT, 1, 1)
+
+
+		self.vbox.add(self.grid)
+		self.add(self.vbox)
+
+	def fillFields(self):
+		g = CONFIG.gui[self.fieldTab.guiType]
+		field = self.fieldTab.field
+		self.overlaySwitch.set_active(field.overlay)
+		self.MultiSwitch.set_active(field.multiLine)
+		self.SpltSwitch.set_active(field.splitSpaces)
+
+
+	def apply(self):
+		g = CONFIG.gui[self.fieldTab.guiType]
+		field = self.fieldTab.field
+		field.setValue('overlay', self.overlaySwitch.get_active())
+		field.setValue('multiLine', self.MultiSwitch.get_active())
+		field.setValue('splitSpaces', self.SpltSwitch.get_active())
+
 
 class GuiTab(Gtk.Box):
 
@@ -428,10 +474,6 @@ class GuiTab(Gtk.Box):
 		# 1st tab -> Background settings
 		self.page_background = BackgroundTab(guiType)
 		self.notebook.append_page(self.page_background, Gtk.Label(_("Background")))
-
-		# 2nd tab -> Field settings
-		# self.page_font = LyricfontTab(type)
-		# self.notebook.append_page(self.page_font, Gtk.Label(_("Lyric-Font")))
 		self.page_fields = FieldTab(guiType)
 		self.notebook.append_page(self.page_fields, Gtk.Label(_("Fields")))
 
