@@ -374,8 +374,8 @@ class AudioFile(object):
 			return None
 		picPlace = self.__metaFields[key]
 		self.guiPlayer.logoPic = None
-		winWidth = picPlace.maxWidth
-		winHeight = picPlace.maxHeight
+		winWidth = picPlace.pos.maxWidth
+		winHeight = picPlace.pos.maxHeight
 		picW, picH = logo.get_size()
 		if picW == 0 : picW = 1
 		proz = (winWidth * 100.0) / (picW)

@@ -29,8 +29,8 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
 		if (g.picField is None): return None
-		winWidth = g.picField.maxWidth
-		winHeight = g.picField.maxHeight
+		winWidth = g.picField.pos.maxWidth
+		winHeight = g.picField.pos.maxHeight
 
 		# --> skalieren -------------------------------
 		logging.debug("Pic-Area: {!s} * {!s} at {!s}, {!s}".format(winWidth, winHeight, g.picField.pos.posH, g.picField.pos.posV))
@@ -66,8 +66,8 @@ class BlitPicture(dacapo.ui.interface_blitobject.BlitInterface):
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
 		g = CONFIG.gui[winstate]
 		# get the screen-size
-		width = g.picField.maxWidth
-		height = g.picField.maxHeight
+		width = g.picField.pos.maxWidth
+		height = g.picField.pos.maxHeight
 		w = g.picField.pos.posH
 		h = g.picField.pos.posV
 		picW, picH = self.renderedSize
