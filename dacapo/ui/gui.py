@@ -29,8 +29,8 @@ class Gui(dacapo.ui.configelement.ConfigElement):
 
 	def initFields(self):
 		for field in self.fields:
-			self.fields[field].renderedData = None
-			self.fields[field].renderedSize = None
+			if hasattr(field, "initFields"):
+				field.initFields()
 
 	def grabXMLData(self, xml):
 		super(Gui, self).grabXMLData(xml)

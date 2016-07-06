@@ -26,6 +26,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		self.savedBackground = None
 		self.savedBackgroundRect = None
 
+	def initFields(self):
+		self.renderedData = None
+		self.renderedSize = None
+		self.sysFont = None
+
 	def getReplacedContent(self):
 		from dacapo.config.gui import *
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
@@ -272,6 +277,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				mH = refPosH + refHeight
 				logging.debug("V-Position of {!s} is relative to {!s}: {!s} + height: {!s}".format(self.name, posRefV.name, refPosH, refHeight))
 
+			logging.debug("Align position of {!s} is horizontal: {!s} {!s} vertical: {!s} {!s}".format(self.name, self.pos.alignH, self.pos.posH, self.pos.alignV, self.pos.posV))
 			## align left or right or center
 			if self.pos.alignH == 'left':
 				mW += self.pos.posH

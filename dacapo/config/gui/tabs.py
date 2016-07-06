@@ -12,6 +12,8 @@ from dacapo.config.gui.fontchooser import MyFontChooserWidget
 from dacapo.config.gui.colorchooser import MyColorChooserWidget
 # from  gi.repository.GObject import GEnum
 
+UI_ALIGN_H = {_("Left") : "left" , _("Right") : "right",	"Center" : "center"}
+UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "middle"}
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -138,7 +140,7 @@ class BackgroundTab(PreviewTab):
 			return None
 		else:
 			a = list()
-			CONFIG.readConfig()
+			#CONFIG.readConfig()
 			g = CONFIG.gui[self.guiType]
 			g.initFields()
 			for field in g.fields:
@@ -232,6 +234,7 @@ class FieldTab(PreviewTab):
 		if audio is None or self.field is None:
 			return None
 		else:
+			self.field.initFields()
 			#self.field.content = self.field.getReplacedContent()
 			#print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
 			return self.field.getBlitObject()
@@ -308,6 +311,8 @@ class FieldPosTab(FieldChildTab):
 		labelPosV = Gtk.Label(_('The vertical position'))
 		labelRefH = Gtk.Label(_('The horizontal reference position'))
 		labelRefV = Gtk.Label(_('The vertical reference position'))
+		labelAlignH = Gtk.Label(_('The horizontal alignment'))
+		labelAlignV = Gtk.Label(_('The vertical alignment'))
 		labelWidth = Gtk.Label(_('Maximal field width'))
 		labelHeight = Gtk.Label(_('Maximal field height'))
 		labelDummy = Gtk.Label(' ')
@@ -323,6 +328,11 @@ class FieldPosTab(FieldChildTab):
 		self.comboRefHFields.set_tooltip_text(_("Select an existing field here."))
 		self.grid.attach_next_to(self.comboRefHFields, labelRefH, Gtk.PositionType.RIGHT, 1, 1)
 
+		self.grid.attach_next_to(labelAlignH, self.comboRefHFields, Gtk.PositionType.RIGHT, 1, 1)
+		self.comboAlignH = get_align_combo(UI_ALIGN_H)
+		self.comboAlignH.set_tooltip_text(_("Select the horizontal alignment for the field on the screen here."))
+		self.grid.attach_next_to(self.comboAlignH, labelAlignH, Gtk.PositionType.RIGHT, 1, 1)
+
 		# Vertical Position
 		self.grid.attach_next_to(labelPosV, labelPosH, Gtk.PositionType.BOTTOM, 1, 1)
 		self.posV_spinbutton = Gtk.SpinButton()
@@ -333,6 +343,11 @@ class FieldPosTab(FieldChildTab):
 		self.comboRefVFields = get_field_combo(self.fieldTab.guiType)
 		self.comboRefVFields.set_tooltip_text(_("Select an existing field here."))
 		self.grid.attach_next_to(self.comboRefVFields, labelRefV, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelAlignV, self.comboRefVFields, Gtk.PositionType.RIGHT, 1, 1)
+		self.comboAlignV = get_align_combo(UI_ALIGN_V)
+		self.comboAlignV.set_tooltip_text(_("Select the vertical alignment for the field on the screen here."))
+		self.grid.attach_next_to(self.comboAlignV, labelAlignV, Gtk.PositionType.RIGHT, 1, 1)
 
 
 		# Max width and height
@@ -367,25 +382,12 @@ class FieldPosTab(FieldChildTab):
 		adjustment = Gtk.Adjustment(fieldpos.maxHeight, 0, int(g.width), 1, 10, 0)
 		self.height_spinbutton.set_adjustment(adjustment)
 		self.height_spinbutton.set_value(fieldpos.maxHeight)
-		model = self.comboRefHFields.get_model()
-		i = 0
-		self.comboRefHFields.set_active(0)
-		if fieldpos.posRefH is not None:
-			for row in model:
-				if row[0] == fieldpos.posRefH:
-					self.comboRefHFields.set_active(i)
-					break
-				i += 1
 
-		model = self.comboRefVFields.get_model()
-		self.comboRefVFields.set_active(0)
-		i = 0
-		if fieldpos.posRefV is not None:
-			for row in model:
-				if row[0] == fieldpos.posRefV:
-					self.comboRefVFields.set_active(i)
-					break
-				i += 1
+		set_combo_active_value(self.comboRefHFields, fieldpos.posRefH)
+		set_combo_active_value(self.comboRefVFields, fieldpos.posRefV)
+
+		set_combo_active_value(self.comboAlignH, fieldpos.alignH)
+		set_combo_active_value(self.comboAlignV, fieldpos.alignV)
 
 	def apply(self):
 		fieldpos = self.fieldTab.field.pos
@@ -394,19 +396,20 @@ class FieldPosTab(FieldChildTab):
 		fieldpos.setValue('posH', posH)
 		fieldpos.setValue('posV', posV)
 
-		model = self.comboRefHFields.get_model()
-		combo_iter = self.comboRefHFields.get_active_iter()
-		if combo_iter is not None:
-			fieldName = model.get_value(combo_iter, 0)
-			posRefH = fieldName
-			fieldpos.setValue('posRefH', posRefH)
-		model = self.comboRefVFields.get_model()
-		combo_iter = self.comboRefVFields.get_active_iter()
-		if combo_iter is not None:
-			fieldName = model.get_value(combo_iter, 0)
-			posRefV = fieldName
-			fieldpos.setValue('posRefV', posRefV)
+		posRefH = get_combo_active_value(self.comboRefHFields)
+		fieldpos.setValue('posRefH', posRefH)
+		posRefV = get_combo_active_value(self.comboRefVFields)
+		fieldpos.setValue('posRefV', posRefV)
+
 		print("posRefH: {!s} posRefV: {!s}".format(posRefH, posRefV))
+
+		alignH = get_combo_active_value(self.comboAlignH)
+		fieldpos.setValue('alignH', alignH)
+		alignV = get_combo_active_value(self.comboAlignV)
+		fieldpos.setValue('alignV', alignV)
+
+		print("alignH: {!s} alignV: {!s}".format(alignH, alignV))
+
 		maxW = self.width_spinbutton.get_value()
 		maxH = self.height_spinbutton.get_value()
 		fieldpos.setValue('maxWidth', maxW)
@@ -445,3 +448,34 @@ def get_field_combo(type):
 	field_combo.set_entry_text_column(0)
 	return field_combo
 
+def get_align_combo(align):
+	## Create ComboBox
+	type_store = Gtk.ListStore(str, str)
+	type_store.append(('', ''))
+	for k in align.iterkeys():
+		type_store.append((align[k], k))
+	cmb = Gtk.ComboBox.new_with_model(type_store)
+	renderer = Gtk.CellRendererText()
+	cmb.pack_start(renderer, True)
+	cmb.add_attribute(renderer, 'text', 1)
+	cmb.set_entry_text_column(1)
+	return cmb
+
+def set_combo_active_value(combo, value):
+	model = combo.get_model()
+	combo.set_active(0)
+	i = 0
+	if value is not None:
+		for row in model:
+			if row[0] == value:
+				combo.set_active(i)
+				break
+			i += 1
+
+def get_combo_active_value(combo):
+	ret_val = ''
+	model = combo.get_model()
+	combo_iter = combo.get_active_iter()
+	if combo_iter is not None:
+		ret_val = model.get_value(combo_iter, 0)
+	return ret_val
