@@ -32,7 +32,6 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 		FPS = 30
 		fpsClock = pygame.time.Clock()
 		fpsClock.tick(FPS)
-		print("going to set pygame.display to: {!s}".format(self.guiType))
 		try:
 			if self.guiType == "fullscreen":
 				self.screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
@@ -42,22 +41,17 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 			print(pygame.get_error())
 			return
 
-		print("going to fill the background to: {!s}".format(g.backgroundColor))
 		try: self.doFillBackground(self.screen, g.backgroundColor, True)
 		except:
 			print(pygame.get_error())
 			return
-		print("going to get blit objeckt: ")
 		obj = self.getBlitObject()
-		print("going to blit objeckt-type: {!s}".format(type(obj)))
 		if isinstance(obj, types.ListType):
 			sorted_x = sorted(obj, key=operator.attrgetter('zIndex'))
 			for o in sorted_x:
 				self.doBlitObject(self.screen, o, True)
 		else:
-			print("doBlitObject: {!s}".format(type(obj)))
 			self.doBlitObject(self.screen, obj, True)
-		print("going to loop: ")
 		while True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -147,7 +141,6 @@ class BackgroundTab(PreviewTab):
 			g.initFields()
 			for field in g.fields:
 				if not g.fields[field].isPicField and hasattr(g.fields[field], 'zIndex'):
-					print('Adding field {!s}'.format(g.fields[field].name))
 					a.append(g.fields[field].getBlitObject())
 			a.append(audio.getCover())
 			return a
@@ -177,11 +170,10 @@ class FieldTab(PreviewTab):
 		g = CONFIG.gui[type]
 		self.set_border_width(10)
 		vbox = Gtk.VBox()
-		self.set_border_width(10)
-		vbox.add(Gtk.Label(_('Window-Fields-Settings')))
 		grid = Gtk.Grid()
 		grid.set_column_homogeneous(False)
 		grid.set_column_spacing(6)
+		vbox.set_spacing(10)
 		self.notebook = Gtk.Notebook()
 
 		self.fields = get_field_combo(type)
@@ -229,7 +221,6 @@ class FieldTab(PreviewTab):
 		i = self.notebook.get_n_pages()
 		for x in range(0, i):
 			p = self.notebook.get_nth_page(x)
-			print self.notebook.get_tab_label_text(p)
 			p.fillFields()
 
 
@@ -239,15 +230,12 @@ class FieldTab(PreviewTab):
 			return None
 		else:
 			self.field.initFields()
-			#self.field.content = self.field.getReplacedContent()
-			#print(u"Preview for field {!s} with example-content: {!s}".format(self.field.name, self.field.content))
 			return self.field.getBlitObject()
 
 	def on_applied(self, *data):
 		i = self.notebook.get_n_pages()
 		for x in range(0, i):
 			p = self.notebook.get_nth_page(x)
-			print self.notebook.get_tab_label_text(p)
 			p.apply()
 
 class FieldChildTab(Gtk.Box):
@@ -259,6 +247,7 @@ class FieldChildTab(Gtk.Box):
 		self.grid = Gtk.Grid()
 		self.grid.set_column_homogeneous(False)
 		self.grid.set_column_spacing(10)
+		self.grid.set_row_spacing(10)
 
 
 class FieldFontTab(FieldChildTab):
@@ -278,10 +267,7 @@ class FieldFontTab(FieldChildTab):
 		font_chooser = self.font_chooser
 		font = self.fieldTab.field.font
 		font_chooser.setBGcolor(self.fieldTab.guiType)
-		fontFace = '{!s} {!s}'.format(font.fontWeight, font.fontStyle)
-		## print(u"Field-Font " + font + " fontColor: " + field.font.getRGBAColor().to_string())
 		font_chooser.set_font(font.name, font.fontWeight, font.fontStyle, font.fontSize)
-		# font_chooser.set_font(field.font.name, fontFace, field.font.fontSize)
 		font_chooser.setFGcolor(font.getRGBAColor())
 
 	def onColorChanged(self, obj, colorchooser):
@@ -298,7 +284,6 @@ class FieldFontTab(FieldChildTab):
 			size = pangoFontDesc.get_size() / 1024
 			weight = pangoFontDesc.get_weight()
 			style = pangoFontDesc.get_style()
-			# pprint(GEnum.__dict__,None,2)
 			self.fieldTab.field.font.setValue('font', font)
 			self.fieldTab.field.font.setValue('fontSize', size)
 			self.fieldTab.field.font.setValue('fontWeight', weight.value_nick)
