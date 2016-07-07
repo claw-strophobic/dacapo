@@ -411,6 +411,9 @@ class FieldLayoutTab(FieldChildTab):
 		labelSplit = Gtk.Label(_("Split the field at spaces"), xalign=0)
 		labelzIndex = Gtk.Label(_("Stack order of the field"), xalign=0)
 		labelConvert = Gtk.Label(_("Convert content"), xalign=0)
+		labelComments = Gtk.Label(_("Comments"), xalign=0)
+		labelContent = Gtk.Label(_("Content"), xalign=0)
+		labelDummy = Gtk.Label('')
 
 		self.grid.add(labelOverlay)
 		self.overlaySwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
@@ -437,6 +440,19 @@ class FieldLayoutTab(FieldChildTab):
 		self.comboConvert.set_tooltip_text(_("Select a converting type here. Uppercase - all letter in upper case / Lowercase - all letters in lower case."))
 		self.grid.attach_next_to(self.comboConvert, labelConvert, Gtk.PositionType.RIGHT, 1, 1)
 
+		self.grid.attach_next_to(labelComments, self.overlaySwitch, Gtk.PositionType.RIGHT, 1,1)
+		self.txtCommentView = Gtk.TextView()
+		self.txtComment = self.txtCommentView.get_buffer()
+		# self.txtComment.set_width_chars(500)
+		self.txtCommentView.set_tooltip_text(_("Set a free comment here"))
+		self.grid.attach_next_to(self.txtCommentView, labelComments, Gtk.PositionType.RIGHT, 1, 2)
+
+		self.grid.attach_next_to(labelDummy, labelComments, Gtk.PositionType.BOTTOM, 1, 1)
+		self.grid.attach_next_to(labelContent, labelDummy, Gtk.PositionType.BOTTOM, 1, 1)
+		self.txtContentView = Gtk.TextView()
+		self.txtContent = self.txtContentView.get_buffer()
+		self.txtContentView.set_tooltip_text(_("Set the content of the field here"))
+		self.grid.attach_next_to(self.txtContentView, labelContent, Gtk.PositionType.RIGHT, 1, 2)
 
 		self.vbox.add(self.grid)
 		self.add(self.vbox)
@@ -451,6 +467,12 @@ class FieldLayoutTab(FieldChildTab):
 		self.zIndex_spinbutton.set_adjustment(adjustment)
 		self.zIndex_spinbutton.set_value(field.zIndex)
 		set_combo_active_value(self.comboConvert, field.convert)
+		self.txtComment.set_text('')
+		if field.comments and field.comments <> 'None':
+			self.txtComment.set_text(field.comments)
+		self.txtContent.set_text('')
+		if field.content:
+			self.txtContent.set_text(field.content)
 
 
 	def apply(self):
@@ -461,6 +483,10 @@ class FieldLayoutTab(FieldChildTab):
 		field.setValue('splitSpaces', self.SpltSwitch.get_active())
 		field.setValue('zIndex', self.zIndex_spinbutton.get_value())
 		field.setValue('convert', get_combo_active_value(self.comboConvert))
+		comment = self.txtComment.get_text(self.txtComment.get_start_iter(), self.txtComment.get_end_iter(), False)
+		content = self.txtContent.get_text(self.txtContent.get_start_iter(), self.txtContent.get_end_iter(), False)
+		field.setValue('comments', comment)
+		field.setValue('value', content)
 
 
 class GuiTab(Gtk.Box):
