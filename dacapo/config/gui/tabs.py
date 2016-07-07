@@ -14,6 +14,7 @@ from dacapo.config.gui.colorchooser import MyColorChooserWidget
 
 UI_ALIGN_H = {_("Left") : "left" , _("Right") : "right",	"Center" : "center"}
 UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "center"}
+UI_CONVERT = {_("Lowercase") : "lower" , _("Uppercase") : "upper"}
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -255,10 +256,9 @@ class FieldChildTab(Gtk.Box):
 		self.fieldTab = fieldTab
 		self.set_border_width(10)
 		self.vbox = Gtk.VBox()
-		self.set_border_width(10)
 		self.grid = Gtk.Grid()
 		self.grid.set_column_homogeneous(False)
-		self.grid.set_column_spacing(6)
+		self.grid.set_column_spacing(10)
 
 
 class FieldFontTab(FieldChildTab):
@@ -332,7 +332,7 @@ class FieldPosTab(FieldChildTab):
 		self.grid.attach_next_to(self.comboRefHFields, labelRefH, Gtk.PositionType.RIGHT, 1, 1)
 
 		self.grid.attach_next_to(labelAlignH, self.comboRefHFields, Gtk.PositionType.RIGHT, 1, 1)
-		self.comboAlignH = get_align_combo(UI_ALIGN_H)
+		self.comboAlignH = get_simple_combo(UI_ALIGN_H)
 		self.comboAlignH.set_tooltip_text(_("Select the horizontal alignment for the field on the screen here."))
 		self.grid.attach_next_to(self.comboAlignH, labelAlignH, Gtk.PositionType.RIGHT, 1, 1)
 
@@ -348,7 +348,7 @@ class FieldPosTab(FieldChildTab):
 		self.grid.attach_next_to(self.comboRefVFields, labelRefV, Gtk.PositionType.RIGHT, 1, 1)
 
 		self.grid.attach_next_to(labelAlignV, self.comboRefVFields, Gtk.PositionType.RIGHT, 1, 1)
-		self.comboAlignV = get_align_combo(UI_ALIGN_V)
+		self.comboAlignV = get_simple_combo(UI_ALIGN_V)
 		self.comboAlignV.set_tooltip_text(_("Select the vertical alignment for the field on the screen here."))
 		self.grid.attach_next_to(self.comboAlignV, labelAlignV, Gtk.PositionType.RIGHT, 1, 1)
 
@@ -404,19 +404,16 @@ class FieldPosTab(FieldChildTab):
 		posRefV = get_combo_active_value(self.comboRefVFields)
 		fieldpos.setValue('posRefV', posRefV)
 
-		print("posRefH: {!s} posRefV: {!s}".format(posRefH, posRefV))
-
 		alignH = get_combo_active_value(self.comboAlignH)
 		fieldpos.setValue('alignH', alignH)
 		alignV = get_combo_active_value(self.comboAlignV)
 		fieldpos.setValue('alignV', alignV)
 
-		print("alignH: {!s} alignV: {!s}".format(alignH, alignV))
-
 		maxW = self.width_spinbutton.get_value()
 		maxH = self.height_spinbutton.get_value()
 		fieldpos.setValue('maxWidth', maxW)
 		fieldpos.setValue('maxHeight', maxH)
+
 
 class FieldLayoutTab(FieldChildTab):
 
@@ -424,9 +421,11 @@ class FieldLayoutTab(FieldChildTab):
 		super(FieldLayoutTab, self).__init__(fieldTab)
 		g = CONFIG.gui[self.fieldTab.guiType]
 
-		labelOverlay = Gtk.Label(_('Overlay over other elements'), xalign=0)
-		labelMulti = Gtk.Label(_('Field has multi lines'), xalign=0)
-		labelSplit = Gtk.Label(_('Split the field at spaces'), xalign=0)
+		labelOverlay = Gtk.Label(_("Overlay over other elements"), xalign=0)
+		labelMulti = Gtk.Label(_("Field has multi lines"), xalign=0)
+		labelSplit = Gtk.Label(_("Split the field at spaces"), xalign=0)
+		labelzIndex = Gtk.Label(_("Stack order of the field"), xalign=0)
+		labelConvert = Gtk.Label(_("Convert content"), xalign=0)
 
 		self.grid.add(labelOverlay)
 		self.overlaySwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
@@ -443,6 +442,16 @@ class FieldLayoutTab(FieldChildTab):
 		self.SpltSwitch.set_tooltip_text(_("Should this field get line breaks at spaces?"))
 		self.grid.attach_next_to(self.SpltSwitch, labelSplit, Gtk.PositionType.RIGHT, 1, 1)
 
+		self.grid.attach_next_to(labelzIndex, labelSplit, Gtk.PositionType.BOTTOM, 1, 1)
+		self.zIndex_spinbutton = Gtk.SpinButton()
+		self.zIndex_spinbutton.set_tooltip_text(_("Set here the stack order of the field. The higher the value the higher on the stack."))
+		self.grid.attach_next_to(self.zIndex_spinbutton, labelzIndex, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelConvert, labelzIndex, Gtk.PositionType.BOTTOM, 1, 1)
+		self.comboConvert = get_simple_combo(UI_CONVERT)
+		self.comboConvert.set_tooltip_text(_("Select a converting type here. Uppercase - all letter in upper case / Lowercase - all letters in lower case."))
+		self.grid.attach_next_to(self.comboConvert, labelConvert, Gtk.PositionType.RIGHT, 1, 1)
+
 
 		self.vbox.add(self.grid)
 		self.add(self.vbox)
@@ -453,6 +462,10 @@ class FieldLayoutTab(FieldChildTab):
 		self.overlaySwitch.set_active(field.overlay)
 		self.MultiSwitch.set_active(field.multiLine)
 		self.SpltSwitch.set_active(field.splitSpaces)
+		adjustment = Gtk.Adjustment(field.zIndex, (-999), 999, 1, 10, 0)
+		self.zIndex_spinbutton.set_adjustment(adjustment)
+		self.zIndex_spinbutton.set_value(field.zIndex)
+		set_combo_active_value(self.comboConvert, field.convert)
 
 
 	def apply(self):
@@ -461,6 +474,8 @@ class FieldLayoutTab(FieldChildTab):
 		field.setValue('overlay', self.overlaySwitch.get_active())
 		field.setValue('multiLine', self.MultiSwitch.get_active())
 		field.setValue('splitSpaces', self.SpltSwitch.get_active())
+		field.setValue('zIndex', self.zIndex_spinbutton.get_value())
+		field.setValue('convert', get_combo_active_value(self.comboConvert))
 
 
 class GuiTab(Gtk.Box):
@@ -491,12 +506,12 @@ def get_field_combo(type):
 	field_combo.set_entry_text_column(0)
 	return field_combo
 
-def get_align_combo(align):
+def get_simple_combo(keyValue):
 	## Create ComboBox
 	type_store = Gtk.ListStore(str, str)
 	type_store.append(('', ''))
-	for k in align.iterkeys():
-		type_store.append((align[k], k))
+	for k in keyValue.iterkeys():
+		type_store.append((keyValue[k], k))
 	cmb = Gtk.ComboBox.new_with_model(type_store)
 	renderer = Gtk.CellRendererText()
 	cmb.pack_start(renderer, True)
