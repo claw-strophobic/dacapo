@@ -139,6 +139,10 @@ class Configurator(Gtk.Window):
 			self.audio = getAudioFile(file)
 			self.audio.loadFrontCover()
 			CONFIG.setConfig('TEMP', Key='AUDIOFILE', Value=self.audio)
+			if self.page_window.page_fields.field:
+				self.page_window.page_fields.prev_button.set_sensitive(True)
+			if self.page_fullscreen.page_fields.field:
+				self.page_fullscreen.page_fields.prev_button.set_sensitive(True)
 		dialog.destroy()
 		return
 
