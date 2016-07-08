@@ -122,6 +122,7 @@ setup(
         'dacapo': ['*.glade'],
         # And include any *.tar.gz from the package 'dacapo.config, too:
         'dacapo.config': ['*.gz'],
+        'dacapo.config.gui': ['*.css'],
         'dacapo.data': ['*'],
         'dacapo': ['locale/*/LC_MESSAGES/*'],
     },

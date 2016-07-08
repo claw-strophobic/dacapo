@@ -1,0 +1,37 @@
+/* This is a comment
+GtkLabel {
+    background-color: red;
+}
+
+GtkTextView {
+    background-color: white;
+    border-radius: 8px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+}
+*/
+.myview {
+    background-color: white;
+    border-radius: 8px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+}
+
+
+.notebook tab.top:active {
+    border-radius: 20px;
+    background-image: -gtk-gradient (linear,
+                                     left top, left bottom,
+                                     from (white),
+                                     to (shade (@bg_color, 0.95)));
+}
+
+
+textview.view border.top {
+    border-radius: 8px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black;
+}

@@ -11,10 +11,12 @@ from dacapo.config.gui import *
 from dacapo.config.gui.fontchooser import MyFontChooserWidget
 from dacapo.config.gui.colorchooser import MyColorChooserWidget
 # from  gi.repository.GObject import GEnum
+import os
 
 UI_ALIGN_H = {_("Left") : "left" , _("Right") : "right",	"Center" : "center"}
 UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "center"}
 UI_CONVERT = {_("Lowercase") : "lower" , _("Uppercase") : "upper"}
+CSSFILE = os.path.join(os.path.dirname(__file__), 'configurator.css')
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
@@ -241,6 +243,11 @@ class FieldTab(PreviewTab):
 class FieldChildTab(Gtk.Box):
 	def __init__(self, fieldTab):
 		super(FieldChildTab, self).__init__()
+		screen = Gdk.Screen.get_default()
+		css_provider = Gtk.CssProvider()
+		css_provider.load_from_path(CSSFILE)
+		context = Gtk.StyleContext()
+		context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 		self.fieldTab = fieldTab
 		self.set_border_width(10)
 		self.vbox = Gtk.VBox()
@@ -446,6 +453,7 @@ class FieldLayoutTab(FieldChildTab):
 		# self.txtComment.set_width_chars(500)
 		self.txtCommentView.set_tooltip_text(_("Set a free comment here"))
 		self.grid.attach_next_to(self.txtCommentView, labelComments, Gtk.PositionType.RIGHT, 1, 2)
+		self.txtCommentView.get_style_context().add_class("myview")
 
 		self.grid.attach_next_to(labelDummy, labelComments, Gtk.PositionType.BOTTOM, 1, 1)
 		self.grid.attach_next_to(labelContent, labelDummy, Gtk.PositionType.BOTTOM, 1, 1)
@@ -453,6 +461,7 @@ class FieldLayoutTab(FieldChildTab):
 		self.txtContent = self.txtContentView.get_buffer()
 		self.txtContentView.set_tooltip_text(_("Set the content of the field here"))
 		self.grid.attach_next_to(self.txtContentView, labelContent, Gtk.PositionType.RIGHT, 1, 2)
+		self.txtCommentView.get_style_context().add_class("myview")
 
 		self.vbox.add(self.grid)
 		self.add(self.vbox)
