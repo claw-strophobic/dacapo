@@ -519,14 +519,14 @@ class GuiTab(Gtk.Box):
 		self.notebook.append_page(self.page_fields, Gtk.Label(_("Fields")))
 
 
-def get_field_combo(type):
+def get_field_combo(guiType):
 	type_store = Gtk.ListStore(str, object)
-	g = CONFIG.gui[type]
+	g = CONFIG.gui[guiType]
 	type_store.append(['', None])
 	for key in g.fields:
 		type_store.append([key, g.fields[key]])
 	field_combo = Gtk.ComboBox.new_with_model(type_store)
-	field_combo.type = type
+	field_combo.type = guiType
 	renderer = Gtk.CellRendererText()
 	field_combo.pack_start(renderer, True)
 	field_combo.add_attribute(renderer, 'text', 0)
