@@ -59,11 +59,11 @@ class Configurator(Gtk.Window):
 		vbox.add(self.notebook)
 
 		# 1st tab -> Window settings
-		self.page_window = GuiTab('window')
+		self.page_window = GuiTab(self, 'window')
 		self.notebook.append_page(self.page_window, Gtk.Label(_("GUI Window")))
 
 		# 2nd tab -> Fullscreen settings
-		self.page_fullscreen = GuiTab('fullscreen')
+		self.page_fullscreen = GuiTab(self, 'fullscreen')
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
 
 		self.page_metadata = Gtk.Box()
@@ -87,6 +87,14 @@ class Configurator(Gtk.Window):
 			)
 		)
 		self.add(vbox)
+
+		# Create a statusbar
+		self.statusbar = Gtk.Statusbar()
+		self.context_id = self.statusbar.get_context_id("start")
+		self.statusbar.push(self.context_id, _("Ready..."))
+		vbox.add(self.statusbar)
+
+
 
 	def add_file_menu_actions(self, action_group):
 		action_group.add_actions([
@@ -143,6 +151,8 @@ class Configurator(Gtk.Window):
 				self.page_window.page_fields.prev_button.set_sensitive(True)
 			if self.page_fullscreen.page_fields.field:
 				self.page_fullscreen.page_fields.prev_button.set_sensitive(True)
+			self.statusbar.push(self.context_id, _("Loaded audiofile: ") + file)
+
 		dialog.destroy()
 		return
 
@@ -157,18 +167,23 @@ class Configurator(Gtk.Window):
 		if response == Gtk.ResponseType.ACCEPT:
 			file = dialog.get_filename()
 			CONFIG.saveConfig(file)
+			self.statusbar.push(self.context_id, _("Saved config to: ") + file)
+		else:
+			self.statusbar.push(self.context_id, _("Saving canceled"))
 
 		dialog.destroy()
 		return
 
 	def on_menu_save(self, widget):
 		text = CONFIG.saveConfig()
+		self.statusbar.push(self.context_id, _("Saved config. "))
 		return
 
 	def on_menu_file_new_generic(self, widget):
 		print("A File|New menu item ({!s}) was selected.".format(widget.get_name()))
 
 	def on_menu_file_quit(self, widget):
+		self.statusbar.remove_all(self.context_id)
 		Gtk.main_quit()
 
 	def on_menu_others(self, widget):

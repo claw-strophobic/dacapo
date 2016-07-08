@@ -20,10 +20,11 @@ CSSFILE = os.path.join(os.path.dirname(__file__), 'configurator.css')
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
-	def __init__(self, guiType):
+	def __init__(self, main, guiType):
 		Gtk.Box.__init__(self)
 		self.guiType = guiType
 		self.screen = None
+		self.window = main
 
 	def on_preview(self, *data):
 		import types
@@ -70,8 +71,8 @@ class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
 
 class BackgroundTab(PreviewTab):
 
-	def __init__(self, guiType):
-		super(BackgroundTab, self).__init__(guiType)
+	def __init__(self, main, guiType):
+		super(BackgroundTab, self).__init__(main, guiType)
 		backcolorchooser = MyColorChooserWidget(guiType)
 		s = Gdk.Screen.get_default()
 		g = CONFIG.gui[guiType]
@@ -82,11 +83,11 @@ class BackgroundTab(PreviewTab):
 		grid.set_column_spacing(6)
 
 		if guiType == 'window':
-			labelWidth = Gtk.Label(_('Window width'))
-			labelHeight = Gtk.Label(_('Window height'))
+			labelWidth = Gtk.Label(_('Window width'), xalign=0)
+			labelHeight = Gtk.Label(_('Window height'), xalign=0)
 		else:
-			labelWidth = Gtk.Label(_('Fullscreen width'))
-			labelHeight = Gtk.Label(_('Fullscreen height'))
+			labelWidth = Gtk.Label(_('Fullscreen width'), xalign=0)
+			labelHeight = Gtk.Label(_('Fullscreen height'), xalign=0)
 		labelDummy = Gtk.Label(' ')
 
 		grid.add(labelWidth)
@@ -107,7 +108,7 @@ class BackgroundTab(PreviewTab):
 		self.height_spinbutton.connect('value-changed', self.onValueChanged, 'height')
 		grid.attach_next_to(self.height_spinbutton,labelHeight, Gtk.PositionType.RIGHT, 1, 1)
 
-		labelMouseVisible = Gtk.Label(_('Show the mouse cursor'))
+		labelMouseVisible = Gtk.Label(_('Show the mouse cursor'), xalign=0)
 		grid.attach_next_to(labelMouseVisible, labelHeight, Gtk.PositionType.BOTTOM, 1, 1)
 		self.mouseVisible = Gtk.CheckButton()
 		self.mouseVisible.set_active(g.mouseVisible)
@@ -166,8 +167,8 @@ class BackgroundTab(PreviewTab):
 
 class FieldTab(PreviewTab):
 
-	def __init__(self, type):
-		super(FieldTab, self).__init__(type)
+	def __init__(self, main, type):
+		super(FieldTab, self).__init__(main, type)
 		self.field = None
 		g = CONFIG.gui[type]
 		self.set_border_width(10)
@@ -207,6 +208,7 @@ class FieldTab(PreviewTab):
 		self.add(vbox)
 
 	def on_field_combo_changed(self, combo):
+		window = self.window
 		combo_iter = combo.get_active_iter()
 		if not combo_iter:
 			return
@@ -224,6 +226,7 @@ class FieldTab(PreviewTab):
 		for x in range(0, i):
 			p = self.notebook.get_nth_page(x)
 			p.fillFields()
+		window.statusbar.push(window.context_id, _("Selected field: ") + fieldName)
 
 
 	def getBlitObject( self ):
@@ -235,14 +238,17 @@ class FieldTab(PreviewTab):
 			return self.field.getBlitObject()
 
 	def on_applied(self, *data):
+		window = self.window
 		i = self.notebook.get_n_pages()
 		for x in range(0, i):
 			p = self.notebook.get_nth_page(x)
 			p.apply()
+		window.statusbar.push(window.context_id, _("Applied the settings."))
 
 class FieldChildTab(Gtk.Box):
 	def __init__(self, fieldTab):
 		super(FieldChildTab, self).__init__()
+		self.window = self.get_toplevel()
 		screen = Gdk.Screen.get_default()
 		css_provider = Gtk.CssProvider()
 		css_provider.load_from_path(CSSFILE)
@@ -500,15 +506,16 @@ class FieldLayoutTab(FieldChildTab):
 
 class GuiTab(Gtk.Box):
 
-	def __init__(self, guiType):
+	def __init__(self, main, guiType):
 		Gtk.Box.__init__(self)
+		self.main = main
 		self.notebook = Gtk.Notebook()
 		self.add(self.notebook)
 
 		# 1st tab -> Background settings
-		self.page_background = BackgroundTab(guiType)
+		self.page_background = BackgroundTab(main, guiType)
 		self.notebook.append_page(self.page_background, Gtk.Label(_("Background")))
-		self.page_fields = FieldTab(guiType)
+		self.page_fields = FieldTab(main, guiType)
 		self.notebook.append_page(self.page_fields, Gtk.Label(_("Fields")))
 
 
