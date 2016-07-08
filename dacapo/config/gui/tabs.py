@@ -219,7 +219,7 @@ class FieldTab(PreviewTab):
 			return
 		self.field = field
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
-		self.apply_button.set_sensitive(True)
+		self.apply_button.set_sensitive(False)
 		if audio is not None:
 			self.prev_button.set_sensitive(True)
 		i = self.notebook.get_n_pages()
