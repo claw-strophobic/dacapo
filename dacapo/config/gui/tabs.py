@@ -167,10 +167,10 @@ class BackgroundTab(PreviewTab):
 
 class FieldTab(PreviewTab):
 
-	def __init__(self, main, type):
-		super(FieldTab, self).__init__(main, type)
+	def __init__(self, main, guiType):
+		super(FieldTab, self).__init__(main, guiType)
 		self.field = None
-		g = CONFIG.gui[type]
+		g = CONFIG.gui[guiType]
 		self.set_border_width(10)
 		vbox = Gtk.VBox()
 		grid = Gtk.Grid()
@@ -179,7 +179,7 @@ class FieldTab(PreviewTab):
 		vbox.set_spacing(10)
 		self.notebook = Gtk.Notebook()
 
-		self.fields = get_field_combo(type)
+		self.fields = get_field_combo(guiType)
 		self.fields.set_tooltip_text(_("Select an existing field here."))
 		self.fields.connect("changed", self.on_field_combo_changed)
 		labelField = Gtk.Label(_('Field:'))
