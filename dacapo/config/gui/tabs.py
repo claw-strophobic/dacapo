@@ -219,7 +219,7 @@ class FieldTab(PreviewTab):
 			return
 		self.field = field
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
-		self.apply_button.set_sensitive(False)
+		self.apply_button.set_sensitive(True)
 		if audio is not None:
 			self.prev_button.set_sensitive(True)
 		i = self.notebook.get_n_pages()
@@ -504,6 +504,56 @@ class FieldLayoutTab(FieldChildTab):
 		field.setValue('value', content)
 
 
+class CondTab(PreviewTab):
+
+	def __init__(self, main):
+		super(CondTab, self).__init__(main, 'metaData')
+		self.cond = None
+		g = CONFIG.gui['metaData']
+		self.set_border_width(10)
+		vbox = Gtk.VBox()
+		grid = Gtk.Grid()
+		grid.set_column_homogeneous(False)
+		grid.set_column_spacing(6)
+		vbox.set_spacing(10)
+
+		self.conds = get_field_combo('metaData')
+		self.conds.set_tooltip_text(_("Select an existing condition here."))
+		self.conds.connect("changed", self.on_cond_combo_changed)
+		labelField = Gtk.Label(_('Field:'))
+		grid.add(labelField)
+		grid.attach_next_to(self.conds, labelField, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.apply_button = Gtk.Button(_("apply"))
+		self.apply_button.set_sensitive(False)
+		self.apply_button.connect('clicked', self.on_applied)
+		self.apply_button.set_tooltip_text(_("Click here to see apply the settings of this field."))
+		grid.attach_next_to(self.apply_button, self.conds, Gtk.PositionType.RIGHT, 1, 1)
+
+		vbox.add(grid)
+		self.add(vbox)
+
+	def on_cond_combo_changed(self, combo):
+		window = self.window
+		combo_iter = combo.get_active_iter()
+		if not combo_iter:
+			return
+		model = combo.get_model()
+		fieldName = model.get_value(combo_iter, 0)
+		field = model.get_value(combo_iter, 1)
+		if field is None:
+			return
+		self.cond = field
+		self.apply_button.set_sensitive(True)
+		window.statusbar.push(window.context_id, _("Selected field: ") + fieldName)
+
+
+	def on_applied(self, *data):
+		window = self.window
+		window.statusbar.push(window.context_id, _("Applied the settings."))
+
+
+
 class GuiTab(Gtk.Box):
 
 	def __init__(self, main, guiType):
@@ -517,6 +567,18 @@ class GuiTab(Gtk.Box):
 		self.notebook.append_page(self.page_background, Gtk.Label(_("Background")))
 		self.page_fields = FieldTab(main, guiType)
 		self.notebook.append_page(self.page_fields, Gtk.Label(_("Fields")))
+
+class MetaTab(Gtk.Box):
+
+	def __init__(self, main):
+		Gtk.Box.__init__(self)
+		self.main = main
+		self.notebook = Gtk.Notebook()
+		self.add(self.notebook)
+
+		# 1st tab -> Background settings
+		self.page_cond = CondTab(main)
+		self.notebook.append_page(self.page_cond, Gtk.Label(_("Conditions")))
 
 
 def get_field_combo(guiType):

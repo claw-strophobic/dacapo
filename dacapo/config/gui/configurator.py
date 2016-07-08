@@ -66,10 +66,11 @@ class Configurator(Gtk.Window):
 		self.page_fullscreen = GuiTab(self, 'fullscreen')
 		self.notebook.append_page(self.page_fullscreen, Gtk.Label(_("GUI Fullscreen")))
 
-		self.page_metadata = Gtk.Box()
-		self.page_metadata.set_border_width(10)
-		self.page_metadata.add(Gtk.Label(_('Metadata-Settings!')))
+		# 3rd tab -> Metadata settings
+		self.page_metadata = MetaTab(self)
 		self.notebook.append_page(self.page_metadata, Gtk.Label(_("Metadata")))
+
+		# 4th tab -> Audio & Debug
 		self.page_debug = Gtk.Box()
 		self.page_debug.set_border_width(10)
 		self.page_debug.add(Gtk.Label(_('Audio & Debug-Settings!')))
