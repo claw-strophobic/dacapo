@@ -21,11 +21,22 @@ GtkTextView {
 
 
 .notebook tab.top:active {
-    border-radius: 20px;
     background-image: -gtk-gradient (linear,
-                                     left top, left bottom,
-                                     from (white),
-                                     to (shade (@bg_color, 0.95)));
+                                       left top,
+                                       right bottom,
+                                       color-stop(0.0, @bg_color),
+                                       color-stop(0.33, white),
+                                       color-stop(0.66, white),
+                                       color-stop(1.00, @bg_color)
+                                    );
+/*
+    background-image: -gtk-gradient (radial,
+                                   center center, 0,
+                                   center center, 1,
+                                   color-stop(0.0, white),
+                                   color-stop(0.20, @bg_color)
+                                   );
+*/
 }
 
 
