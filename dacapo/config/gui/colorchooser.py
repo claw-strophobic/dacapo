@@ -40,7 +40,8 @@ class MyColorChooserWidget(Gtk.ColorChooserWidget):
 		self.set_property("show-editor", True)
 
 	def connect_color_activated(self, method):
-		self.entryField.connect("changed", method, self)
+		if self.entryField is not None:
+			self.entryField.connect("changed", method, self)
 
 	def get_attr(self, obj):
 		for attr in obj:
@@ -50,11 +51,15 @@ class MyColorChooserWidget(Gtk.ColorChooserWidget):
 				self.get_attr(attr)
 			elif str.lower(type(attr).__name__) == "gtk.coloreditor":
 				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "gtkcoloreditor":
+				self.get_attr(attr)
 			elif str.lower(type(attr).__name__) == "overlay":
 				self.colorEditor = attr
 				self.get_attr(attr)
 			elif str.lower(type(attr).__name__) == "entry":
 				self.entryField = attr
+			else:
+				continue
 
 	def my_even_fancier_attribute_getter(self, obj):
 		return [(attr, value) for attr, value in obj.__dict__.items() if not callable(value)]
