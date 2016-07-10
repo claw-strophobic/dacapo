@@ -7,12 +7,14 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation
 #
+import dacapo.ui.configelement
 
-class Condition(object):
+class Condition(dacapo.ui.configelement.ConfigElement):
 
 	def __init__(self, name=''):
 		self.name = name
 		self.content = ''
+		self.comment = ''
 		self.operator = ''
 		self.operand = ''
 		self.type = 'cond'
@@ -21,6 +23,7 @@ class Condition(object):
 		self.name = xml.tag
 		self.operator = xml.get("operator", "ne")
 		self.operand = xml.get("operand", " ").lower()
+		self.comment = xml.get("comment", " ")
 		self.content = xml.text
 
 	def checkOperand(self, operand):
@@ -47,6 +50,8 @@ class Condition(object):
 			res = False
 		return res
 
+	def setVars(self):
+		self.vars = {}
 
 	def printValues(self):
 		print('Condition: {!s} {!s} {!s} {!s}'.format(self.name, self.content, self.operator, self.operand))
