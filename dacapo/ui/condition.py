@@ -12,6 +12,7 @@ import dacapo.ui.configelement
 class Condition(dacapo.ui.configelement.ConfigElement):
 
 	def __init__(self, name=''):
+		super(Condition, self).__init__()
 		self.name = name
 		self.content = ''
 		self.comment = ''
@@ -21,9 +22,9 @@ class Condition(dacapo.ui.configelement.ConfigElement):
 
 	def grabXMLData(self, xml):
 		self.name = xml.tag
-		self.operator = xml.get("operator", "ne")
+		self.operator = xml.get("operator", "notempty")
 		self.operand = xml.get("operand", " ").lower()
-		self.comment = xml.get("comment", " ")
+		self.comments = xml.get("comments", " ")
 		self.content = xml.text
 
 	def checkOperand(self, operand):
@@ -51,7 +52,26 @@ class Condition(dacapo.ui.configelement.ConfigElement):
 		return res
 
 	def setVars(self):
-		self.vars = {}
+		extendvars = {
+			'comments': {
+				'target': 'comments',
+				'type': 'text',
+			},
+			'content': {
+				'target': 'content',
+				'type': 'text',
+			},
+			'operator': {
+				'target': 'operator',
+				'type': 'text',
+			},
+			'operand': {
+				'target': 'operand',
+				'type': 'text',
+			},
+		}
+		self.vars.update(extendvars)
+
 
 	def printValues(self):
 		print('Condition: {!s} {!s} {!s} {!s}'.format(self.name, self.content, self.operator, self.operand))
