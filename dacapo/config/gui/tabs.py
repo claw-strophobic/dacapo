@@ -16,6 +16,7 @@ import os
 UI_ALIGN_H = {_("Left") : "left" , _("Right") : "right",	"Center" : "center"}
 UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "center"}
 UI_CONVERT = {_("Lowercase") : "lower" , _("Uppercase") : "upper"}
+UI_OPERATOR = {_("Empty") : "empty" , _("Not empty") : "notempty"}
 CSSFILE = os.path.join(os.path.dirname(__file__), 'configurator.css')
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
@@ -456,7 +457,6 @@ class FieldLayoutTab(FieldChildTab):
 		self.grid.attach_next_to(labelComments, self.overlaySwitch, Gtk.PositionType.RIGHT, 1,1)
 		self.txtCommentView = Gtk.TextView()
 		self.txtComment = self.txtCommentView.get_buffer()
-		# self.txtComment.set_width_chars(500)
 		self.txtCommentView.set_tooltip_text(_("Set a free comment here"))
 		self.grid.attach_next_to(self.txtCommentView, labelComments, Gtk.PositionType.RIGHT, 1, 2)
 		self.txtCommentView.get_style_context().add_class("myview")
@@ -517,6 +517,14 @@ class CondTab(PreviewTab):
 		grid.set_column_spacing(6)
 		vbox.set_spacing(10)
 
+		labelComments = Gtk.Label(_("Comments"), xalign=0)
+		labelOperator = Gtk.Label(_("Operator"), xalign=0)
+		labelOperand = Gtk.Label(_("Operand"), xalign=0)
+		labelContent = Gtk.Label(_("Content"), xalign=0)
+		labelDummy = Gtk.Label('')
+		labelDummy2 = Gtk.Label('')
+		labelDummy3 = Gtk.Label('')
+
 		self.conds = get_field_combo('metaData')
 		self.conds.set_tooltip_text(_("Select an existing condition here."))
 		self.conds.connect("changed", self.on_cond_combo_changed)
@@ -527,11 +535,51 @@ class CondTab(PreviewTab):
 		self.apply_button = Gtk.Button(_("apply"))
 		self.apply_button.set_sensitive(False)
 		self.apply_button.connect('clicked', self.on_applied)
-		self.apply_button.set_tooltip_text(_("Click here to see apply the settings of this field."))
+		self.apply_button.set_tooltip_text(_("Click here to see apply the settings of this condition."))
 		grid.attach_next_to(self.apply_button, self.conds, Gtk.PositionType.RIGHT, 1, 1)
+
+		grid.attach_next_to(labelDummy, labelField, Gtk.PositionType.BOTTOM, 1, 1)
+
+		grid.attach_next_to(labelOperand, labelDummy, Gtk.PositionType.BOTTOM, 1,1)
+		self.operand = Gtk.Entry()
+		grid.attach_next_to(self.operand, labelOperand, Gtk.PositionType.RIGHT, 1, 1)
+
+		grid.attach_next_to(labelComments, labelOperand, Gtk.PositionType.BOTTOM, 1,1)
+		self.txtCommentView = Gtk.TextView()
+		self.txtComment = self.txtCommentView.get_buffer()
+		self.txtCommentView.set_tooltip_text(_("Set a free comment here"))
+		grid.attach_next_to(self.txtCommentView, labelComments, Gtk.PositionType.RIGHT, 1, 2)
+		self.txtCommentView.get_style_context().add_class("myview")
+		grid.attach_next_to(labelDummy2, labelComments, Gtk.PositionType.BOTTOM, 1, 1)
+
+		grid.attach_next_to(labelOperator, labelDummy2, Gtk.PositionType.BOTTOM, 1, 1)
+		self.comboOperator = get_simple_combo(UI_OPERATOR)
+		self.comboOperator.set_tooltip_text(_("Select a converting type here. Uppercase - all letter in upper case / Lowercase - all letters in lower case."))
+		grid.attach_next_to(self.comboOperator, labelOperator, Gtk.PositionType.RIGHT, 1, 1)
+
+
+		grid.attach_next_to(labelContent, labelOperator, Gtk.PositionType.BOTTOM, 1, 1)
+		self.txtContentView = Gtk.TextView()
+		self.txtContent = self.txtContentView.get_buffer()
+		self.txtContentView.set_tooltip_text(_("Set the content of the condition here"))
+		grid.attach_next_to(self.txtContentView, labelContent, Gtk.PositionType.RIGHT, 1, 2)
+		self.txtCommentView.get_style_context().add_class("myview")
+		grid.attach_next_to(labelDummy3, labelContent, Gtk.PositionType.BOTTOM, 1, 1)
 
 		vbox.add(grid)
 		self.add(vbox)
+
+	def fillFields(self):
+		g = CONFIG.gui['metaData']
+		field = self.cond
+		set_combo_active_value(self.comboOperator, field.operator)
+		self.operand.set_text(field.operand)
+		self.txtComment.set_text('')
+		if field.comments and field.comments <> 'None':
+			self.txtComment.set_text(field.comments)
+		self.txtContent.set_text('')
+		if field.content:
+			self.txtContent.set_text(field.content)
 
 	def on_cond_combo_changed(self, combo):
 		window = self.window
@@ -546,11 +594,20 @@ class CondTab(PreviewTab):
 		self.cond = field
 		self.apply_button.set_sensitive(True)
 		window.statusbar.push(window.context_id, _("Selected field: ") + fieldName)
+		self.fillFields()
 
 
 	def on_applied(self, *data):
 		window = self.window
+		g = CONFIG.gui['metaData']
+		field = self.cond
+		field.setValue('operator', get_combo_active_value(self.comboOperator))
+		comment = self.txtComment.get_text(self.txtComment.get_start_iter(), self.txtComment.get_end_iter(), False)
+		content = self.txtContent.get_text(self.txtContent.get_start_iter(), self.txtContent.get_end_iter(), False)
+		field.setValue('comments', comment)
+		field.setValue('value', content)
 		window.statusbar.push(window.context_id, _("Applied the settings."))
+
 
 
 
