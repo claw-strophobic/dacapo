@@ -22,17 +22,7 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		self.set_show_preview_entry(True)
 		self.grid = None
 		self.entry = None
-		for attr in self:
-			self.grid = attr
-			break
-		if self.grid <> None:
-			for attr in self.grid:
-				if type(attr).__name__ == "SearchEntry":
-					self.searchEntry = attr
-					self.searchEntry.set_tooltip_text(_("Search here for a font name."))
-				if type(attr).__name__ == "Entry":
-					self.entry = attr
-					self.entry.set_tooltip_text(_("Change here the text of the preview."))
+		self.get_attr(self)
 
 		box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 		self.colorchooser = MyColorChooserWidget()
@@ -44,6 +34,31 @@ class MyFontChooserWidget(Gtk.FontChooserWidget):
 		self.connect("notify::font", self.font_cb)
 		# self.printValues()
 
+	def get_attr(self, obj):
+		for attr in obj:
+			if str.lower(type(attr).__name__) == "box":
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "grid":
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "gtk.coloreditor":
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "gtkcoloreditor":
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "stack":
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "overlay":
+				self.colorEditor = attr
+				self.get_attr(attr)
+			elif str.lower(type(attr).__name__) == "searchentry":
+				# print('SearchEntry gefunden \n\tName: {!s} \n\tType:{!s} \n\tObject: {!s}'.format(type(attr).__name__, type(attr), attr))
+				self.searchEntry = attr
+				self.searchEntry.set_tooltip_text(_("Search here for a font name."))
+			elif str.lower(type(attr).__name__) == "entry":
+				# print('Entry gefunden \n\tName: {!s} \n\tType:{!s} \n\tObject: {!s}'.format(type(attr).__name__, type(attr), attr))
+				self.entry = attr
+				self.entry.set_tooltip_text(_("Change here the text of the preview."))
+			else:
+				continue
 
 	# callback function:
 	def font_cb(self, event, user_data):
