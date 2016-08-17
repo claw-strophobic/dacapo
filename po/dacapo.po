@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: dacapo 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 15:45+0100\n"
-"PO-Revision-Date: 2016-07-07 16:28+0100\n"
+"PO-Revision-Date: 2016-08-17 15:34+0100\n"
 "Last-Translator: Claw Strophobic <claw.strophobic@gmx.de>\n"
 "Language-Team: LANGUAGE <claw.strophobic@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -334,6 +334,8 @@ msgstr "GUI Fullscreen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:328
 #: dacapo/config/gui/configurator.py:72
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:72
+#: dacapo/config/gui/configurator.py:71
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:71
 msgid "Metadata"
 msgstr "Metadaten"
 
@@ -344,6 +346,8 @@ msgstr "Metadaten"
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:332
 #: dacapo/config/gui/configurator.py:76
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:76
+#: dacapo/config/gui/configurator.py:77
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:77
 msgid "Audio & Debug"
 msgstr "Audio & Debug"
 
@@ -397,6 +401,9 @@ msgstr "Fenster-Felder-Einstellungen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:190
 #: dacapo/config/gui/tabs.py:182
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:182
+#: dacapo/config/gui/tabs.py:186 dacapo/config/gui/tabs.py:539
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:186
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:539
 msgid "Field:"
 msgstr "Feld:"
 
@@ -418,6 +425,9 @@ msgstr "Feld:"
 #: dacapo/config/gui/tabs.py:124 dacapo/config/gui/tabs.py:185
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:124
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:185
+#: dacapo/config/gui/tabs.py:128 dacapo/config/gui/tabs.py:189
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:128
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:189
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -493,6 +503,8 @@ msgstr "Metadata-Einstellungen!"
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:331
 #: dacapo/config/gui/configurator.py:75
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:75
+#: dacapo/config/gui/configurator.py:76
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:76
 msgid "Audio & Debug-Settings!"
 msgstr "Audio & Debug-Einstellungen!"
 
@@ -501,6 +513,8 @@ msgstr "Audio & Debug-Einstellungen!"
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:51
 #: dacapo/config/gui/fontchooser.py:32
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/fontchooser.py:32
+#: dacapo/config/gui/fontchooser.py:55
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/fontchooser.py:55
 msgid "Search here for a font name."
 msgstr "Suche hier nach einem Schriftnamen."
 
@@ -509,6 +523,8 @@ msgstr "Suche hier nach einem Schriftnamen."
 #: build/lib.linux-x86_64-2.7/dacapo/config/configurator.py:54
 #: dacapo/config/gui/fontchooser.py:35
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/fontchooser.py:35
+#: dacapo/config/gui/fontchooser.py:59
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/fontchooser.py:59
 msgid "Change here the text of the preview."
 msgstr "Ändere hier den Text für die Vorschau."
 
@@ -530,6 +546,11 @@ msgstr "Ändere hier den Text für die Vorschau."
 #: dacapo/config/gui/tabs.py:180 dacapo/config/gui/tabs.py:316
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:180
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:316
+#: dacapo/config/gui/tabs.py:184 dacapo/config/gui/tabs.py:330
+#: dacapo/config/gui/tabs.py:346
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:184
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:330
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:346
 msgid "Select an existing field here."
 msgstr "Selektiere hier ein existierendes Feld."
 
@@ -550,6 +571,9 @@ msgstr "Selektiere hier ein existierendes Feld."
 #: dacapo/config/gui/tabs.py:127 dacapo/config/gui/tabs.py:188
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:127
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:188
+#: dacapo/config/gui/tabs.py:131 dacapo/config/gui/tabs.py:192
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:131
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:192
 msgid "Click here to see a preview of this field."
 msgstr "Klicke hier um eine Vorschau anzuschauen."
 
@@ -591,6 +615,8 @@ msgstr "FLAC Dateien"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:146
 #: dacapo/config/gui/configurator.py:150
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:150
+#: dacapo/config/gui/configurator.py:161
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:161
 msgid "Save Config File"
 msgstr "Speichere Config Datei"
 
@@ -602,6 +628,8 @@ msgstr "Speichere Config Datei"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:88
 #: dacapo/config/gui/tabs.py:89
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:89
+#: dacapo/config/gui/tabs.py:87
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:87
 msgid "Window width"
 msgstr "Fenster Breite"
 
@@ -613,6 +641,8 @@ msgstr "Fenster Breite"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:89
 #: dacapo/config/gui/tabs.py:90
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:90
+#: dacapo/config/gui/tabs.py:88
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:88
 msgid "Window height"
 msgstr "Fenster Höhe"
 
@@ -624,6 +654,8 @@ msgstr "Fenster Höhe"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:91
 #: dacapo/config/gui/tabs.py:92
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:92
+#: dacapo/config/gui/tabs.py:90
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:90
 msgid "Fullscreen width"
 msgstr "Vollbild Breite"
 
@@ -635,6 +667,8 @@ msgstr "Vollbild Breite"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:92
 #: dacapo/config/gui/tabs.py:93
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:93
+#: dacapo/config/gui/tabs.py:91
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:91
 msgid "Fullscreen height"
 msgstr "Vollbild Höhe"
 
@@ -646,6 +680,8 @@ msgstr "Vollbild Höhe"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:100
 #: dacapo/config/gui/tabs.py:101
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:101
+#: dacapo/config/gui/tabs.py:99
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:99
 msgid "Set here the pixel width of the display."
 msgstr "Setze hier die Breite des Bildschirms in Pixeln."
 
@@ -657,6 +693,8 @@ msgstr "Setze hier die Breite des Bildschirms in Pixeln."
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:109
 #: dacapo/config/gui/tabs.py:110
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:110
+#: dacapo/config/gui/tabs.py:108
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:108
 msgid "Set here the pixel height of the display. (max {!s})"
 msgstr "Setze hier die Höhe des Bildschirms in Pixeln. (Max. {!s})"
 
@@ -670,6 +708,8 @@ msgstr "Setze hier die Höhe des Bildschirms in Pixeln. (Max. {!s})"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:123
 #: dacapo/config/gui/tabs.py:117
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:117
+#: dacapo/config/gui/tabs.py:121
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:121
 msgid "Background colour"
 msgstr "Hintergrundfarbe"
 
@@ -851,6 +891,8 @@ msgstr "Zeige Bilder"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:113
 #: dacapo/config/gui/tabs.py:114
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:114
+#: dacapo/config/gui/tabs.py:112
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:112
 msgid "Show the mouse cursor"
 msgstr "Zeige den Mauszeiger"
 
@@ -866,6 +908,8 @@ msgstr "Zeige den Mauszeiger"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:492
 #: dacapo/config/gui/tabs.py:503
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:503
+#: dacapo/config/gui/tabs.py:634
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:634
 msgid "Fields"
 msgstr "Felder"
 
@@ -877,21 +921,29 @@ msgstr "Keine Datei gewählt. Keine Playliste fortzuführen. Nix zu tun."
 
 #: dacapo/config/gui/tabs.py:15
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:15
+#: dacapo/config/gui/tabs.py:16
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:16
 msgid "Left"
 msgstr "Links"
 
 #: dacapo/config/gui/tabs.py:15
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:15
+#: dacapo/config/gui/tabs.py:16
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:16
 msgid "Right"
 msgstr "Rechts"
 
 #: dacapo/config/gui/tabs.py:16
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:16
+#: dacapo/config/gui/tabs.py:17
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:17
 msgid "Top"
 msgstr "Oben"
 
 #: dacapo/config/gui/tabs.py:16
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:16
+#: dacapo/config/gui/tabs.py:17
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:17
 msgid "Bottom"
 msgstr "Unten"
 
@@ -901,6 +953,9 @@ msgstr "Unten"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:199
 #: dacapo/config/gui/tabs.py:191
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:191
+#: dacapo/config/gui/tabs.py:195 dacapo/config/gui/tabs.py:543
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:195
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:543
 msgid "apply"
 msgstr "Anwenden"
 
@@ -910,6 +965,8 @@ msgstr "Anwenden"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:202
 #: dacapo/config/gui/tabs.py:194
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:194
+#: dacapo/config/gui/tabs.py:198
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:198
 msgid "Click here to see apply the settings of this field."
 msgstr "Klicke hier, um die Einstellungen für das Feld anzuwenden"
 
@@ -919,6 +976,8 @@ msgstr "Klicke hier, um die Einstellungen für das Feld anzuwenden"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:207
 #: dacapo/config/gui/tabs.py:199
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:199
+#: dacapo/config/gui/tabs.py:203
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:203
 msgid "Font settings"
 msgstr "Schrift Einstellungen"
 
@@ -928,6 +987,8 @@ msgstr "Schrift Einstellungen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:209
 #: dacapo/config/gui/tabs.py:201
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:201
+#: dacapo/config/gui/tabs.py:205
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:205
 msgid "Position settings"
 msgstr "Positions Einstellungen"
 
@@ -937,6 +998,8 @@ msgstr "Positions Einstellungen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:211
 #: dacapo/config/gui/tabs.py:203
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:203
+#: dacapo/config/gui/tabs.py:207
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:207
 msgid "Layout settings"
 msgstr "Layout Einstellungen"
 
@@ -946,6 +1009,8 @@ msgstr "Layout Einstellungen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:314
 #: dacapo/config/gui/tabs.py:298
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:298
+#: dacapo/config/gui/tabs.py:312
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:312
 msgid "The horizontal position"
 msgstr "Die horizontale Position"
 
@@ -955,6 +1020,8 @@ msgstr "Die horizontale Position"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:315
 #: dacapo/config/gui/tabs.py:299
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:299
+#: dacapo/config/gui/tabs.py:313
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:313
 msgid "The vertical position"
 msgstr "Die vertikale Position"
 
@@ -964,6 +1031,8 @@ msgstr "Die vertikale Position"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:316
 #: dacapo/config/gui/tabs.py:300
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:300
+#: dacapo/config/gui/tabs.py:314
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:314
 msgid "The horizontal reference position"
 msgstr "Die horizontale Referenz"
 
@@ -973,6 +1042,8 @@ msgstr "Die horizontale Referenz"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:317
 #: dacapo/config/gui/tabs.py:301
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:301
+#: dacapo/config/gui/tabs.py:315
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:315
 msgid "The vertical reference position"
 msgstr "Die vertikale Referenz"
 
@@ -982,6 +1053,8 @@ msgstr "Die vertikale Referenz"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:318
 #: dacapo/config/gui/tabs.py:302
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:302
+#: dacapo/config/gui/tabs.py:316
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:316
 msgid "The horizontal alignment"
 msgstr "Die horizontale Ausrichtung"
 
@@ -991,6 +1064,8 @@ msgstr "Die horizontale Ausrichtung"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:319
 #: dacapo/config/gui/tabs.py:303
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:303
+#: dacapo/config/gui/tabs.py:317
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:317
 msgid "The vertical alignment"
 msgstr "Die vertikale Ausrichtung"
 
@@ -1000,6 +1075,8 @@ msgstr "Die vertikale Ausrichtung"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:320
 #: dacapo/config/gui/tabs.py:304
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:304
+#: dacapo/config/gui/tabs.py:318
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:318
 msgid "Maximal field width"
 msgstr "Maximale Feldbreite"
 
@@ -1009,6 +1086,8 @@ msgstr "Maximale Feldbreite"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:321
 #: dacapo/config/gui/tabs.py:305
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:305
+#: dacapo/config/gui/tabs.py:319
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:319
 msgid "Maximal field height"
 msgstr "Maximale Feldhöhe"
 
@@ -1018,6 +1097,8 @@ msgstr "Maximale Feldhöhe"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:327
 #: dacapo/config/gui/tabs.py:311
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:311
+#: dacapo/config/gui/tabs.py:325
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:325
 msgid "Set here the horizontal position of the field."
 msgstr "Setze die horizontale Position des Feldes."
 
@@ -1027,6 +1108,8 @@ msgstr "Setze die horizontale Position des Feldes."
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:337
 #: dacapo/config/gui/tabs.py:321
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:321
+#: dacapo/config/gui/tabs.py:335
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:335
 msgid "Select the horizontal alignment for the field on the screen here."
 msgstr "Wähle die horizontale Ausrichtung des Feldes auf dem Bildschirm aus."
 
@@ -1036,6 +1119,8 @@ msgstr "Wähle die horizontale Ausrichtung des Feldes auf dem Bildschirm aus."
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:343
 #: dacapo/config/gui/tabs.py:327
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:327
+#: dacapo/config/gui/tabs.py:341
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:341
 msgid "Set here the vertical position of the field."
 msgstr "Setze die vertikale Position des Feldes."
 
@@ -1045,6 +1130,8 @@ msgstr "Setze die vertikale Position des Feldes."
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:353
 #: dacapo/config/gui/tabs.py:337
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:337
+#: dacapo/config/gui/tabs.py:351
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:351
 msgid "Select the vertical alignment for the field on the screen here."
 msgstr "Wähle die vertikale Ausrichtung des Feldes auf dem Bildschirm aus."
 
@@ -1054,6 +1141,8 @@ msgstr "Wähle die vertikale Ausrichtung des Feldes auf dem Bildschirm aus."
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:360
 #: dacapo/config/gui/tabs.py:344
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:344
+#: dacapo/config/gui/tabs.py:358
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:358
 msgid "Set here the maximal pixel width of the field. Leave 0 for no max."
 msgstr ""
 "Setze hier die maximale Breite des Feldes (in Pixeln). Setze 0 für maximale "
@@ -1065,6 +1154,8 @@ msgstr ""
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:365
 #: dacapo/config/gui/tabs.py:349
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:349
+#: dacapo/config/gui/tabs.py:363
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:363
 msgid "Set here the maximal pixel height of the field. Leave 0 for no max."
 msgstr ""
 "Setze hier die maximale Höhe des Feldes (in Pixeln). Setze 0 für maximale "
@@ -1078,6 +1169,8 @@ msgstr ""
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:424
 #: dacapo/config/gui/tabs.py:409
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:409
+#: dacapo/config/gui/tabs.py:423
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:423
 msgid "Overlay over other elements"
 msgstr "Überlagere andere Elemente"
 
@@ -1089,6 +1182,8 @@ msgstr "Überlagere andere Elemente"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:425
 #: dacapo/config/gui/tabs.py:410
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:410
+#: dacapo/config/gui/tabs.py:424
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:424
 msgid "Field has multi lines"
 msgstr "Feld hat mehrere Zeilen"
 
@@ -1100,6 +1195,8 @@ msgstr "Feld hat mehrere Zeilen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:426
 #: dacapo/config/gui/tabs.py:411
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:411
+#: dacapo/config/gui/tabs.py:425
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:425
 msgid "Split the field at spaces"
 msgstr "Splitte das Feld bei Leerzeichen"
 
@@ -1113,6 +1210,8 @@ msgstr "Splitte das Feld bei Leerzeichen"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:432
 #: dacapo/config/gui/tabs.py:420
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:420
+#: dacapo/config/gui/tabs.py:435
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:435
 msgid "Should this field overlay other elements?"
 msgstr "Soll das Feld z.B. Bilder überlagern?"
 
@@ -1126,6 +1225,8 @@ msgstr "Soll das Feld z.B. Bilder überlagern?"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:437
 #: dacapo/config/gui/tabs.py:425
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:425
+#: dacapo/config/gui/tabs.py:440
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:440
 msgid "Should this field be displayed with multi lines?"
 msgstr "Soll das Feld mit mehreren Zeilen angezeigt werden?"
 
@@ -1139,6 +1240,8 @@ msgstr "Soll das Feld mit mehreren Zeilen angezeigt werden?"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:442
 #: dacapo/config/gui/tabs.py:430
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:430
+#: dacapo/config/gui/tabs.py:445
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:445
 msgid "Should this field get line breaks at spaces?"
 msgstr "Soll das Feld an Leerzeichen umgebrochen werden?"
 
@@ -1152,6 +1255,8 @@ msgstr "Soll das Feld an Leerzeichen umgebrochen werden?"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:490
 #: dacapo/config/gui/tabs.py:501
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:501
+#: dacapo/config/gui/tabs.py:632
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:632
 msgid "Background"
 msgstr "Hintergrund"
 
@@ -1171,6 +1276,8 @@ msgstr "Großbuchstaben"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:427
 #: dacapo/config/gui/tabs.py:412
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:412
+#: dacapo/config/gui/tabs.py:426
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:426
 msgid "Stack order of the field"
 msgstr "Ordernummer für Rendering"
 
@@ -1180,6 +1287,8 @@ msgstr "Ordernummer für Rendering"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:428
 #: dacapo/config/gui/tabs.py:413
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:413
+#: dacapo/config/gui/tabs.py:427
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:427
 msgid "Convert content"
 msgstr "Konvertiere den Inhalt"
 
@@ -1189,6 +1298,8 @@ msgstr "Konvertiere den Inhalt"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:447
 #: dacapo/config/gui/tabs.py:435
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:435
+#: dacapo/config/gui/tabs.py:450
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:450
 msgid ""
 "Set here the stack order of the field. The higher the value the higher on "
 "the stack."
@@ -1203,11 +1314,15 @@ msgstr "Wähle eine Konvertierungsart."
 
 #: dacapo/config/gui/tabs.py:17
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:17
+#: dacapo/config/gui/tabs.py:18
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:18
 msgid "Lowercase"
 msgstr "Kleinbuchstaben"
 
 #: dacapo/config/gui/tabs.py:17
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:17
+#: dacapo/config/gui/tabs.py:18
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:18
 msgid "Uppercase"
 msgstr "Großbuchstaben"
 
@@ -1215,6 +1330,9 @@ msgstr "Großbuchstaben"
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:452
 #: dacapo/config/gui/tabs.py:440
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:440
+#: dacapo/config/gui/tabs.py:455 dacapo/config/gui/tabs.py:565
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:455
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:565
 msgid ""
 "Select a converting type here. Uppercase - all letter in upper case / "
 "Lowercase - all letters in lower case."
@@ -1224,20 +1342,118 @@ msgstr ""
 
 #: dacapo/config/gui/tabs.py:414
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:414
+#: dacapo/config/gui/tabs.py:428 dacapo/config/gui/tabs.py:528
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:428
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:528
 msgid "Comments"
 msgstr "Kommentar"
 
 #: dacapo/config/gui/tabs.py:415
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:415
+#: dacapo/config/gui/tabs.py:429 dacapo/config/gui/tabs.py:531
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:429
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:531
 msgid "Content"
 msgstr "Inhalt"
 
 #: dacapo/config/gui/tabs.py:447
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:447
+#: dacapo/config/gui/tabs.py:466 dacapo/config/gui/tabs.py:558
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:466
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:558
 msgid "Set a free comment here"
 msgstr "Schreibe hier einen freien Kommentar"
 
 #: dacapo/config/gui/tabs.py:454
 #: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:454
+#: dacapo/config/gui/tabs.py:474
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:474
 msgid "Set the content of the field here"
 msgstr "Setze hier die Variablen und Konstanten für den Inhalt des Feldes."
+
+#: dacapo/config/gui/configurator.py:95
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:95
+msgid "Ready..."
+msgstr "Bereit..."
+
+#: dacapo/config/gui/configurator.py:155
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:155
+msgid "Loaded audiofile: "
+msgstr "Geladene Audiodatei: "
+
+#: dacapo/config/gui/configurator.py:171
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:171
+msgid "Saved config to: "
+msgstr "Config gesichert nach: "
+
+#: dacapo/config/gui/configurator.py:173
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:173
+msgid "Saving canceled"
+msgstr "Sicherung abgebrochen"
+
+#: dacapo/config/gui/configurator.py:180
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/configurator.py:180
+msgid "Saved config. "
+msgstr "Config gesichert."
+
+#: dacapo/config/gui/tabs.py:19
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:19
+msgid "Empty"
+msgstr "Leer"
+
+#: dacapo/config/gui/tabs.py:19
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:19
+msgid "Not empty"
+msgstr "Nicht leer"
+
+#: dacapo/config/gui/tabs.py:230 dacapo/config/gui/tabs.py:604
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:230
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:604
+msgid "Selected field: "
+msgstr "Selektiertes Feld: "
+
+#: dacapo/config/gui/tabs.py:247 dacapo/config/gui/tabs.py:617
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:247
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:617
+msgid "Applied the settings."
+msgstr "Einstellungen angewendet."
+
+#: dacapo/config/gui/tabs.py:430
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:430
+msgid "Alignment"
+msgstr "Ausrichtung"
+
+#: dacapo/config/gui/tabs.py:460
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:460
+msgid "Select the alingment of the text in the field."
+msgstr "Wähle die Ausrichtung des Textes innerhalb des Feldes."
+
+#: dacapo/config/gui/tabs.py:529
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:529
+msgid "Operator"
+msgstr "Operator"
+
+#: dacapo/config/gui/tabs.py:530
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:530
+msgid "Operand"
+msgstr "Operand"
+
+#: dacapo/config/gui/tabs.py:537
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:537
+msgid "Select an existing condition here."
+msgstr "Wähle eine existierende Abhängigkeit."
+
+#: dacapo/config/gui/tabs.py:546
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:546
+msgid "Click here to see apply the settings of this condition."
+msgstr "Klicke hier um die Einstellungen anzuwenden."
+
+#: dacapo/config/gui/tabs.py:572
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:572
+msgid "Set the content of the condition here"
+msgstr "Setze den Inhalt der Abhängigkeit hier."
+
+#: dacapo/config/gui/tabs.py:646
+#: build/lib.linux-x86_64-2.7/dacapo/config/gui/tabs.py:646
+msgid "Conditions"
+msgstr "Abhängigkeiten"

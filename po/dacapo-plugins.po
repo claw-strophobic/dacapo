@@ -71,8 +71,8 @@ msgstr ""
 "Sortiert die Bilder in der Audiodatei so um, dass das Frontcover an erster "
 "stelle steht (falls es das nicht schon tut)."
 
-#: dacapo/ql-plugins/setCoverAsFirst.py:49
-#: dacapo/ql-plugins/setLyricFlag.py:64 dacapo/ql-plugins/countImages.py:48
+#: dacapo/ql-plugins/setCoverAsFirst.py:49 dacapo/ql-plugins/setLyricFlag.py:64
+#: dacapo/ql-plugins/countImages.py:48
 msgid "Check {!s} files?"
 msgstr "Prüfe {!s} Dateien?"
 
