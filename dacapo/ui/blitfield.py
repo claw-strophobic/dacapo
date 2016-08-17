@@ -216,64 +216,6 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		return image
 
 
-	def getRenderedMaxwidth(self):
-		from dacapo.config.gui import *
-		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
-		g = CONFIG.gui[winstate]
-		maxwidth = self.pos.maxWidth
-		if maxwidth == 0:
-			maxwidth = g.width
-		logging.debug('Rendering Metadata with Max-Width: %s %s: %s -> %s' % (maxwidth, self.name, self.content, self.data))
-		rList = list()
-		w = 0
-		h = 0
-		lineH = 0
-		lineTest = ''
-		lineSave = None
-		counter = 0
-		for s in self.data:
-			counter += 1
-			if len(lineTest) > 0:
-				lineTest = lineTest + ' ' + s
-			else:
-				lineTest = s
-			logging.debug('Trying Text: %s ' % (lineTest))
-			rData = self.sysFont.render(lineTest,True,self.font.fontColor)
-			wT,hT = rData.get_size()
-			#logging.debug('Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
-			if wT < maxwidth and counter < len(self.data):
-				lineSave = rData
-				continue
-			if lineSave is None:
-				lineSave = rData
-			logging.debug('List-Append Text: %s Text-Width: %s - Max-Width: %s ' % (lineTest, wT, maxwidth))
-			rList.append(rData)
-			lineTest = ''
-			lineSave = None
-			if wT > w: w = wT
-			h += hT
-			lineH = hT
-
-		image = pygame.Surface([w, h])
-		image.set_colorkey(g.backgroundColor)
-		image.fill(g.backgroundColor)
-		self.savedRect = image
-		hT = 0
-		for r in rList:
-			mW = 0
-			wT,htT = r.get_size()
-			if self.pos.alignH == 'right':
-				mW = w - wT
-			elif self.pos.alignH == 'center':
-				mW = (w - wT) / 2
-
-			image.blit(r, (mW, hT))
-			hT += lineH
-
-		self.renderedData = image
-		return image
-
-
 	def getBlitObject( self ):
 		from dacapo.config.gui import *
 		try:
