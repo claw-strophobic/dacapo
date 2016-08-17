@@ -152,23 +152,45 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		w = maxwidth
 		h = 0
 		lineH = 0
-		counter = 0
 		for s in vList:
 			try:
 				insensitive_text = re.compile(re.escape('\n'), re.IGNORECASE)
 				s = insensitive_text.sub('', s)
 			except:
 				pass
-			counter += 1
 			logging.debug('Trying Text: %s ' % (s))
-			rData = self.sysFont.render(s, True, self.font.fontColor)
-			wT, hT = rData.get_size()
-			logging.debug('List-Append Text: {!s} Text-Height: {!s}'.format(s, hT))
-			rList.append(rData)
-			h += hT
-			lineH = hT
+			s_org = s
+			s_spaces = maxwidth
+			count = 0
+			while s_spaces > 0:
+				count += 1
+				s_temp = s[0:s_spaces].strip()
+				if len(s_temp) <= 0:
+					break
+				s_hang = s[s_spaces:].strip()
+				s_spaces = s_temp.rfind(' ')
+				rData = self.sysFont.render(s_temp, True, self.font.fontColor)
+				wT, hT = rData.get_size()
+				logging.debug('Text: %s Hang: %s Width: %s Next Space: %s' % (s_temp, s_hang, wT, s_spaces))
+				if wT <= maxwidth:
+					logging.debug('List-Append Text: {!s} Text-Height: {!s}'.format(s_temp, hT))
+					rList.append(rData)
+					h += hT
+					lineH = hT
+					if s_temp == s_org:
+						break
+					s = s_hang.strip()
+					s_spaces = maxwidth
+				if count > 99: ## Emergency Break
+					break
+
 
 		logging.debug('Found {!s} Lines with Line-Height: {!s}'.format(len(rList), lineH))
+		maxheight = self.pos.maxHeight
+		if maxheight == 0:
+			maxheight = g.height
+		if h > maxheight:
+			h = maxheight
 		image = pygame.Surface([w, h])
 		image.set_colorkey(g.backgroundColor)
 		image.fill(g.backgroundColor)
@@ -187,10 +209,11 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			logging.debug('Blitting line {!s} position: {!s}, {!s}'.format(i, mW, hT))
 			image.blit(r, (mW, hT))
 			hT += lineH
+			if hT >= maxheight:
+				break
 
 		self.renderedData = image
 		return image
-
 
 
 	def getRenderedMaxwidth(self):
