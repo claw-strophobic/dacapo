@@ -23,6 +23,7 @@ class Field(dacapo.ui.configelement.ConfigElement):
 		self.multiLine = False
 		self.overlay = False
 		self.splitSpaces = False
+		self.alignment = ''
 		self.zIndex = 0
 		self.pos = dacapo.ui.position.Position()
 		self.font = dacapo.ui.fieldfont.FieldFont()
@@ -64,6 +65,10 @@ class Field(dacapo.ui.configelement.ConfigElement):
 			},
 			'convert': {
 				'target': 'convert',
+				'type': 'text',
+			},
+			'alignment': {
+				'target': 'alignment',
 				'type': 'text',
 			},
 		}

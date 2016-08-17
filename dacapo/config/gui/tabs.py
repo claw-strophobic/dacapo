@@ -427,6 +427,7 @@ class FieldLayoutTab(FieldChildTab):
 		labelConvert = Gtk.Label(_("Convert content"), xalign=0)
 		labelComments = Gtk.Label(_("Comments"), xalign=0)
 		labelContent = Gtk.Label(_("Content"), xalign=0)
+		labelAlignment = Gtk.Label(_("Alignment"), xalign=0)
 		labelDummy = Gtk.Label('')
 
 		self.grid.add(labelOverlay)
@@ -453,6 +454,11 @@ class FieldLayoutTab(FieldChildTab):
 		self.comboConvert = get_simple_combo(UI_CONVERT)
 		self.comboConvert.set_tooltip_text(_("Select a converting type here. Uppercase - all letter in upper case / Lowercase - all letters in lower case."))
 		self.grid.attach_next_to(self.comboConvert, labelConvert, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelAlignment, labelConvert, Gtk.PositionType.BOTTOM, 1, 1)
+		self.comboAlignment = get_simple_combo(UI_ALIGN_H)
+		self.comboAlignment.set_tooltip_text(_("Select the alingment of the text in the field."))
+		self.grid.attach_next_to(self.comboAlignment, labelAlignment, Gtk.PositionType.RIGHT, 1, 1)
 
 		self.grid.attach_next_to(labelComments, self.overlaySwitch, Gtk.PositionType.RIGHT, 1,1)
 		self.txtCommentView = Gtk.TextView()
@@ -482,6 +488,7 @@ class FieldLayoutTab(FieldChildTab):
 		self.zIndex_spinbutton.set_adjustment(adjustment)
 		self.zIndex_spinbutton.set_value(field.zIndex)
 		set_combo_active_value(self.comboConvert, field.convert)
+		set_combo_active_value(self.comboAlignment, field.alignment)
 		self.txtComment.set_text('')
 		if field.comments and field.comments <> 'None':
 			self.txtComment.set_text(field.comments)
@@ -498,6 +505,7 @@ class FieldLayoutTab(FieldChildTab):
 		field.setValue('splitSpaces', self.SpltSwitch.get_active())
 		field.setValue('zIndex', self.zIndex_spinbutton.get_value())
 		field.setValue('convert', get_combo_active_value(self.comboConvert))
+		field.setValue('alignment', get_combo_active_value(self.comboAlignment))
 		comment = self.txtComment.get_text(self.txtComment.get_start_iter(), self.txtComment.get_end_iter(), False)
 		content = self.txtContent.get_text(self.txtContent.get_start_iter(), self.txtContent.get_end_iter(), False)
 		field.setValue('comments', comment)

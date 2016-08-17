@@ -201,9 +201,9 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			i += 1
 			mW = 0
 			wT,htT = r.get_size()
-			if self.pos.alignH == 'right':
+			if self.alignment == 'right':
 				mW = w - wT
-			elif self.pos.alignH == 'center':
+			elif self.alignment == 'center':
 				mW = (w - wT) / 2
 
 			logging.debug('Blitting line {!s} position: {!s}, {!s}'.format(i, mW, hT))
