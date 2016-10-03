@@ -199,6 +199,16 @@ class Ui_Dialog(QtGui.QMainWindow):
         self.checkAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_application_accept.png'), 'Check', self)
         self.checkAction.setToolTip(u"Zeilenlänge überprüfen")
         self.connect(self.checkAction, QtCore.SIGNAL('triggered()'), self.checkText)
+        # --- BIG-to-small letters
+        self.lowercaseAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicon_text_lowercase.png'), 'Check', self)
+        self.lowercaseAction.setToolTip(u"Großbuchstaben auf Kleinbuchstaben setzen")
+        self.connect(self.lowercaseAction, QtCore.SIGNAL('triggered()'), self.toLower)
+
+        # --- small-to-BIG letters
+        self.uppercaseAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicon_text_uppercase.png'), 'Check', self)
+        self.uppercaseAction.setToolTip(u"Kleinbuchstaben auf Großbuchstaben setzen")
+        self.connect(self.uppercaseAction, QtCore.SIGNAL('triggered()'), self.toUpper)
+
         # --- exit
         self.exitAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'quit.png'), 'Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
@@ -214,6 +224,8 @@ class Ui_Dialog(QtGui.QMainWindow):
         self.toolbar.addAction(self.markAction)
         self.toolbar.addAction(self.remarkAction)
         self.toolbar.addAction(self.checkAction)
+        self.toolbar.addAction(self.lowercaseAction)
+        self.toolbar.addAction(self.uppercaseAction)
         self.toolbar.addAction(self.exitAction)
 
         return
@@ -695,6 +707,22 @@ class Ui_Dialog(QtGui.QMainWindow):
         except ValueError:
             return ""
 
+    def toLower(self):
+        cursor = self.textEdit.textCursor()
+        markedText = cursor.selectedText()
+        if markedText.isEmpty():
+            return True
+        cursor.insertText(markedText.toLower())
+        return True
+
+    def toUpper(self):
+        cursor = self.textEdit.textCursor()
+        markedText = cursor.selectedText()
+        if markedText.isEmpty():
+            return True
+        cursor.insertText(markedText.toUpper())
+        return True
+
     def checkText(self):
         syncTime = list()
         syncText = list()
@@ -764,7 +792,6 @@ class Ui_Dialog(QtGui.QMainWindow):
             cursor.setPosition(markPosEnd, QTextCursor.KeepAnchor)
             self.textEdit.setTextCursor(cursor)
             self.textEdit.cut()
-
 
 
     def removeLastMarkBackup(self) :
