@@ -173,7 +173,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				wT, hT = rData.get_size()
 				logging.debug('Text: %s Hang: %s Width: %s Next Space: %s' % (s_temp, s_hang, wT, s_spaces))
 				if wT <= maxwidth:
-					logging.debug('List-Append Text: {!s} Text-Height: {!s}'.format(s_temp, hT))
+					logging.debug(u'List-Append Text: {!s} Text-Height: {!s}'.format(s_temp, hT))
 					rList.append(rData)
 					h += hT
 					lineH = hT
