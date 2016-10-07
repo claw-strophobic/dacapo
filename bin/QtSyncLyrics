@@ -8,7 +8,8 @@ from PyQt4.QtGui import QDialog, \
     QApplication, \
     QTextCursor, \
     QMessageBox, \
-    QCursor
+    QCursor, \
+    QPrinter, QPrintDialog, QAbstractPrintDialog
 import sys, os, time, math, locale
 import logging
 import traceback
@@ -20,7 +21,9 @@ import codecs
 import ConfigParser
 import pygame
 from dacapo.config import readconfig
-
+import gettext
+t = gettext.translation('dacapo', "/usr/share/locale/")
+t.install()
 
 encoding = locale.getpreferredencoding()
 utf8conv = lambda x : unicode(x, encoding).encode('utf8')
@@ -209,6 +212,11 @@ class Ui_Dialog(QtGui.QMainWindow):
         self.uppercaseAction.setToolTip(u"Kleinbuchstaben auf Großbuchstaben setzen")
         self.connect(self.uppercaseAction, QtCore.SIGNAL('triggered()'), self.toUpper)
 
+        # --- print the Text
+        self.printAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'dryicons_printer.png'), 'Check', self)
+        self.printAction.setToolTip(u"Kleinbuchstaben auf Großbuchstaben setzen")
+        self.connect(self.printAction, QtCore.SIGNAL('triggered()'), self.printText)
+
         # --- exit
         self.exitAction = QtGui.QAction(QtGui.QIcon(DACAPO_CONFIG_DIR + 'quit.png'), 'Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
@@ -226,6 +234,7 @@ class Ui_Dialog(QtGui.QMainWindow):
         self.toolbar.addAction(self.checkAction)
         self.toolbar.addAction(self.lowercaseAction)
         self.toolbar.addAction(self.uppercaseAction)
+        self.toolbar.addAction(self.printAction)
         self.toolbar.addAction(self.exitAction)
 
         return
@@ -721,6 +730,18 @@ class Ui_Dialog(QtGui.QMainWindow):
         if markedText.isEmpty():
             return True
         cursor.insertText(markedText.toUpper())
+        return True
+
+    def printText(self):
+        printer = QPrinter()
+        pd = QPrintDialog(printer)
+        pd.setWindowTitle(_("Drucke synchronisierten Text"));
+        cursor = self.textEdit.textCursor()
+        if (cursor.hasSelection()):
+            pd.addEnabledOption(QAbstractPrintDialog.PrintSelection)
+        if (pd.exec_() <> QDialog.Accepted):
+            return False
+        self.textEdit.print_(printer)
         return True
 
     def checkText(self):
