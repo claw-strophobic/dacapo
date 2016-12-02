@@ -43,7 +43,7 @@ class BlitObject(object):
 		if (self.blitField is None): return
 
 		try:
-			if (self.blitField.isPicField):
+			if (self.blitField.isPicField or self.blitField.isLyricField):
 				image = pygame.Surface(self.rect.size)
 				winState = self.CONFIG.getConfig('TEMP', 'gui', 'winState')
 				g = self.CONFIG.gui[winState]
