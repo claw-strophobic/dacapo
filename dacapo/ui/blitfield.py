@@ -60,7 +60,8 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			if 'oblique' in self.font.fontStyle.lower():
 				self.sysFont.set_italic(True)
 
-		logging.debug('Font created. Rendering Field: {!s} with content {!s}'.format(self.name, self.content))
+		try: logging.debug(u'Font created. Rendering Field: {!s} with content {!s}'.format(self.name, self.content))
+		except: pass
 		audio = CONFIG.getConfig('TEMP', Key='AUDIOFILE')
 		player = CONFIG.getConfig('TEMP', Key='PLAYER')
 		assert isinstance(player.gstPlayer, object)
@@ -173,7 +174,8 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 				wT, hT = rData.get_size()
 				logging.debug('Text: %s Hang: %s Width: %s Next Space: %s' % (s_temp, s_hang, wT, s_spaces))
 				if wT <= maxwidth:
-					logging.debug(u'List-Append Text: {!s} Text-Height: {!s}'.format(s_temp, hT))
+					try: logging.debug(u'List-Append Text: {!s} Text-Height: {!s}'.format(s_temp, hT))
+					except: pass
 					rList.append(rData)
 					h += hT
 					lineH = hT

@@ -36,7 +36,7 @@ fs_encoding = sys.getfilesystemencoding()
 encoding = locale.getpreferredencoding()
 stdout_encoding = sys.stdout.encoding
 stdin_encoding = sys.stdin.encoding
-utf8conv = lambda x : unicode(x, stdin_encoding).encode('utf8')
+utf8conv = lambda x : unicode(x, stdin_encoding, 'ignore').encode('utf8')
 if stdin_encoding == None : stdin_encoding = fs_encoding
 
 try:
@@ -142,9 +142,9 @@ class PlayList(object):
 	def proceed(self):
 		if self.isPlaylist() :
 			self.readPlaylist()
-			if self.isDebug() :
-				for f in self.getPlaylist() :
-					logging.debug("In Playlist(en) gefunden: %s" % (_fromUtf8(f)))
+			##if self.isDebug() :
+			##	for f in self.getPlaylist() :
+			##		logging.debug("In Playlist(en) gefunden: %s" % (_fromUtf8(f)))
 
 			if self.isShuffel() : self.shuffleList()
 		else:	
