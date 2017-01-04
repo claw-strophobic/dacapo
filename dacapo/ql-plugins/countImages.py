@@ -11,12 +11,31 @@
 from gi.repository import Gtk
 from quodlibet.qltk.wlw import WaitLoadWindow
 from quodlibet.plugins.songsmenu import SongsMenuPlugin
+from quodlibet import qltk
 from mutagen.flac import FLAC, Picture
-from quodlibet import qltk, app
 import traceback, sys
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
 t.install()
+_ = t.ugettext
+
+class ConfirmAction(qltk.Message):
+	"""A message dialog that asks a yes/no question."""
+
+	def __init__(self, *args, **kwargs):
+		kwargs["buttons"] = Gtk.ButtonsType.YES_NO
+		super(ConfirmAction, self).__init__(
+			Gtk.MessageType.WARNING, *args, **kwargs)
+
+	def run(self, destroy=True):
+		"""Returns True if yes was clicked, False otherwise."""
+		resp = super(qltk.Message, self).run()
+		if destroy:
+			self.destroy()
+		if resp == Gtk.ResponseType.YES:
+			return True
+		else:
+			return False
 
 
 class CountImages(SongsMenuPlugin):
@@ -43,7 +62,7 @@ class CountImages(SongsMenuPlugin):
 		if (songs is None) or (len(songs) <= 0):
 			return True
 
-		if not qltk.ConfirmAction(self.plugin_window,
+		if not ConfirmAction(self.plugin_window,
 			_(self.PLUGIN_NAME),
 			_("Check {!s} files?").format(len(songs))
 								  ).run():

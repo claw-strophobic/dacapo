@@ -19,8 +19,12 @@ import traceback, sys
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
 t.install()
+_ = t.ugettext
 
-class RemoveImageFileChooser(qltk.ConfirmAction):
+from quodlibet import qltk
+
+
+class RemoveImageFileChooser(qltk.Message):
 	TYPE = {
 		0: "Other",
 		1: "32x32 pixels 'file icon' (PNG only)",
@@ -45,8 +49,10 @@ class RemoveImageFileChooser(qltk.ConfirmAction):
 		20: "Publisher/Studio logotype"
 	}
 
-	def __init__(self, parent, title, msg):
-		super(RemoveImageFileChooser, self).__init__(parent, title, msg)
+	def __init__(self, *args, **kwargs):
+		kwargs["buttons"] = Gtk.ButtonsType.YES_NO
+		super(RemoveImageFileChooser, self).__init__(
+			Gtk.MessageType.WARNING, *args, **kwargs)
 		## Create ComboBox
 		type_store = Gtk.ListStore(int, str)
 		for key in self.TYPE:
@@ -100,6 +106,17 @@ class RemoveImageFileChooser(qltk.ConfirmAction):
 
 	def get_type(self):
 		return self.imgType
+
+	def run(self, destroy=True):
+		"""Returns True if yes was clicked, False otherwise."""
+		resp = super(qltk.Message, self).run()
+		if destroy:
+			self.destroy()
+		if resp == Gtk.ResponseType.YES:
+			return True
+		else:
+			return False
+
 
 class RemoveImage(SongsMenuPlugin):
 	PLUGIN_ID = "RemoveImage"

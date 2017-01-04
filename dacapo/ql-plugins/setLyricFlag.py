@@ -17,6 +17,9 @@ try:
 except ImportError, err:
 	errorhandling.Error.show()
 	sys.exit(2)
+import gettext
+t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
+_ = t.ugettext
 
 DEBUG=True
 levels = {'CRITICAL' : logging.CRITICAL,
@@ -35,6 +38,26 @@ try:
 except :
 	errorhandling.Error.show()
 	sys.exit(2)
+
+
+class ConfirmAction(qltk.Message):
+	"""A message dialog that asks a yes/no question."""
+
+	def __init__(self, *args, **kwargs):
+		kwargs["buttons"] = Gtk.ButtonsType.YES_NO
+		super(ConfirmAction, self).__init__(
+			Gtk.MessageType.WARNING, *args, **kwargs)
+
+	def run(self, destroy=True):
+		"""Returns True if yes was clicked, False otherwise."""
+		resp = super(qltk.Message, self).run()
+		if destroy:
+			self.destroy()
+		if resp == Gtk.ResponseType.YES:
+			return True
+		else:
+			return False
+
 
 class SetDacapoLyricFlag(SongsMenuPlugin):
 	PLUGIN_ID = "SetDacapoLyricFlag"
@@ -59,7 +82,7 @@ class SetDacapoLyricFlag(SongsMenuPlugin):
 		return result
 
 	def plugin_songs(self, songs):
-		if not qltk.ConfirmAction(self.plugin_window,
+		if not ConfirmAction(self.plugin_window,
 			_('Set dacapo Lyric Flag'),
 			_("Check {!s} files?").format(self.counter)
 								  ).run():
