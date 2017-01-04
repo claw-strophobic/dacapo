@@ -89,6 +89,7 @@ class dacapo_install(install):
 		if sys.argv[1] == "install" :
 			print "installiere config"
 			import dacapo.config.packconfigdir
+			dacapo.config.packconfigdir.main()
 			import dacapo.config.createconfig
 			self.install_manpages()
 			self.install_qlplugins()
