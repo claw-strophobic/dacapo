@@ -9,6 +9,7 @@
 #
 from dacapo.config.gui.tabs import *
 from dacapo.metadata import *
+_ = t.ugettext
 
 UI_INFO = """
 <ui>

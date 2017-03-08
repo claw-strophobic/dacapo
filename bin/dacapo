@@ -20,6 +20,7 @@ import sys
 import gettext
 t = gettext.translation('dacapo', "/usr/share/locale/")
 t.install()
+_ = t.ugettext
 
 SHOWPIC_CHOICES = ["NO", "coverOnly", "allCover", "allPics",
 	"diaShowAllCover", "diaShowAllPics", "help"]

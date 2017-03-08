@@ -24,6 +24,7 @@ from dacapo.config import readconfig
 import gettext
 t = gettext.translation('dacapo', "/usr/share/locale/")
 t.install()
+_ = t.ugettext
 
 encoding = locale.getpreferredencoding()
 utf8conv = lambda x : unicode(x, encoding).encode('utf8')
