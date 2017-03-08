@@ -517,8 +517,8 @@ class Ui_Dialog(QtGui.QMainWindow):
 		filter = '*.flac;;*.*'
 		self.filename = str(QtCore.QDir.toNativeSeparators( \
 			QtGui.QFileDialog.getOpenFileName(self, \
-											  u"Audiodatei auswählen", \
-											  path, filter)))
+				_("Open Audiofile"), \
+				path, filter)))
 		self.loadAudiofile()
 		return
 
