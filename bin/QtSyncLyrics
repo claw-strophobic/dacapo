@@ -726,7 +726,15 @@ class Ui_Dialog(QtGui.QMainWindow):
 		markedText = cursor.selectedText()
 		if markedText.isEmpty():
 			return True
-		cursor.insertText(markedText.toLower())
+		lines = str(markedText.toUtf8()).decode('utf-8').splitlines()
+		lowerLines = []
+		for line in lines:
+			line = line.lower()
+			lineTime = line[line.find("["):line.find("]")+1]
+			lineText = lineTime + line[line.find("]")+1:].capitalize()
+			lowerLines.append(lineText)
+
+		cursor.insertText("\n".join(lowerLines))
 		return True
 
 	def toUpper(self):
