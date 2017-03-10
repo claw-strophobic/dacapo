@@ -524,7 +524,7 @@ class Ui_Dialog(QtGui.QMainWindow):
 
 	def loadAudiofile(self) :
 		logging.debug("Audiodatei = " +  self.filename)
-		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename))
+		self.inputText.setText(QtCore.QDir.toNativeSeparators(self.filename.decode('utf-8)')))
 		self.audioFile = dacapo.metadata.getAudioFile(self.filename)
 		if self.audioFile <> None :
 			self.artistText.setText(' '.join(self.audioFile.getMetaData('artist')))
