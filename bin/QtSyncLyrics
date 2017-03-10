@@ -515,6 +515,7 @@ class Ui_Dialog(QtGui.QMainWindow):
 		else :
 			path = os.path.dirname(self.last_filename)
 		filter = '*.flac;;*.*'
+		path = path.decode('utf-8')
 		self.filename = str(QtCore.QDir.toNativeSeparators( \
 			QtGui.QFileDialog.getOpenFileName(self, \
 				_("Open Audiofile"), \
@@ -549,9 +550,10 @@ class Ui_Dialog(QtGui.QMainWindow):
 			else :
 				path = os.path.dirname(self.last_filename)
 		filter = '*.lrc;;*.*'
+		path = path.decode('utf-8')
 		self.textFilename = str(QtCore.QDir.toNativeSeparators( \
 			QtGui.QFileDialog.getOpenFileName(self, \
-											  u"Textdatei auswählen", \
+											  _("Open Synced-Text file"), \
 											  path, filter)))
 		logging.debug("Textdatei = " +  self.textFilename)
 		if (self.textFilename <> '') :
@@ -620,8 +622,10 @@ class Ui_Dialog(QtGui.QMainWindow):
 		self.last_filename = self.filename
 		tryFilename, ext = os.path.splitext(self.filename)
 		tryFilename += '.lrc'
+		tryFilename = tryFilename.decode('utf-8')
 		if self.getDebug() : logging.debug("LRC Sichern")
 		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save File', tryFilename)
+		filename = str(filename.toUtf8()).decode('utf-8')
 		if (filename <> None) :
 			f = open(filename, 'w')
 			# filedata = ARTIST + self.artistText.text().simplified().toUtf8() + "]" + '\n'

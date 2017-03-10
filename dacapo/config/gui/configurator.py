@@ -153,7 +153,7 @@ class Configurator(Gtk.Window):
 				self.page_window.page_fields.prev_button.set_sensitive(True)
 			if self.page_fullscreen.page_fields.field:
 				self.page_fullscreen.page_fields.prev_button.set_sensitive(True)
-			self.statusbar.push(self.context_id, _("Loaded audiofile: ") + file)
+			self.statusbar.push(self.context_id, _("Loaded audiofile: ") + file.decode('utf-8'))
 
 		dialog.destroy()
 		return
