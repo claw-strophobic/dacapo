@@ -12,11 +12,13 @@ from dacapo.config.gui.fontchooser import MyFontChooserWidget
 from dacapo.config.gui.colorchooser import MyColorChooserWidget
 # from  gi.repository.GObject import GEnum
 import os
+_ = t.ugettext
 
 UI_ALIGN_H = {_("Left") : "left" , _("Right") : "right",	"Center" : "center"}
 UI_ALIGN_V = {_("Top") : "top" , _("Bottom") : "bottom",	"Middle" : "center"}
 UI_CONVERT = {_("Lowercase") : "lower" , _("Uppercase") : "upper"}
 UI_OPERATOR = {_("Empty") : "empty" , _("Not empty") : "notempty"}
+UI_SINKTYPE = {_("Alsa") : "alsa" , _("JACK") : "jack"}
 CSSFILE = os.path.join(os.path.dirname(__file__), 'configurator.css')
 
 class PreviewTab(Gtk.Box, dacapo.ui.interface_blitobject.BlitInterface):
@@ -523,6 +525,7 @@ class CondTab(PreviewTab):
 		grid = Gtk.Grid()
 		grid.set_column_homogeneous(False)
 		grid.set_column_spacing(6)
+		grid.set_row_spacing(10)
 		vbox.set_spacing(10)
 
 		labelComments = Gtk.Label(_("Comments"), xalign=0)
@@ -616,6 +619,60 @@ class CondTab(PreviewTab):
 		field.setValue('value', content)
 		window.statusbar.push(window.context_id, _("Applied the settings."))
 
+class AudioTab(PreviewTab):
+
+	def __init__(self, main):
+		super(AudioTab, self).__init__(main, 'audio_engine')
+		g = CONFIG.gui['audio_engine']
+		self.set_border_width(10)
+		vbox = Gtk.VBox()
+		self.grid = Gtk.Grid()
+		self.grid.set_column_homogeneous(False)
+		self.grid.set_column_spacing(6)
+		self.grid.set_row_spacing(10)
+		vbox.set_spacing(10)
+
+		labelSinkType = Gtk.Label(_("Sink Type"), xalign=0)
+		labelReplayGain = Gtk.Label(_("ReplayGain"), xalign=0)
+		labelGapless = Gtk.Label(_("Gapless"), xalign=0)
+
+		self.grid.add(labelSinkType)
+		self.comboSinkType = get_simple_combo(UI_SINKTYPE)
+		self.comboSinkType.set_tooltip_text(_("Select a sink type here."))
+		self.grid.attach_next_to(self.comboSinkType, labelSinkType, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.apply_button = Gtk.Button(_("apply"))
+		self.apply_button.connect('clicked', self.on_applied)
+		self.apply_button.set_tooltip_text(_("Click here to apply the changes of this settings."))
+		self.grid.attach_next_to(self.apply_button, self.comboSinkType, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelReplayGain, labelSinkType, Gtk.PositionType.BOTTOM, 1, 1)
+		self.ReplayGainSwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
+		self.ReplayGainSwitch.set_tooltip_text(_("Use ReplayGain?"))
+		self.grid.attach_next_to(self.ReplayGainSwitch, labelReplayGain, Gtk.PositionType.RIGHT, 1, 1)
+
+		self.grid.attach_next_to(labelGapless, labelReplayGain, Gtk.PositionType.BOTTOM, 1, 1)
+		self.GaplessSwitch = Gtk.Switch(halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
+		self.GaplessSwitch.set_tooltip_text(_("Use gapless playback?"))
+		self.grid.attach_next_to(self.GaplessSwitch, labelGapless, Gtk.PositionType.RIGHT, 1, 1)
+
+		vbox.add(self.grid)
+		self.add(vbox)
+		self.fillFields()
+
+	def fillFields(self):
+		g = CONFIG.gui['audio_engine']
+		set_combo_active_value(self.comboSinkType, g.sinkType)
+		self.ReplayGainSwitch.set_active(g.replayGain)
+		self.GaplessSwitch.set_active(g.gapless)
+
+	def on_applied(self, *data):
+		window = self.window
+		g = CONFIG.gui['audio_engine']
+		g.setValue('sinkType', get_combo_active_value(self.comboSinkType))
+		g.setValue('replayGain', self.ReplayGainSwitch.get_active())
+		g.setValue('gapless', self.GaplessSwitch.get_active())
+		window.statusbar.push(window.context_id, _("Applied the settings."))
 
 
 
@@ -644,6 +701,19 @@ class MetaTab(Gtk.Box):
 		# 1st tab -> Background settings
 		self.page_cond = CondTab(main)
 		self.notebook.append_page(self.page_cond, Gtk.Label(_("Conditions")))
+
+class AudioAndDebugTab(Gtk.Box):
+
+	def __init__(self, main):
+		Gtk.Box.__init__(self)
+		self.main = main
+		self.notebook = Gtk.Notebook()
+		self.add(self.notebook)
+
+		# 1st tab -> Background settings
+		self.page_audio = AudioTab(main)
+		self.notebook.append_page(self.page_audio, Gtk.Label(_('Audio & Debug-Settings!')))
+
 
 
 def get_field_combo(guiType):

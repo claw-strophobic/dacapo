@@ -33,6 +33,8 @@ class ConfigElement(object):
 		return res
 
 	def grabXMLData(self, xml, printme=False):
+		if printme:
+			print(xml)
 		d = self.__dict__
 		for child in xml:
 			name = child.tag

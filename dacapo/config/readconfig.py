@@ -14,6 +14,7 @@ from dacapo import errorhandling
 from dacapo.ui import condition
 from dacapo.ui import gui as MetaGUI
 from dacapo.ui import meta as MetaData
+from dacapo.ui import audio_engine as AudioEngine
 try:
     # import pkg_resources
     import sys, os
@@ -113,6 +114,11 @@ class Config(object):
 		g = MetaData.Meta('metaData')
 		g.grabXMLData(root)
 		self.gui['metaData'] = g
+		g = AudioEngine.AudioEngine('audio_engine')
+		audio_engine = root.xpath('audio_engine')
+		g.grabXMLData(audio_engine[0])
+		self.gui['audio_engine'] = g
+
 
 	def loadConfig(self):
 		self.__dConfigGUI = {}
@@ -232,6 +238,11 @@ class Config(object):
 				gui[0].remove(child)
 		gui[0].append(self.gui['window'].getXMLData())
 		gui[0].append(self.gui['fullscreen'].getXMLData())
+		for element in root.getiterator():
+			if (element.tag == 'audio_engine'):
+				root.remove(element)
+
+		root.append(self.gui['audio_engine'].getXMLData())
 		if file is None:
 			file = CONFIG_DIR + XML_CONFIG
 		filedata = etree.tostring(root, pretty_print=True).decode()
