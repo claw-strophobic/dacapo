@@ -92,9 +92,12 @@ class Mp3File(audiofile.AudioFile):
 		}
 
 		mp3Tags = copy.deepcopy(IDS)
-		configTags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
-		for tag in configTags :
-			mp3Tags[tag] = configTags[tag]
+		try:
+			configTags = self.config.getConfig('gui', 'metaData', 'MP3-Tags')
+			for tag in configTags :
+				mp3Tags[tag] = configTags[tag]
+		except BaseException :
+			logging.error("No config-entry for MP3-Tags")
 
 		return mp3Tags
 
