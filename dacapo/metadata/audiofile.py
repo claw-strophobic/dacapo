@@ -153,6 +153,8 @@ class AudioFile(object):
 		syncText = list()
 		lines = list()
 		pathName = os.path.dirname(self.filename)
+		if (pathName == ""):
+			pathName = "./"
 		fullFileName = os.path.basename(self.filename)
 		fileName, fileExtension = os.path.splitext(fullFileName)
 		lrcFile = fileName + ".lrc"
