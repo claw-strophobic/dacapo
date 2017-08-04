@@ -394,10 +394,15 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 						# if self._debug : print 'Hole Cover: {0}'.format(self.filename)
 						# self.pic = self.audioFile.getCover()
 						logging.info('Starte GStreamer: {0} '.format(self.filename))
-						if GAPLESS:
-							self._gstPlayer.doGaplessPlay(self.filename)
-						else:
-							self._gstPlayer.doPlay(self.filename)
+						try:
+							if GAPLESS:
+								self._gstPlayer.doGaplessPlay(self.filename)
+							else:
+								self._gstPlayer.doPlay(self.filename)
+						except:
+							print "Unexpected error:", sys.exc_info()[0]
+							self._gstPlayer.doStop()
+							self.quit()
 						logging.debug('Bereite Texte auf: {0} '.format(self.filename))
 						self.display_text()
 						logging.debug('Alles super: {0} '.format(self.filename))
@@ -408,10 +413,15 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 						if self.actSong >= len(self.playlist): self.quit()
 				else:
 					logging.info('Starte GStreamer: {0} '.format(self.filename))
-					if GAPLESS:
-						self._gstPlayer.doGaplessPlay(self.filename)
-					else:
-						self._gstPlayer.doPlay(self.filename)
+					try:
+						if GAPLESS:
+							self._gstPlayer.doGaplessPlay(self.filename)
+						else:
+							self._gstPlayer.doPlay(self.filename)
+					except:
+						print "Unexpected error:", sys.exc_info()[0]
+						self._gstPlayer.doStop()
+						self.quit()
 
 		if self.actSong > len(self.playlist):
 			self._gstPlayer.doStop()
