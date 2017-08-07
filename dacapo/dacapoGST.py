@@ -42,152 +42,59 @@ class GstPlayer(threading.Thread):
 		GObject.threads_init()
 		Gst.init(None)
 		self.context = self.mainloop.get_context()
-		if self._gapless:
-			self.__init_pipelineGapless()
-		else:
-			self.__init_pipeline()
+		self.__init_pipeline()
 		if self.debug: logging.debug('GstPlayer __init__() -> done ')
 
 	def __init_pipeline(self):
-		if self.debug: logging.debug("start creating pipeline! ")
+
 		bReplayGain = self.config.getConfig('audio_engine', 'audio_engine', 'replayGain')
-		# Pipeline erstellen
-		self.player = Gst.Pipeline()
-		# File-Source erstellen und der Pipeline zufügen
-		self.filesrc = Gst.ElementFactory.make("filesrc", "file-source")
-		self.player.add(self.filesrc)
+		bGapless = self.config.getConfig('audio_engine', 'audio_engine', 'gapless')
 
-		# (Auto-) Decoder erstellen und der Pipeline zufügen
-		self.decode = Gst.ElementFactory.make("decodebin", "decode")
-		self.decode.connect("pad-added", self.OnDynamicPad)
-		self.player.add(self.decode)
+		replay = Gst.ElementFactory.make("rgvolume", "replay")
+		convert = Gst.ElementFactory.make("audioconvert", "convert")
+		sink = Gst.ElementFactory.make("autoaudiosink", "audio_sink")
 
-		# Link den Decoder an die File-Source
-		self.filesrc.link(self.decode)
+		pipeline = Gst.ElementFactory.make("playbin", "playbin")
+		bin = Gst.Bin()
+		bin.add(replay)
+		bin.add(convert)
+		bin.add(sink)
 
-		# Converter erstellen und zufügen
-		self.convert = Gst.ElementFactory.make("audioconvert", "convert")
-		# self.convert.connect("about-to-finish", self.on_about_to_finish)
-		self.player.add(self.convert)
-
-		# ReplayGain erstellen und zufügen
 		if bReplayGain:
-			if self.debug: logging.debug("ReplayGain wird aktiviert! ")
-			self.replay = Gst.ElementFactory.make("rgvolume", "replay")
-			self.player.add(self.replay)
-			self.convert.link(self.replay)
-			if self.debug: logging.debug("ReplayGain ist an Converter gelinkt! ")
-
-		# Output-Sink erstellen und zufügen
-		# self.sink = Gst.ElementFactory.make("alsasink", "sink")
-		sinkType = self.config.getConfig('audio_engine', ' ', 'sinkType') + 'sink'
-		if self.debug: logging.debug("Versuche Sink: %s " % sinkType)
-		self.sink = Gst.ElementFactory.make(sinkType, "sink")
-		self.player.add(self.sink)
-		if bReplayGain:
-			self.replay.link(self.sink)
-			if self.debug: logging.debug("Sink an ReplayGain gelinkt! ")
+			logging.debug("Link replay, convert and sink")
+			replay.link(convert)
+			convert.link(sink)
 		else:
-			if self.debug: logging.debug("ReplayGain ist deaktiviert! \n ")
-			self.convert.link(self.sink)
+			logging.debug("Link convert and sink")
+			convert.link(sink)
 
-		bus = self.player.get_bus()
-		bus.add_signal_watch()
-		self.__bus_id = bus.connect("message", self.on_message)
-		return
-
-	def __init_pipelineGapless(self):
-		if self.debug: logging.debug("start creating gapless pipeline! ")
-		bReplayGain = self.config.getConfig('audio_engine', 'audio_engine', 'replayGain')
-		sinkType = self.config.getConfig('audio_engine', ' ', 'sinkType') + 'sink'
-		if self.debug: logging.debug("Trying to create a sink of type: %s " % sinkType)
-
-		# Create an empty Pipeline
-		data_pipeline = Gst.Pipeline()
-
-		# Create the elements
-		data_convert = Gst.ElementFactory.make('audioconvert', "convert")
-		data_queue = Gst.ElementFactory.make('queue')
-		data_queue.set_property('max-size-time', 500 * Gst.MSECOND)
-		data_volume = Gst.ElementFactory.make('volume', "volume")
-		data_sink = Gst.ElementFactory.make(sinkType, "sink")
-		data_elements = [data_queue, data_volume]
-		# ReplayGain?
 		if bReplayGain:
-			if self.debug: logging.debug("activating ReplayGain! ")
-			data_rgain = Gst.ElementFactory.make("rgvolume", "replay")
-			data_elements.append(data_rgain)
-		data_elements.append(data_convert)
-		data_elements.append(data_sink)
+			pad = replay.get_static_pad('sink')
+		else:
+			pad = convert.get_static_pad('sink')
+		ghost_pad =  Gst.GhostPad.new('sink', pad)
+		ghost_pad.set_active(True)
+		bin.add_pad(ghost_pad)
 
-		if (not data_pipeline or not data_convert or not data_sink):
-			logging.error("Could not create GStreamer pipeline. ")
-			return False
+		## Set playbin's audio sink to be our sink bin ##
+		logging.debug("Set playbin's audio sink to be our sink bin")
+		pipeline.set_property('audio-sink', bin)
 
-		# Create a bin to put all together
-		# --------------------------------------------------------------------------------------------#
-		bufbin = Gst.Bin()
-		map(bufbin.add, data_elements)
-		if len(data_elements) > 1:
-			data_queue.link(data_volume)
-			if bReplayGain:
-				data_volume.link(data_rgain)
-				data_rgain.link(data_convert)
-			else:
-				data_volume.link(data_convert)
-			data_convert.link(data_sink)
-
-		# --------------------------------------------------------------------------------------------#
-
-
-		# Make the sink of the first element the sink of the bin
-		gpad = Gst.GhostPad.new('sink', data_elements[0].get_static_pad('sink'))
-		data_pipeline.add_pad(gpad)
-
-		logging.debug("Trying to create playbin. ")
-		self.player = Gst.ElementFactory.make("playbin", "player")
-		# by default playbin will render video -> suppress using fakesink
-		fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
-		self.player.set_property("video-sink", fakesink)
-		# disable all video/text decoding in playbin2
-		GST_PLAY_FLAG_VIDEO = 1 << 0
-		GST_PLAY_FLAG_TEXT = 1 << 2
-		flags = self.player.get_property("flags")
-		flags &= ~(GST_PLAY_FLAG_VIDEO | GST_PLAY_FLAG_TEXT)
-		self.player.set_property("flags", flags)
-		# set the buffer for gapless playback
-		duration = float(1.5)
-		duration = int(duration * 1000) * Gst.MSECOND
-		self.player.set_property('buffer-duration', duration)
-		# link the function for gapless playback
-		self.__atf_id = self.player.connect("about-to-finish", self.on_about_to_finish)
-
-		# --------------------------------------------------------------------------------------------#
-
-		# Hier wird die Ausgabe von playbin2 auf bufbin gesetzt!
-		logging.debug("Connecting the audi-sink from playbin with our bufbin. ")
-		self.player.set_property('audio-sink', bufbin)
-
+		logging.debug("Set playbin to self.player and get bus")
+		self.player = pipeline
 		bus = self.player.get_bus()
 		bus.add_signal_watch()
 		self.__bus_id = bus.connect("message", self.on_message)
+
+		if bGapless:
+			logging.debug("Setting 'about-to-finish' -> self.on_about_to_finish")
+			self.__atf_id = self.player.connect('about-to-finish', self.on_about_to_finish)
+
+		logging.debug("Done.")
 
 		return
 
 	# --------------------------------------------------------------------------------------------#
-
-		# create a simple function that is run when decodebin gives us the signal to let us
-		# know it got audio data for us. Use the get_pad call on the previously
-
-	# created audioconverter element asking to a "sink" pad.
-	def OnDynamicPad(self, dbin, pad):
-		try:
-			string = pad.query_caps(None).to_string()
-			if self.debug: logging.debug("OnDynamicPad Called: {!s}".format(string))
-			pad.link(self.convert.get_static_pad("sink"))
-		except Exception, err:
-			errorhandling.Error.show()
-			self.doEnd()
 
 	def on_about_to_finish(self, bin):
 		# The current song is about to finish, if we want to play another
@@ -211,7 +118,8 @@ class GstPlayer(threading.Thread):
 		if self._gapless:
 			self.player.set_property("uri", "file://%s" % self.filename)
 		else:
-			self.player.get_by_name("file-source").set_property("location", self.filename)
+			self.player.set_property("uri", "file://" + self.filename)
+			#self.player.get_by_name("file-source").set_property("location", self.filename)
 		# self.player.get_by_name("file-source").set_property("location", self.filename)
 		self.player.set_state(Gst.State.PLAYING)
 		# Gst.gst_element_query_duration(self.player, GST_Gst.Format.TIME, time)
@@ -257,6 +165,10 @@ class GstPlayer(threading.Thread):
 				#for key in taglist.keys():
 					# logging.info('MESSAGE_TAG: %s = %s' % (key, taglist[key]))
 				#	logging.info('MESSAGE_TAG: %s ' % (key))
+			elif message.type == Gst.MessageType.BUFFERING:
+				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				percent = message.parse_buffering()
+				# self.__buffering(percent)
 			elif message.type == Gst.MessageType.BUFFERING:
 				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
 				percent = message.parse_buffering()
