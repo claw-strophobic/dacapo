@@ -70,6 +70,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		self._gapless = self._config.getConfig('audio_engine', 'audio_engine', 'gapless')
 		self._resize = False
 		self.diaShowPics = None
+		self.timerIndex = 0
 
 		self.replayGain = self._config.getConfig('audio_engine', 'audio_engine', 'replayGain')
 		self.set_slide_mode(self._config.getConfig('gui', 'misc', 'showPics'))
@@ -402,7 +403,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 						self._gstPlayer.doStop()
 						self.quit()
 					logging.debug('Bereite Texte auf: {0} '.format(self.filename))
-					self.display_text()
+					## self.display_text()
 					logging.debug('Alles super: {0} '.format(self.filename))
 					break
 				else:

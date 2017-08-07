@@ -167,6 +167,8 @@ class GstPlayer(threading.Thread):
 				logging.debug("--> bin in on_message mit message.type %s " % t)
 				percent = message.parse_buffering()
 				# self.__buffering(percent)
+			elif message.type == Gst.MessageType.STREAM_START:
+				self.doTrackChange()
 			elif message.type == Gst.MessageType.ELEMENT:
 				logging.debug("--> bin in on_message mit message.type %s " % t)
 				name = ""
@@ -189,8 +191,11 @@ class GstPlayer(threading.Thread):
 
 	def doTrackChange(self):
 		# self.player.get_state()
+		logging.debug("Do Track Change")
 		self.getGstDuration()
 		self.actualTitel = self.filename
+		self._in_gapless_transition = False
+		self.guiPlayer.display_text()
 
 	def convert_ns(self, t):
 		# This method was submitted by Sam Mason.
