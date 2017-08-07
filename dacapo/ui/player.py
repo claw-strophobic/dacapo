@@ -65,7 +65,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 		# self._config = readconfig.getConfigObject()
 		self._config = readconfig.getConfigObject()
 		self._config.setConfig('TEMP', Key='PLAYER', Value=self)
-		self._showGUI = bool(self._config.getConfig('TEMP', Key='SHOWGUI'))
 		bResume = self._config.getConfig('TEMP', Key='RESUME')
 		# Erstellt einen Zeitnehmer
 		self._gapless = self._config.getConfig('audio_engine', 'audio_engine', 'gapless')
@@ -254,8 +253,8 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			try:
 				if self._ausschalter.isSet(): break
 
-				if self._showGUI == True: self.update_sync_lyrics()
-				if self._showGUI == True: self.update_act_time()
+				self.update_sync_lyrics()
+				self.update_act_time()
 
 				for event in pygame.event.get():
 					# if self._debug : logging.debug("--> bin in event_loop mit event: %s " % (event))
@@ -382,36 +381,16 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			#if os.path.isfile(self.filename):
 			if mimehelp.isInMimeTypes(self.filename):
 				self._config.setConfig('TEMP', Key='FILENAME', Value=self.filename)
-				if self._showGUI == True:
-					logging.info('Versuche Metadaten zu laden ')
-					self.audioFile = getAudioFile(self.filename)
-					self._config.setConfig('TEMP', Key='AUDIOFILE', Value=self.audioFile)
-					antwort = "Yes"
-					if self.audioFile == None:
-						antwort = "No"
-					logging.info('Loaded Metadata? %s' % (antwort))
-					if self.audioFile <> None:
-						# if self._debug : print 'Hole Cover: {0}'.format(self.filename)
-						# self.pic = self.audioFile.getCover()
-						logging.info('Starte GStreamer: {0} '.format(self.filename))
-						try:
-							if GAPLESS:
-								self._gstPlayer.doGaplessPlay(self.filename)
-							else:
-								self._gstPlayer.doPlay(self.filename)
-						except:
-							print "Unexpected error:", sys.exc_info()[0]
-							self._gstPlayer.doStop()
-							self.quit()
-						logging.debug('Bereite Texte auf: {0} '.format(self.filename))
-						self.display_text()
-						logging.debug('Alles super: {0} '.format(self.filename))
-						break
-					else:
-						print  >> sys.stderr, "Fehler bei Nummer: ", self.actSong, " Titel: ", self.filename
-						logging.error('Fehler bei Nummer: %s Titel: %s ' % (self.actSong, self.filename))
-						if self.actSong >= len(self.playlist): self.quit()
-				else:
+				logging.info('Versuche Metadaten zu laden ')
+				self.audioFile = getAudioFile(self.filename)
+				self._config.setConfig('TEMP', Key='AUDIOFILE', Value=self.audioFile)
+				antwort = "Yes"
+				if self.audioFile == None:
+					antwort = "No"
+				logging.info('Loaded Metadata? %s' % (antwort))
+				if self.audioFile <> None:
+					# if self._debug : print 'Hole Cover: {0}'.format(self.filename)
+					# self.pic = self.audioFile.getCover()
 					logging.info('Starte GStreamer: {0} '.format(self.filename))
 					try:
 						if GAPLESS:
@@ -422,6 +401,14 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 						print "Unexpected error:", sys.exc_info()[0]
 						self._gstPlayer.doStop()
 						self.quit()
+					logging.debug('Bereite Texte auf: {0} '.format(self.filename))
+					self.display_text()
+					logging.debug('Alles super: {0} '.format(self.filename))
+					break
+				else:
+					print  >> sys.stderr, "Fehler bei Nummer: ", self.actSong, " Titel: ", self.filename
+					logging.error('Fehler bei Nummer: %s Titel: %s ' % (self.actSong, self.filename))
+					if self.actSong >= len(self.playlist): self.quit()
 
 		if self.actSong > len(self.playlist):
 			self._gstPlayer.doStop()

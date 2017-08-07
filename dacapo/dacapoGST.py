@@ -34,7 +34,6 @@ class GstPlayer(threading.Thread):
 		self.actualTitel = ""
 		self.config = readconfig.getConfigObject()
 		self.guiPlayer = self.config.getConfig('TEMP', Key='PLAYER')
-		self.debug = self.config.getConfig('debug', ' ', 'debugS')
 		self._gapless = self.config.getConfig('audio_engine', 'audio_engine', 'gapless')
 		self.__strTime = "00:00"
 		self.is_Playing = False
@@ -43,7 +42,7 @@ class GstPlayer(threading.Thread):
 		Gst.init(None)
 		self.context = self.mainloop.get_context()
 		self.__init_pipeline()
-		if self.debug: logging.debug('GstPlayer __init__() -> done ')
+		logging.debug('GstPlayer __init__() -> done ')
 
 	def __init_pipeline(self):
 
@@ -99,21 +98,21 @@ class GstPlayer(threading.Thread):
 	def on_about_to_finish(self, bin):
 		# The current song is about to finish, if we want to play another
 		# song after this, we have to do that now
-		if self.debug: logging.debug("--> bin in on_about_to_finish ")
+		logging.debug("--> bin in on_about_to_finish ")
 		if self._gapless: self.guiPlayer.play_next_song(True)
 
 	def doGaplessPlay(self, filename):
 		self.filename = filename
 		self._in_gapless_transition = True
-		if self.debug: logging.debug("playing GAPLESS: %s " % self.filename)
+		logging.debug("playing GAPLESS: %s " % self.filename)
 		self.player.set_property("uri", "file://" + self.filename)
 
 	def doPlay(self, filename):
 		self.player.set_state(Gst.State.NULL)
 		self._in_gapless_transition = False
-		if self.debug: logging.debug("playing in doPlay: %s " % filename)
-		if self.debug: logging.debug("abspath of file: %s " % os.path.abspath(filename))
-		if self.debug: logging.debug("realpath of file: %s " % os.path.realpath(filename))
+		logging.debug("playing in doPlay: %s " % filename)
+		logging.debug("abspath of file: %s " % os.path.abspath(filename))
+		logging.debug("realpath of file: %s " % os.path.realpath(filename))
 		self.filename = filename
 		if self._gapless:
 			self.player.set_property("uri", "file://%s" % self.filename)
@@ -127,7 +126,7 @@ class GstPlayer(threading.Thread):
 		self.getGstDuration()
 		self.is_Playing = True
 		self.actualTitel = filename
-		if self.debug: logging.debug("done. leaving doplay ")
+		logging.debug("done. leaving doplay ")
 
 	def doUnpause(self):
 		self.player.set_state(Gst.State.PLAYING)
@@ -148,45 +147,40 @@ class GstPlayer(threading.Thread):
 		try:
 			USE_TRACK_CHANGE = True
 			t = message.type
-			# if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+			# logging.debug("--> bin in on_message mit message.type %s " % t)
 			if t == Gst.MessageType.EOS:
-				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				logging.debug("--> bin in on_message mit message.type %s " % t)
 				if self.stopWhenEOS:
 					self.player.set_state(Gst.State.NULL)
 					self.guiPlayer.play_next_song()
 			elif t == Gst.MessageType.ERROR:
-				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				logging.debug("--> bin in on_message mit message.type %s " % t)
 				self.player.set_state(Gst.State.NULL)
 				err, debug = message.parse_error()
 				logging.debug('MESSAGE_ERROR: %r' % str(err).decode("utf8", 'replace'))
 			elif message.type == Gst.MessageType.TAG:
-				# if self.debug : logging.debug("--> bin in on_message mit message.type %s " % t)
 				taglist = message.parse_tag()
 				#for key in taglist.keys():
 					# logging.info('MESSAGE_TAG: %s = %s' % (key, taglist[key]))
 				#	logging.info('MESSAGE_TAG: %s ' % (key))
 			elif message.type == Gst.MessageType.BUFFERING:
-				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
-				percent = message.parse_buffering()
-				# self.__buffering(percent)
-			elif message.type == Gst.MessageType.BUFFERING:
-				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				logging.debug("--> bin in on_message mit message.type %s " % t)
 				percent = message.parse_buffering()
 				# self.__buffering(percent)
 			elif message.type == Gst.MessageType.ELEMENT:
-				if self.debug: logging.debug("--> bin in on_message mit message.type %s " % t)
+				logging.debug("--> bin in on_message mit message.type %s " % t)
 				name = ""
 				if hasattr(message.get_structure(), "get_name"):
 					name = message.get_structure().get_name()
 					self.actualTitel = name
-					if self.debug: logging.debug("--> setting current title: %s" % name)
+					logging.debug("--> setting current title: %s" % name)
 
 				# This gets sent on song change. Because it is not in the docs
 				# we can not rely on it. Additionally we check in get_position
 				# which should trigger shortly after this.
 				if USE_TRACK_CHANGE and self._in_gapless_transition and \
 								name == "playbin-stream-changed":
-					if self.debug: logging.debug("--> Titel hat sich geändert! %s" % name)
+					logging.debug("--> Titel hat sich geändert! %s" % name)
 					self.doTrackChange()
 		except Exception, err:
 			errorhandling.Error.show()
@@ -214,21 +208,21 @@ class GstPlayer(threading.Thread):
 		self.player.get_state(timeout=Gst.SECOND / 2)
 		dur_int = self.player.query_duration(Gst.Format.TIME)[1]
 		if dur_int <= 0:
-			if self.debug: logging.debug("--> Couldn't get the length of the song. Trying again.")
+			logging.debug("--> Couldn't get the length of the song. Trying again.")
 		dur_str = self.convert_ns(dur_int)
 		self.__time = dur_int
-		if self.debug: logging.debug("-->  {!s} {!s}".format(dur_int, dur_str))
+		logging.debug("-->  {!s} {!s}".format(dur_int, dur_str))
 		self.__strTime = dur_str
 
 	def getDuration(self):
 		if self.__time <= 0:
-			if self.debug: logging.debug("--> Wrong Duration. Trying to get the real one.")
+			logging.debug("--> Wrong Duration. Trying to get the real one.")
 			self.getGstDuration()
 		return self.__strTime
 
 	def getNumericDuration(self):
 		if self.__time <= 0:
-			if self.debug: logging.debug("--> Wrong Duration. Trying to get the real one.")
+			logging.debug("--> Wrong Duration. Trying to get the real one.")
 			self.getGstDuration()
 		return self.__time
 
@@ -275,7 +269,7 @@ class GstPlayer(threading.Thread):
 		seek_time_secs = self._last_position + pos
 		if self._posNewValue < 0: self._posNewValue = 0
 		if self._posNewValue > self._posRange: return
-		if self.debug: logging.debug("Dauer: %s - Aktuelle Position: %s - Neue Position %s " % (
+		logging.debug("Dauer: %s - Aktuelle Position: %s - Neue Position %s " % (
 		self._posRange, self._posValue, self._posNewValue))
 		try:
 			self.player.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, self._posNewValue * Gst.SECOND)
@@ -325,9 +319,9 @@ class GstPlayer(threading.Thread):
 		self.mainloop.quit()
 
 	def run(self):
-		if self.debug: logging.debug('GstPlayer run() -> self.mainloop.run() ->start ')
+		logging.debug('GstPlayer run() -> self.mainloop.run() ->start ')
 		self.mainloop.run()
-		if self.debug: logging.debug('GstPlayer run() -> done ')
+		logging.debug('GstPlayer run() -> done ')
 
 
 if __name__ == "__main__":
