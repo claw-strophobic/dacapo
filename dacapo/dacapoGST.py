@@ -318,7 +318,10 @@ class GstPlayer(threading.Thread):
 		return
 
 	def doEnd(self):
-		self.player.set_state(Gst.State.NULL)
+		try:
+			self.player.set_state(Gst.State.NULL)
+		except:
+			pass
 		self.ausschalter.set()
 		self.__destroy_pipeline()
 		self.mainloop.quit()
