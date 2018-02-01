@@ -195,7 +195,9 @@ class GstPlayer(threading.Thread):
 		self.getGstDuration()
 		self.actualTitel = self.filename
 		self._in_gapless_transition = False
-		self.guiPlayer.display_text()
+		display_text = getattr(self.guiPlayer, "display_text", None)
+		if callable(display_text):
+			display_text()
 
 	def convert_ns(self, t):
 		# This method was submitted by Sam Mason.
