@@ -254,8 +254,10 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			try:
 				if self._ausschalter.isSet(): break
 
-				self.update_sync_lyrics()
-				self.update_act_time()
+				try: self.update_sync_lyrics()
+				except: pass
+				try: self.update_act_time()
+				except: pass
 
 				for event in pygame.event.get():
 					# if self._debug : logging.debug("--> bin in event_loop mit event: %s " % (event))
