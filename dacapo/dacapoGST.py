@@ -213,7 +213,10 @@ class GstPlayer(threading.Thread):
 
 	def getGstDuration(self):
 		self.player.get_state(timeout=Gst.SECOND / 2)
-		dur_int = self.player.query_duration(Gst.Format.TIME)[1]
+		try:
+			dur_int = self.player.query_duration(Gst.Format.TIME)[1]
+		except:
+			dur_int = -1
 		if dur_int <= 0:
 			logging.debug("--> Couldn't get the length of the song. Trying again.")
 		dur_str = self.convert_ns(dur_int)
