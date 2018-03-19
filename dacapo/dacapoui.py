@@ -34,7 +34,6 @@ from dacapo import errorhandling
 try :
 	from gi.repository import Gtk
 	import os, sys
-	import subprocess
 	from config import readconfig
 	from dacapoHelp import SHOWPIC_CHOICES
 	import dacapo 
@@ -162,5 +161,5 @@ def main():
 				pass
 		
 if __name__ == "__main__":
-    sys.exit(main())
+	sys.exit(main())
         
