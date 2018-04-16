@@ -16,7 +16,7 @@ from quodlibet.plugins.songsmenu import SongsMenuPlugin
 from mutagen.flac import FLAC, Picture
 import mimetypes
 import imghdr, struct
-import traceback, sys, ntpath
+import traceback, sys, ntpath, os
 import gettext
 t = gettext.translation('dacapo-plugins', "/usr/share/locale/")
 t.install()
@@ -66,8 +66,8 @@ class AddImageFileChooser(FileChooser):
 		20: "Publisher/Studio logotype"
 	}
 
-	def __init__(self, parent):
-		super(AddImageFileChooser, self).__init__(parent, _("Select Image File"))
+	def __init__(self, parent, flacFilePath):
+		super(AddImageFileChooser, self).__init__(parent, _("Select Image File"), None, flacFilePath)
 		## Create Filter
 		filter = Gtk.FileFilter()
 		filter.set_name(_("Image files"))
@@ -142,8 +142,12 @@ class AddImage(SongsMenuPlugin):
 		return result
 
 	def plugin_songs(self, songs):
+		for song in songs:
+			if song.get("~filename", "").endswith(".flac"):
+				flacFilePath = os.path.dirname(os.path.abspath(song.get("~filename", "")));
+				break
 
-		choose = AddImageFileChooser(self.plugin_window)
+		choose = AddImageFileChooser(self.plugin_window, flacFilePath)
 		files = choose.run()
 		desc = choose.get_description()
 		choose.destroy()
