@@ -144,6 +144,10 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 		from dacapo.config.gui import *
 
 		winstate = CONFIG.getConfig('TEMP', 'gui', 'winState')
+		if (CONFIG is None) or (CONFIG.gui is None) or not (CONFIG.gui.has_key(winstate)):
+			CONFIG = readconfig.getConfigObject()
+		if not CONFIG.gui.has_key(winstate):
+			return None
 		g = CONFIG.gui[winstate]
 		logging.debug('Rendering Multiline Metadata: %s: %s -> %s' % (self.name, self.content, vList))
 		rList = list()
