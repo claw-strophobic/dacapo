@@ -61,7 +61,7 @@ class OpenSyncLyrics(SongsMenuPlugin):
 		if (songs is None) or (len(songs) <= 0):
 			return True
 
-		if not ConfirmAction(self.plugin_window,
+		if (len(songs) > 1) and not ConfirmAction(self.plugin_window,
 			_(self.PLUGIN_NAME),
 			_("Open {!s} files in QtSyncLyrics?").format(len(songs))
 								  ).run():
