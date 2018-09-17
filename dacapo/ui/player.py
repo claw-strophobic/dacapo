@@ -203,7 +203,7 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 				except:
 					logging.error("Error at blit-object %s " % (sys.exc_info()[0]))
 					errorhandling.Error.show()
-					self.quit()
+					return
 
 			self.timerIndex = seconds
 			obj = g.lyricField.getBlitObject()
