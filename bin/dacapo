@@ -83,5 +83,5 @@ if __name__ == "__main__":
 		dacapoui.main()
 		exit()
 	from dacapo import dacapo
-	dacapo.play()
+	dacapo.play(oConfig)
 
