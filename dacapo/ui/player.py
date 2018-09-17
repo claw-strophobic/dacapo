@@ -381,19 +381,12 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 			self.fontLyrics = None
 			self.actSong += 1
 
-			#if os.path.isfile(self.filename):
 			if mimehelp.isInMimeTypes(self.filename):
 				self._config.setConfig('TEMP', Key='FILENAME', Value=self.filename)
 				logging.info('Versuche Metadaten zu laden ')
 				self.audioFile = getAudioFile(self.filename)
 				self._config.setConfig('TEMP', Key='AUDIOFILE', Value=self.audioFile)
-				antwort = "Yes"
-				if self.audioFile == None:
-					antwort = "No"
-				logging.info('Loaded Metadata? %s' % (antwort))
 				if self.audioFile <> None:
-					# if self._debug : print 'Hole Cover: {0}'.format(self.filename)
-					# self.pic = self.audioFile.getCover()
 					logging.info('Starte GStreamer: {0} '.format(self.filename))
 					try:
 						if GAPLESS:
@@ -405,7 +398,6 @@ class playerGUI(dacapo.ui.interface_blitobject.BlitInterface):
 						self._gstPlayer.doStop()
 						self.quit()
 					logging.debug('Bereite Texte auf: {0} '.format(self.filename))
-					## self.display_text()
 					logging.debug('Alles super: {0} '.format(self.filename))
 					break
 				else:
