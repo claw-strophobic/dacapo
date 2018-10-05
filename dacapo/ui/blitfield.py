@@ -285,7 +285,7 @@ class BlitField(dacapo.ui.field.Field, dacapo.ui.interface_blitobject.BlitInterf
 			errorhandling.Error.show()
 			##event = pygame.event.Event(pygame.event.EventType(pygame.QUIT))
 			##pygame.event.post(event)
-			pygame.quit()
+			##pygame.quit()
 
 
 	def replaceData(self, data):
